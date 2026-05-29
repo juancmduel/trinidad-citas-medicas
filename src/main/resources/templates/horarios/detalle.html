@@ -45,11 +45,12 @@
             <a th:href="@{/horarios/editar/{id}(id=${horario.idHorario})}" class="btn-professional btn-outline-prof">
                 <i class="bi bi-pencil"></i> Editar
             </a>
-            <a th:href="@{/horarios/eliminar/{id}(id=${horario.idHorario})}"
-               class="btn-professional btn-danger-prof"
-               onclick="return confirm('¿Eliminar este horario?')">
-                <i class="bi bi-trash"></i> Eliminar
-            </a>
+            <form th:action="@{/horarios/eliminar/{id}(id=${horario.idHorario})}" method="post" style="display:inline;">
+                <button type="submit" class="btn-professional btn-danger-prof"
+                        onclick="return confirm('¿Eliminar este horario?')">
+                    <i class="bi bi-trash"></i> Eliminar
+                </button>
+            </form>
             <a href="/trinidad/horarios" class="btn-professional btn-outline-prof">
                 <i class="bi bi-arrow-left"></i> Volver
             </a>

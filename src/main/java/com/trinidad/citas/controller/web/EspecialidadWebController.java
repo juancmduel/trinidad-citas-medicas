@@ -50,7 +50,7 @@ public class EspecialidadWebController {
         return "redirect:/especialidades";
     }
 
-    @GetMapping("/eliminar/{id}")
+    @PostMapping("/eliminar/{id}")
     public String eliminar(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         especialidadRepository.deleteById(id);
         redirectAttributes.addFlashAttribute("ok", "Especialidad eliminada correctamente.");

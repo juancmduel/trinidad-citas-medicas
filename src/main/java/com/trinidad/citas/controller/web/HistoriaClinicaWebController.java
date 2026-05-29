@@ -57,7 +57,7 @@ public class HistoriaClinicaWebController {
         return "redirect:/historia-clinica";
     }
 
-    @GetMapping("/eliminar/{id}")
+    @PostMapping("/eliminar/{id}")
     public String eliminar(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         historiaClinicaRepository.deleteById(id);
         redirectAttributes.addFlashAttribute("ok", "Historia clínica eliminada correctamente.");

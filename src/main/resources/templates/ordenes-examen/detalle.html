@@ -48,11 +48,12 @@
             <a th:href="@{/ordenes-examen/editar/{id}(id=${orden.idOrden})}" class="btn-professional btn-outline-prof">
                 <i class="bi bi-pencil"></i> Editar
             </a>
-            <a th:href="@{/ordenes-examen/eliminar/{id}(id=${orden.idOrden})}"
-               class="btn-professional btn-danger-prof"
-               onclick="return confirm('¿Eliminar esta orden?')">
-                <i class="bi bi-trash"></i> Eliminar
-            </a>
+            <form th:action="@{/ordenes-examen/eliminar/{id}(id=${orden.idOrden})}" method="post" style="display:inline;">
+                <button type="submit" class="btn-professional btn-danger-prof"
+                        onclick="return confirm('¿Eliminar esta orden?')">
+                    <i class="bi bi-trash"></i> Eliminar
+                </button>
+            </form>
             <a href="/trinidad/ordenes-examen" class="btn-professional btn-outline-prof">
                 <i class="bi bi-arrow-left"></i> Volver
             </a>

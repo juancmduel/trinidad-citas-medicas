@@ -56,8 +56,12 @@
                                 <td>
                                     <a th:href="@{/medicos/{id}(id=${m.idMedico})}" class="btn btn-sm btn-outline-info"><i class="bi bi-eye"></i></a>
                                     <a th:href="@{/medicos/editar/{id}(id=${m.idMedico})}" class="btn btn-sm btn-outline-warning"><i class="bi bi-pencil"></i></a>
-                                    <a th:href="@{/medicos/eliminar/{id}(id=${m.idMedico})}" class="btn btn-sm btn-outline-danger"
-                                       onclick="return confirm('¿Eliminar este médico?')"><i class="bi bi-trash"></i></a>
+                                    <form th:action="@{/medicos/eliminar/{id}(id=${m.idMedico})}" method="post" style="display:inline;">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger"
+                                                onclick="return confirm('¿Eliminar este médico?')">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
                                 </td>
                             </tr>
                             <tr th:if="${#lists.isEmpty(medicos)}">

@@ -57,7 +57,7 @@ public class HorarioWebController {
         return "redirect:/horarios";
     }
 
-    @GetMapping("/eliminar/{id}")
+    @PostMapping("/eliminar/{id}")
     public String eliminar(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         horarioMedicoRepository.deleteById(id);
         redirectAttributes.addFlashAttribute("ok", "Horario eliminado correctamente.");

@@ -20,11 +20,12 @@
                     <a th:href="@{/usuarios/editar/{id}(id=${usuario.idUsuario})}" class="btn-professional btn-outline-prof btn-sm">
                         <i class="bi bi-pencil"></i> Editar
                     </a>
-                    <a th:href="@{/usuarios/eliminar/{id}(id=${usuario.idUsuario})}"
-                       class="btn-professional btn-danger-prof btn-sm"
-                       onclick="return confirm('¿Eliminar este usuario?')">
-                        <i class="bi bi-trash"></i> Eliminar
-                    </a>
+                    <form th:action="@{/usuarios/eliminar/{id}(id=${usuario.idUsuario})}" method="post" style="display:inline;">
+                        <button type="submit" class="btn-professional btn-danger-prof btn-sm"
+                                onclick="return confirm('¿Eliminar este usuario?')">
+                            <i class="bi bi-trash"></i> Eliminar
+                        </button>
+                    </form>
                 </div>
             </div>
             <div class="p-4">

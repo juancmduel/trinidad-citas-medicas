@@ -50,7 +50,7 @@ public class RolesWebController {
         return "redirect:/roles";
     }
 
-    @GetMapping("/eliminar/{id}")
+    @PostMapping("/eliminar/{id}")
     public String eliminar(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         rolRepository.deleteById(id);
         redirectAttributes.addFlashAttribute("ok", "Rol eliminado correctamente.");

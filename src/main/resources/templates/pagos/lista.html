@@ -55,8 +55,12 @@
                                     <td>
                                         <a th:href="@{/pagos/{id}(id=${p.idPago})}" class="btn btn-sm btn-outline-info"><i class="fa-solid fa-eye"></i></a>
                                         <a th:href="@{/pagos/editar/{id}(id=${p.idPago})}" class="btn btn-sm btn-outline-warning"><i class="fa-solid fa-pencil"></i></a>
-                                        <a th:href="@{/pagos/eliminar/{id}(id=${p.idPago})}" class="btn btn-sm btn-outline-danger"
-                                           onclick="return confirm('¿Eliminar este pago?')"><i class="fa-solid fa-trash"></i></a>
+                                        <form th:action="@{/pagos/eliminar/{id}(id=${p.idPago})}" method="post" style="display:inline;">
+                                            <button type="submit" class="btn btn-sm btn-outline-danger"
+                                                    onclick="return confirm('¿Eliminar este pago?')">
+                                                <i class="fa-solid fa-trash"></i>
+                                            </button>
+                                        </form>
                                     </td>
                                 </tr>
                             </tbody>

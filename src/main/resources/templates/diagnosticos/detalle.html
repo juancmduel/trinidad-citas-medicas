@@ -20,11 +20,12 @@
                     <a th:href="@{/diagnosticos/editar/{id}(id=${diagnostico.codigo})}" class="btn-professional btn-outline-prof btn-sm">
                         <i class="bi bi-pencil"></i> Editar
                     </a>
-                    <a th:href="@{/diagnosticos/eliminar/{id}(id=${diagnostico.codigo})}"
-                       class="btn-professional btn-danger-prof btn-sm"
-                       onclick="return confirm('¿Eliminar este diagnóstico?')">
-                        <i class="bi bi-trash"></i> Eliminar
-                    </a>
+                    <form th:action="@{/diagnosticos/eliminar/{id}(id=${diagnostico.codigo})}" method="post" style="display:inline;">
+                        <button type="submit" class="btn-professional btn-danger-prof btn-sm"
+                                onclick="return confirm('¿Eliminar este diagnóstico?')">
+                            <i class="bi bi-trash"></i> Eliminar
+                        </button>
+                    </form>
                 </div>
             </div>
             <div class="p-4">

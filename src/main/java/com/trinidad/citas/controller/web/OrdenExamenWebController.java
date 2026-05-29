@@ -57,7 +57,7 @@ public class OrdenExamenWebController {
         return "redirect:/ordenes-examen";
     }
 
-    @GetMapping("/eliminar/{id}")
+    @PostMapping("/eliminar/{id}")
     public String eliminar(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         ordenExamenRepository.deleteById(id);
         redirectAttributes.addFlashAttribute("ok", "Orden eliminada correctamente.");

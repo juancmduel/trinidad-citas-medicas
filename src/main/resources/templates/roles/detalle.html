@@ -20,11 +20,12 @@
                     <a th:href="@{/roles/editar/{id}(id=${rol.idRol})}" class="btn-professional btn-outline-prof btn-sm">
                         <i class="bi bi-pencil"></i> Editar
                     </a>
-                    <a th:href="@{/roles/eliminar/{id}(id=${rol.idRol})}"
-                       class="btn-professional btn-danger-prof btn-sm"
-                       onclick="return confirm('¿Eliminar este rol?')">
-                        <i class="bi bi-trash"></i> Eliminar
-                    </a>
+                    <form th:action="@{/roles/eliminar/{id}(id=${rol.idRol})}" method="post" style="display:inline;">
+                        <button type="submit" class="btn-professional btn-danger-prof btn-sm"
+                                onclick="return confirm('¿Eliminar este rol?')">
+                            <i class="bi bi-trash"></i> Eliminar
+                        </button>
+                    </form>
                 </div>
             </div>
             <div class="p-4">

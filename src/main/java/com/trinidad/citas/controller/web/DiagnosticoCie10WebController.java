@@ -49,7 +49,7 @@ public class DiagnosticoCie10WebController {
         return "redirect:/diagnosticos";
     }
 
-    @GetMapping("/eliminar/{id}")
+    @PostMapping("/eliminar/{id}")
     public String eliminar(@PathVariable String id, RedirectAttributes redirectAttributes) {
         diagnosticoRepository.deleteById(id);
         redirectAttributes.addFlashAttribute("ok", "Diagnóstico eliminado correctamente.");

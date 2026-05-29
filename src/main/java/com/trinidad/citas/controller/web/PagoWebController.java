@@ -57,7 +57,7 @@ public class PagoWebController {
         return "redirect:/pagos";
     }
 
-    @GetMapping("/eliminar/{id}")
+    @PostMapping("/eliminar/{id}")
     public String eliminar(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         pagoRepository.deleteById(id);
         redirectAttributes.addFlashAttribute("ok", "Pago eliminado correctamente.");

@@ -55,8 +55,12 @@
                                     <td>
                                         <a th:href="@{/ordenes-examen/{id}(id=${o.idOrden})}" class="btn btn-sm btn-outline-info"><i class="fa-solid fa-eye"></i></a>
                                         <a th:href="@{/ordenes-examen/editar/{id}(id=${o.idOrden})}" class="btn btn-sm btn-outline-warning"><i class="fa-solid fa-pencil"></i></a>
-                                        <a th:href="@{/ordenes-examen/eliminar/{id}(id=${o.idOrden})}" class="btn btn-sm btn-outline-danger"
-                                           onclick="return confirm('¿Eliminar esta orden?')"><i class="fa-solid fa-trash"></i></a>
+                                        <form th:action="@{/ordenes-examen/eliminar/{id}(id=${o.idOrden})}" method="post" style="display:inline;">
+                                            <button type="submit" class="btn btn-sm btn-outline-danger"
+                                                    onclick="return confirm('¿Eliminar esta orden?')">
+                                                <i class="fa-solid fa-trash"></i>
+                                            </button>
+                                        </form>
                                     </td>
                                 </tr>
                             </tbody>

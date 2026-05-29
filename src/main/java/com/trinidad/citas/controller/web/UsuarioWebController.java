@@ -56,7 +56,7 @@ public class UsuarioWebController {
         return "redirect:/usuarios";
     }
 
-    @GetMapping("/eliminar/{id}")
+    @PostMapping("/eliminar/{id}")
     public String eliminar(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         usuarioRepository.deleteById(id);
         redirectAttributes.addFlashAttribute("ok", "Usuario eliminado correctamente.");

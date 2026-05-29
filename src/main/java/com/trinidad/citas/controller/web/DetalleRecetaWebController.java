@@ -59,7 +59,7 @@ public class DetalleRecetaWebController {
         return "redirect:/trinidad/recetas/" + recetaId;
     }
 
-    @GetMapping("/eliminar/{id}")
+    @PostMapping("/eliminar/{id}")
     public String eliminar(@PathVariable Long recetaId, @PathVariable Long id, RedirectAttributes redirectAttributes) {
         detalleRecetaRepository.deleteById(id);
         redirectAttributes.addFlashAttribute("ok", "Medicamento eliminado correctamente.");
