@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: head('Detalle Auditoría')}"></head>
+<body class="app-body">
+<nav th:replace="~{fragments/header :: navbar}"></nav>
+<div class="app-content">
+    <div th:replace="~{fragments/header :: topbar}"></div>
+    <main class="page-main">
+
+        <div class="mb-4">
+            <h1 style="font-size:28px;font-weight:700;margin-bottom:6px;">
+                <i class="bi bi-shield-check me-2" style="color:#06b6d4;"></i>Detalle de Log
+            </h1>
+        </div>
+
+        <div th:if="${log != null}" class="card-professional mb-4">
+            <div class="card-header-professional">
+                <h5><i class="bi bi-file-text"></i> Registro de Auditoría</h5>
+            </div>
+            <div class="p-4">
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <label style="color:rgba(255,255,255,0.5);font-size:12px;">Usuario</label>
+                        <p th:text="${log.username ?: '-'}"></p>
+                    </div>
+                    <div class="col-md-3">
+                        <label style="color:rgba(255,255,255,0.5);font-size:12px;">Acción</label>
+                        <p style="font-weight:700;color:#06b6d4;" th:text="${log.accion}"></p>
+                    </div>
+                    <div class="col-md-3">
+                        <label style="color:rgba(255,255,255,0.5);font-size:12px;">Entidad</label>
+                        <p th:text="${log.entidad ?: '-'}"></p>
+                    </div>
+                    <div class="col-md-3">
+                        <label style="color:rgba(255,255,255,0.5);font-size:12px;">ID Entidad</label>
+                        <p th:text="${log.idEntidad ?: '-'}"></p>
+                    </div>
+                    <div class="col-md-3">
+                        <label style="color:rgba(255,255,255,0.5);font-size:12px;">Fecha/Hora</label>
+                        <p th:text="${#temporals.format(log.fechaHora, 'dd/MM/yyyy HH:mm:ss')}"></p>
+                    </div>
+                    <div class="col-md-3">
+                        <label style="color:rgba(255,255,255,0.5);font-size:12px;">IP Origen</label>
+                        <p th:text="${log.ipOrigen ?: '-'}"></p>
+                    </div>
+                    <div class="col-12" th:if="${log.detalle}">
+                        <label style="color:rgba(255,255,255,0.5);font-size:12px;">Detalle</label>
+                        <p style="background:rgba(0,0,0,0.3);padding:10px;border-radius:4px;" th:text="${log.detalle}"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <a href="/trinidad/auditoria" class="btn-professional btn-outline-prof">
+            <i class="bi bi-arrow-left"></i> Volver
+        </a>
+
+    </main>
+    <footer th:replace="~{fragments/header :: footer}"></footer>
+</div>
+</body>
+</html>

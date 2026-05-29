@@ -1,0 +1,22 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(sc query *)",
+      "Bash(curl *)",
+      "Bash(mvn *)",
+      "Bash(java -jar *)",
+      "Bash(java *)",
+      "Bash(taskkill *)",
+      "Bash(pkill *)",
+      "Bash(kill *)",
+      "Bash(mkdir *)",
+      "Bash(cp *)",
+      "Bash(mv *)",
+      "Bash(rm *)",
+      "Bash(node *)",
+      "Bash(npm *)",
+      "Bash(powershell *)",
+      "Bash(netstat *)"
+    ]
+  }
+}

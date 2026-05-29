@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/header :: head('Horarios de Médicos')}"></head>
+<body class="app-body">
+
+<nav th:replace="~{fragments/header :: navbar}"></nav>
+
+<div class="app-content">
+    <div th:replace="~{fragments/header :: topbar}"></div>
+
+    <main class="page-main">
+        <div class="container-xl">
+            <div class="page-header">
+                <div class="row align-items-center">
+                    <div class="col">
+                        <h2 class="page-title"><i class="fa-solid fa-calendar"></i> Horarios de Médicos</h2>
+                    </div>
+                    <div class="col-auto">
+                        <a href="/trinidad/horarios/nuevo" class="btn btn-primary">
+                            <i class="fa-solid fa-plus"></i> Nuevo Horario
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="page-wrapper">
+            <div class="container-xl">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="table-responsive">
+                                <table class="table card-table table-vcenter">
+                                    <thead>
+                                        <tr>
+                                            <th>Médico</th>
+                                            <th>Día</th>
+                                            <th>Hora Inicio</th>
+                                            <th>Hora Fin</th>
+                                            <th>Estado</th>
+                                            <th>Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr th:if="${horarios.isEmpty()}">
+                                            <td colspan="6" class="text-center">No hay horarios configurados</td>
+                                        </tr>
+                                        <tr th:each="h : ${horarios}">
+                                            <td th:text="${h.medico != null ? h.medico.nombreCompleto : '-'}"></td>
+                                            <td th:text="${h.diaSemana == 1 ? 'Lunes' :
+                                                           h.diaSemana == 2 ? 'Martes' :
+                                                           h.diaSemana == 3 ? 'Miércoles' :
+                                                           h.diaSemana == 4 ? 'Jueves' :
+                                                           h.diaSemana == 5 ? 'Viernes' :
+                                                           h.diaSemana == 6 ? 'Sábado' : 'Domingo'}"></td>
+                                            <td th:text="${h.horaInicio}"></td>
+                                            <td th:text="${h.horaFin}"></td>
+                                            <td>
+                                                <span th:if="${h.activo == 1}" class="badge bg-success">Activo</span>
+                                                <span th:if="${h.activo != 1}" class="badge bg-secondary">Inactivo</span>
+                                            </td>
+                                            <td>
+                                                <a th:href="@{/horarios/{id}(id=${h.idHorario})}" class="btn btn-sm btn-outline-info">
+                                                    <i class="fa-solid fa-eye"></i>
+                                                </a>
+                                                <a th:href="@{/horarios/editar/{id}(id=${h.idHorario})}" class="btn btn-sm btn-outline-warning">
+                                                    <i class="fa-solid fa-pencil"></i>
+                                                </a>
+                                                <a th:href="@{/horarios/eliminar/{id}(id=${h.idHorario})}"
+                                                   class="btn btn-sm btn-outline-danger"
+                                                   onclick="return confirm('¿Eliminar este horario?')">
+                                                    <i class="fa-solid fa-trash"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+</body>
+</html>

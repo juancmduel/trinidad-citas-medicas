@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: head('Rol')}"></head>
+<body class="app-body">
+<nav th:replace="~{fragments/header :: navbar}"></nav>
+<div class="app-content">
+    <div th:replace="~{fragments/header :: topbar}"></div>
+    <main class="page-main">
+
+        <div class="mb-4">
+            <h1 style="font-size:28px;font-weight:700;margin-bottom:6px;">
+                <i class="bi bi-shield-lock me-2" style="color:#06b6d4;"></i>
+                <span th:text="${rol.idRol != null} ? 'Editar Rol' : 'Nuevo Rol'">Rol</span>
+            </h1>
+        </div>
+
+        <div class="card-professional">
+            <div class="card-header-professional">
+                <h5><i class="bi bi-pencil-square"></i> Formulario de Rol</h5>
+            </div>
+            <div class="p-4">
+                <form th:action="@{/roles/guardar}" method="post">
+                    <input type="hidden" th:name="idRol" th:value="${rol.idRol}">
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Nombre del Rol <span style="color:#ef4444;">*</span></label>
+                            <input type="text" name="nombre" class="form-control"
+                                   th:value="${rol.nombre}"
+                                   placeholder="Ej: ADMIN, MEDICO, RECEPCIONISTA" maxlength="30" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Estado</label>
+                            <select name="activo" class="form-select">
+                                <option value="1" th:selected="${rol.activo == 1}">Activo</option>
+                                <option value="0" th:selected="${rol.activo == 0}">Inactivo</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mb-4">
+                        <div class="col-12">
+                            <label class="form-label">Descripción</label>
+                            <textarea name="descripcion" class="form-control" rows="3"
+                                      th:text="${rol.descripcion}"
+                                      placeholder="Descripción del rol y sus permisos..." maxlength="200"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn-professional btn-primary-prof">
+                            <i class="bi bi-save"></i> Guardar
+                        </button>
+                        <a href="/trinidad/roles" class="btn-professional btn-outline-prof">
+                            <i class="bi bi-x-lg"></i> Cancelar
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+    </main>
+    <footer th:replace="~{fragments/header :: footer}"></footer>
+</div>
+</body>
+</html>

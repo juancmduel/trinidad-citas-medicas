@@ -1,0 +1,80 @@
+﻿<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/header :: head('Médicos')}"></head>
+<body class="app-body">
+
+<nav th:replace="~{fragments/header :: navbar}"></nav>
+
+<div class="app-content">
+    <div th:replace="~{fragments/header :: topbar}"></div>
+
+    <main class="page-main">
+        <!-- Page Header -->
+        <div class="mb-4">
+            <h1 style="font-size:28px;font-weight:700;margin-bottom:6px;">
+                <i class="bi bi-person-badge me-2" style="color:#06b6d4;"></i>Médicos
+            </h1>
+            <p style="color:rgba(255,255,255,0.5);font-size:13px;">Personal médico registrado en el sistema</p>
+        </div>
+
+        <!-- Médicos Table Card -->
+        <div class="card-professional">
+            <div class="card-header-professional">
+                <h5><i class="bi bi-list-check"></i>Médicos Disponibles</h5>
+            </div>
+            <div class="p-4">
+                <div class="table-responsive">
+                    <table class="table-professional">
+                        <thead>
+                            <tr>
+                                <th>CMP</th>
+                                <th>Nombre Completo</th>
+                                <th>Especialidad</th>
+                                <th>Consultorio</th>
+                                <th>Teléfono</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="m : ${medicos}">
+                                <td>
+                                    <span class="badge-status badge-primary" th:text="${m.cmp}"></span>
+                                </td>
+                                <td>
+                                    <strong th:text="${m.apellidoPaterno + ' ' + m.nombres}"></strong>
+                                </td>
+                                <td>
+                                    <span class="badge-status badge-primary" th:text="${m.especialidadNombre ?: '-'}"></span>
+                                </td>
+                                <td th:text="${m.consultorio ?: '-'}"></td>
+                                <td th:text="${m.telefono ?: '-'}"></td>
+                                <td>
+                                    <span th:if="${m.activo == 1}" class="badge-status badge-success">Activo</span>
+                                    <span th:unless="${m.activo == 1}" class="badge-status badge-danger">Inactivo</span>
+                                </td>
+                                <td>
+                                    <a th:href="@{/medicos/{id}(id=${m.idMedico})}" class="btn btn-sm btn-outline-info"><i class="bi bi-eye"></i></a>
+                                    <a th:href="@{/medicos/editar/{id}(id=${m.idMedico})}" class="btn btn-sm btn-outline-warning"><i class="bi bi-pencil"></i></a>
+                                    <a th:href="@{/medicos/eliminar/{id}(id=${m.idMedico})}" class="btn btn-sm btn-outline-danger"
+                                       onclick="return confirm('¿Eliminar este médico?')"><i class="bi bi-trash"></i></a>
+                                </td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(medicos)}">
+                                <td colspan="7" style="text-align:center; padding:3rem 1.25rem; color:rgba(255,255,255,0.5);">
+                                    <i class="bi bi-person-badge" style="font-size:2.5rem;"></i>
+                                    <p class="mt-2">No hay médicos registrados</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer th:replace="~{fragments/header :: footer}"></footer>
+</div>
+
+</body>
+</html>

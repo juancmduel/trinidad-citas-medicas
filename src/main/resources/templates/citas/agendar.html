@@ -1,0 +1,458 @@
+﻿<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/header :: head(${titulo})}"></head>
+<body class="app-body">
+
+<nav th:replace="~{fragments/header :: navbar}"></nav>
+
+<div class="app-content">
+    <div th:replace="~{fragments/header :: topbar}"></div>
+
+    <main class="page-main">
+        <style>
+            /* ===== ESTILOS FORM ===== */
+            .form-section { margin-bottom: 2rem; }
+            .form-section-title {
+                font-size: 0.75rem;
+                font-weight: 700;
+                text-transform: uppercase;
+                letter-spacing: 1.5px;
+                color: #06b6d4;
+                margin-bottom: 1.25rem;
+                padding-bottom: 0.75rem;
+                border-bottom: 2px solid rgba(6,182,212,0.3);
+                display: flex;
+                align-items: center;
+                gap: 0.75rem;
+            }
+            .form-field { margin-bottom: 1.5rem; }
+            .form-field label {
+                display: block;
+                font-size: 0.8rem;
+                font-weight: 700;
+                color: rgba(255,255,255,0.75);
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                margin-bottom: 0.65rem;
+            }
+            .form-field .required { color: #ef4444; }
+            
+            .form-select, .form-control {
+                background: linear-gradient(135deg, rgba(6,182,212,0.06), rgba(6,182,212,0.02)) !important;
+                border: 1.5px solid rgba(6,182,212,0.35) !important;
+                color: #fff !important;
+                border-radius: 10px !important;
+                padding: 0.75rem 2.5rem 0.75rem 2.8rem !important;
+                font-size: 0.95rem !important;
+                font-weight: 500;
+                transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+                cursor: pointer;
+                letter-spacing: 0.3px;
+                appearance: none;
+                -webkit-appearance: none;
+                -moz-appearance: none;
+            }
+            .form-select:hover, .form-control:hover {
+                background: linear-gradient(135deg, rgba(6,182,212,0.12), rgba(6,182,212,0.08)) !important;
+                border-color: #06b6d4 !important;
+                box-shadow: inset 0 0 10px rgba(6,182,212,0.08) !important;
+            }
+            .form-select:focus, .form-control:focus {
+                background: linear-gradient(135deg, rgba(6,182,212,0.15), rgba(6,182,212,0.1)) !important;
+                border-color: #06b6d4 !important;
+                box-shadow: 0 0 0 4px rgba(6,182,212,0.2), inset 0 0 12px rgba(6,182,212,0.1) !important;
+                outline: none !important;
+            }
+            .form-select option {
+                background: #0d1f2d;
+                color: #fff;
+            }
+            
+            .field-with-icon {
+                position: relative;
+            }
+            .field-with-icon .form-icon {
+                position: absolute;
+                left: 14px;
+                top: 50%;
+                transform: translateY(-50%);
+                color: #06b6d4;
+                font-size: 1.1rem;
+                pointer-events: none;
+                opacity: 0.8;
+            }
+            
+            .canal-container {
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 1rem;
+                margin-top: 1rem;
+            }
+            .canal-card {
+                border: 2px solid rgba(255,255,255,0.12);
+                border-radius: 12px;
+                padding: 1.25rem 0.75rem;
+                cursor: pointer;
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                text-align: center;
+                background: linear-gradient(135deg, rgba(6,182,212,0.02), rgba(6,182,212,0.01));
+                min-height: 120px;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+            }
+            .canal-card:hover {
+                border-color: #06b6d4;
+                background: linear-gradient(135deg, rgba(6,182,212,0.08), rgba(6,182,212,0.04));
+                box-shadow: 0 4px 16px rgba(6,182,212,0.15);
+                transform: translateY(-2px);
+            }
+            .canal-card input[type="radio"] { display: none; }
+            .canal-card.selected {
+                border-color: #06b6d4;
+                background: linear-gradient(135deg, rgba(6,182,212,0.2), rgba(6,182,212,0.12));
+                box-shadow: 0 0 20px rgba(6,182,212,0.25), inset 0 0 12px rgba(6,182,212,0.1);
+            }
+            .canal-card i {
+                font-size: 2rem;
+                display: block;
+                margin-bottom: 0.6rem;
+                color: rgba(255,255,255,0.5);
+                transition: all 0.3s ease;
+            }
+            .canal-card:hover i {
+                color: #06b6d4;
+                transform: scale(1.15);
+            }
+            .canal-card.selected i {
+                color: #06b6d4;
+                text-shadow: 0 0 10px rgba(6,182,212,0.4);
+                transform: scale(1.2);
+            }
+            .canal-card span {
+                font-size: 0.8rem;
+                font-weight: 700;
+                color: rgba(255,255,255,0.6);
+                text-transform: uppercase;
+                letter-spacing: 0.8px;
+                transition: color 0.3s ease;
+            }
+            .canal-card:hover span { color: #06b6d4; }
+            .canal-card.selected span {
+                color: #06b6d4;
+                font-weight: 800;
+            }
+            
+            .form-textarea {
+                background: linear-gradient(135deg, rgba(6,182,212,0.06), rgba(6,182,212,0.02)) !important;
+                border: 1.5px solid rgba(6,182,212,0.35) !important;
+                color: #fff !important;
+                border-radius: 10px !important;
+                padding: 0.85rem 1.1rem !important;
+                font-size: 0.95rem !important;
+                resize: none;
+                transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+                width: 100%;
+                font-family: inherit;
+            }
+            .form-textarea:focus {
+                background: linear-gradient(135deg, rgba(6,182,212,0.15), rgba(6,182,212,0.1)) !important;
+                border-color: #06b6d4 !important;
+                box-shadow: 0 0 0 4px rgba(6,182,212,0.2), inset 0 0 12px rgba(6,182,212,0.1) !important;
+                outline: none;
+            }
+            
+            .btn-submit {
+                background: linear-gradient(135deg, #06b6d4, #0891b2);
+                border: none;
+                color: #061220;
+                font-weight: 800;
+                padding: 0.85rem 2.25rem;
+                border-radius: 10px;
+                font-size: 0.95rem;
+                letter-spacing: 0.6px;
+                text-transform: uppercase;
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                cursor: pointer;
+                box-shadow: 0 4px 15px rgba(6,182,212,0.2);
+            }
+            .btn-submit:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 8px 25px rgba(6,182,212,0.35);
+                background: linear-gradient(135deg, #22d3ee, #06b6d4);
+            }
+            
+            .btn-cancel {
+                background: transparent;
+                border: 1.5px solid rgba(255,255,255,0.2);
+                color: rgba(255,255,255,0.7);
+                font-weight: 700;
+                padding: 0.85rem 1.75rem;
+                border-radius: 10px;
+                font-size: 0.95rem;
+                letter-spacing: 0.4px;
+                text-transform: uppercase;
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                text-decoration: none;
+                display: inline-block;
+                cursor: pointer;
+            }
+            .btn-cancel:hover {
+                border-color: rgba(255,255,255,0.4);
+                color: #fff;
+                background: rgba(255,255,255,0.08);
+            }
+            
+            .step-badge {
+                width: 28px;
+                height: 28px;
+                background: linear-gradient(135deg, rgba(6,182,212,0.25), rgba(6,182,212,0.15));
+                border: 1.5px solid #06b6d4;
+                border-radius: 50%;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 0.7rem;
+                font-weight: 800;
+                color: #06b6d4;
+                flex-shrink: 0;
+            }
+        </style>
+
+        <!-- Page Header -->
+        <div class="d-flex align-items-center justify-content-between mb-4">
+            <div>
+                <h1 style="font-size:26px;font-weight:700;margin-bottom:4px;">
+                    <i class="bi bi-calendar-plus me-2" style="color:#06b6d4;"></i>Agendar Nueva Cita
+                </h1>
+                <p style="color:rgba(255,255,255,0.4);font-size:13px;margin:0;">Completa el formulario para reservar una cita médica</p>
+            </div>
+            <a th:href="@{/citas}" class="btn-cancel">
+                <i class="bi bi-arrow-left me-1"></i>Volver
+            </a>
+        </div>
+
+        <!-- Error Alert -->
+        <div th:if="${error}" style="display:flex; gap:1rem; padding:1rem 1.25rem; border-radius:10px; border-left:4px solid #ef4444; background:rgba(239,68,68,0.1); margin-bottom:1.5rem;">
+            <i class="bi bi-exclamation-triangle-fill" style="color:#ef4444;"></i>
+            <span th:text="${error}" style="color:#fca5a5;"></span>
+        </div>
+
+        <form th:action="@{/citas/agendar}" th:object="${cita}" method="post">
+            <div class="row g-4">
+
+                <!-- COLUMNA IZQUIERDA: DATOS PRINCIPALES -->
+                <div class="col-lg-8">
+                    <div class="card-professional h-100">
+                        <div class="p-4">
+
+                            <!-- SECCIÓN 1: Paciente -->
+                            <div class="form-section">
+                                <div class="form-section-title">
+                                    <span class="step-badge">1</span>Selección del Paciente
+                                </div>
+                                <div class="form-field">
+                                    <label>Paciente <span class="required">*</span></label>
+                                    <div class="field-with-icon">
+                                        <i class="bi bi-person-fill form-icon"></i>
+                                        <select th:field="*{idPaciente}" class="form-select" required>
+                                            <option value="">— Seleccione un paciente —</option>
+                                            <option th:each="p : ${pacientes}"
+                                                    th:value="${p.idPaciente}"
+                                                    th:text="${p.dni + '  ·  ' + p.apellidoPaterno + ' ' + p.apellidoMaterno + ', ' + p.nombres}"></option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- SECCIÓN 2: Especialidad y Médico -->
+                            <div class="form-section">
+                                <div class="form-section-title">
+                                    <span class="step-badge">2</span>Especialidad y Médico
+                                </div>
+                                <div class="row g-3">
+                                    <div class="col-md-6 form-field">
+                                        <label>Especialidad <span class="required">*</span></label>
+                                        <div class="field-with-icon">
+                                            <i class="bi bi-heart-pulse form-icon"></i>
+                                            <select th:field="*{idEspecialidad}" class="form-select" required>
+                                                <option value="">— Seleccione especialidad —</option>
+                                                <option th:each="e : ${especialidades}"
+                                                        th:value="${e.idEspecialidad}"
+                                                        th:text="${e.nombre + '  ·  S/. ' + e.precioConsulta}"></option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 form-field">
+                                        <label>Médico <span class="required">*</span></label>
+                                        <div class="field-with-icon">
+                                            <i class="bi bi-person-badge form-icon"></i>
+                                            <select th:field="*{idMedico}" class="form-select" required>
+                                                <option value="">— Seleccione médico —</option>
+                                                <option th:each="m : ${medicos}"
+                                                        th:value="${m.idMedico}"
+                                                        th:text="${'Dr. ' + m.apellidoPaterno + ', ' + m.nombres + '  [' + m.especialidadNombre + ']'}"></option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- SECCIÓN 3: Fecha y Hora -->
+                            <div class="form-section">
+                                <div class="form-section-title">
+                                    <span class="step-badge">3</span>Fecha y Horario
+                                </div>
+                                <div class="row g-3">
+                                    <div class="col-md-6 form-field">
+                                        <label>Fecha de Cita <span class="required">*</span></label>
+                                        <div class="field-with-icon">
+                                            <i class="bi bi-calendar3 form-icon"></i>
+                                            <input type="date" th:field="*{fechaCita}" class="form-control" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 form-field">
+                                        <label>Hora de Inicio <span class="required">*</span></label>
+                                        <div class="field-with-icon">
+                                            <i class="bi bi-clock form-icon"></i>
+                                            <input type="time" th:field="*{horaInicio}" class="form-control" required>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- SECCIÓN 4: Motivo -->
+                            <div class="form-section mb-0">
+                                <div class="form-section-title">
+                                    <span class="step-badge">4</span>Motivo de Consulta
+                                </div>
+                                <div class="form-field mb-0">
+                                    <label>Descripción del motivo</label>
+                                    <textarea th:field="*{motivoConsulta}"
+                                              class="form-textarea"
+                                              rows="3"
+                                              placeholder="Describe brevemente el motivo de la consulta médica..."></textarea>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+                <!-- COLUMNA DERECHA: CANAL + RESUMEN -->
+                <div class="col-lg-4">
+
+                    <!-- Canal de Reserva -->
+                    <div class="card-professional mb-4">
+                        <div class="p-4">
+                            <div class="form-section-title mb-3">
+                                <span class="step-badge">5</span>Canal de Reserva
+                            </div>
+                            <div class="canal-container">
+                                <label class="canal-card" id="canal-web" onclick="selectCanal('WEB', this)">
+                                    <input type="radio" name="canalRadio" value="WEB">
+                                    <i class="fas fa-globe"></i>
+                                    <span>Web</span>
+                                </label>
+                                <label class="canal-card" id="canal-tel" onclick="selectCanal('TELEFONO', this)">
+                                    <input type="radio" name="canalRadio" value="TELEFONO">
+                                    <i class="fas fa-phone"></i>
+                                    <span>Teléfono</span>
+                                </label>
+                                <label class="canal-card" id="canal-pre" onclick="selectCanal('PRESENCIAL', this)">
+                                    <input type="radio" name="canalRadio" value="PRESENCIAL">
+                                    <i class="fas fa-hospital"></i>
+                                    <span>Presencial</span>
+                                </label>
+                            </div>
+                            <input type="hidden" th:field="*{canalReserva}" id="canalReservaHidden">
+                        </div>
+                    </div>
+
+                    <!-- Resumen Visual -->
+                    <div class="card-professional mb-4" style="background:linear-gradient(135deg, rgba(6,182,212,0.1), rgba(6,182,212,0.05)); border-color:rgba(6,182,212,0.25);">
+                        <div class="p-4">
+                            <div class="form-section-title mb-3" style="color:rgba(6,182,212,0.8);">
+                                <i class="bi bi-clipboard-check me-1"></i>Resumen de la Cita
+                            </div>
+                            <div class="d-flex flex-column gap-2" style="font-size:0.83rem;">
+                                <div class="d-flex align-items-start gap-2" style="color:rgba(255,255,255,0.5);">
+                                    <i class="bi bi-person" style="color:#06b6d4;margin-top:2px;"></i>
+                                    <span id="res-paciente">Paciente no seleccionado</span>
+                                </div>
+                                <div class="d-flex align-items-start gap-2" style="color:rgba(255,255,255,0.5);">
+                                    <i class="bi bi-heart-pulse" style="color:#06b6d4;margin-top:2px;"></i>
+                                    <span id="res-especialidad">Especialidad no seleccionada</span>
+                                </div>
+                                <div class="d-flex align-items-start gap-2" style="color:rgba(255,255,255,0.5);">
+                                    <i class="bi bi-person-badge" style="color:#06b6d4;margin-top:2px;"></i>
+                                    <span id="res-medico">Médico no seleccionado</span>
+                                </div>
+                                <div class="d-flex align-items-start gap-2" style="color:rgba(255,255,255,0.5);">
+                                    <i class="bi bi-calendar3" style="color:#06b6d4;margin-top:2px;"></i>
+                                    <span id="res-fecha">Fecha no seleccionada</span>
+                                </div>
+                                <div class="d-flex align-items-start gap-2" style="color:rgba(255,255,255,0.5);">
+                                    <i class="bi bi-clock" style="color:#06b6d4;margin-top:2px;"></i>
+                                    <span id="res-hora">Hora no seleccionada</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Botones de acción -->
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn-submit">
+                            <i class="bi bi-calendar-check me-2"></i>Confirmar Cita
+                        </button>
+                        <a th:href="@{/citas}" class="btn-cancel text-center">
+                            Cancelar
+                        </a>
+                    </div>
+
+                </div>
+            </div>
+        </form>
+
+        <script>
+            function selectCanal(value, el) {
+                document.querySelectorAll('.canal-card').forEach(c => c.classList.remove('selected'));
+                el.classList.add('selected');
+                document.getElementById('canalReservaHidden').value = value;
+            }
+            
+            document.addEventListener('DOMContentLoaded', function() {
+                var webCard = document.getElementById('canal-web');
+                if (webCard) selectCanal('WEB', webCard);
+
+                function textOf(select) {
+                    return select.options[select.selectedIndex]?.text || null;
+                }
+                function update() {
+                    var p = document.querySelector('[name="idPaciente"]');
+                    var e = document.querySelector('[name="idEspecialidad"]');
+                    var m = document.querySelector('[name="idMedico"]');
+                    var f = document.querySelector('[name="fechaCita"]');
+                    var h = document.querySelector('[name="horaInicio"]');
+                    if (p) document.getElementById('res-paciente').textContent = p.value ? textOf(p).split('·')[1]?.trim() || textOf(p) : 'Paciente no seleccionado';
+                    if (e) document.getElementById('res-especialidad').textContent = e.value ? textOf(e).split('·')[0]?.trim() || textOf(e) : 'Especialidad no seleccionada';
+                    if (m) document.getElementById('res-medico').textContent = m.value ? textOf(m).split('[')[0]?.trim() || textOf(m) : 'Médico no seleccionado';
+                    if (f) document.getElementById('res-fecha').textContent = f.value ? new Date(f.value + 'T00:00').toLocaleDateString('es-PE', {weekday:'long', day:'numeric', month:'long'}) : 'Fecha no seleccionada';
+                    if (h) document.getElementById('res-hora').textContent = h.value || 'Hora no seleccionada';
+                }
+                ['idPaciente','idEspecialidad','idMedico','fechaCita','horaInicio'].forEach(n => {
+                    var el = document.querySelector('[name="' + n + '"]');
+                    if (el) el.addEventListener('change', update);
+                });
+                update();
+            });
+        </script>
+
+    </main>
+
+    <footer th:replace="~{fragments/header :: footer}"></footer>
+</div>
+
+</body>
+</html>

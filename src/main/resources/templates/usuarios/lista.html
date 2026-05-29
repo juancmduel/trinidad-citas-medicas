@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: head('Usuarios')}"></head>
+<body class="app-body">
+
+<nav th:replace="~{fragments/header :: navbar}"></nav>
+
+<div class="app-content">
+    <div th:replace="~{fragments/header :: topbar}"></div>
+
+    <main class="page-main">
+        <!-- Page Header -->
+        <div class="mb-4">
+            <h1 style="font-size:28px;font-weight:700;margin-bottom:6px;">
+                <i class="bi bi-person-gear me-2" style="color:#06b6d4;"></i>Gestión de Usuarios
+            </h1>
+            <p style="color:rgba(255,255,255,0.5);font-size:13px;">Administración de cuentas de usuario del sistema</p>
+        </div>
+
+        <!-- Data Table -->
+        <div class="card-professional">
+            <div class="card-header-professional">
+                <h5><i class="bi bi-list"></i>Usuarios del Sistema</h5>
+            </div>
+            <div class="p-4">
+                <div class="table-responsive">
+                    <table class="table-professional">
+                        <thead>
+                            <tr>
+                                <th>Usuario</th>
+                                <th>Email</th>
+                                <th>Roles</th>
+                                <th>Estado</th>
+                                <th>Último Acceso</th>
+                                <th class="text-end">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="usuario : ${usuarios}">
+                                <td><strong th:text="${usuario.username}"></strong></td>
+                                <td th:text="${usuario.email}"></td>
+                                <td>
+                                    <span class="badge-status badge-primary" th:each="rol : ${usuario.roles}" th:text="${rol.nombre}"></span>
+                                </td>
+                                <td>
+                                    <span class="badge-status" 
+                                        th:classappend="${usuario.activo ? 'badge-success' : 'badge-danger'}"
+                                        th:text="${usuario.activo ? 'Activo' : 'Inactivo'}">
+                                    </span>
+                                </td>
+                                <td th:text="${usuario.fechaUltLogin ? #temporals.format(usuario.fechaUltLogin, 'dd/MM/yyyy HH:mm') : 'Nunca'}"></td>
+                                <td class="text-end">
+                                    <a th:href="@{/usuarios/{id}(id=${usuario.idUsuario})}" class="btn-professional btn-outline-prof btn-sm">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div th:if="${#lists.isEmpty(usuarios)}" style="text-align:center; padding:3rem 1.25rem; color:rgba(255,255,255,0.5);">
+                    <i class="bi bi-inbox" style="font-size:2.5rem;"></i>
+                    <p class="mt-2">No hay usuarios registrados</p>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <footer th:replace="~{fragments/header :: footer}"></footer>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,101 @@
+﻿<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/header :: head('Dashboard')}"></head>
+<body class="app-body">
+
+<nav th:replace="~{fragments/header :: navbar}"></nav>
+
+<div class="app-content">
+    <div th:replace="~{fragments/header :: topbar}"></div>
+
+    <main class="page-main">
+        <!-- Page Header -->
+        <div class="mb-4">
+            <h1 style="font-size:28px;font-weight:700;margin-bottom:6px;">
+                <i class="bi bi-speedometer2 me-2" style="color:#06b6d4;"></i>Dashboard
+            </h1>
+            <p style="color:rgba(255,255,255,0.5);font-size:13px;">Resumen en tiempo real del sistema médico</p>
+        </div>
+
+        <!-- KPI Grid -->
+        <div class="grid-professional grid-cols-4" th:if="${kpis}">
+            <div class="kpi-card-professional">
+                <i class="bi bi-people kpi-icon-professional"></i>
+                <div class="kpi-label-professional">Total Pacientes</div>
+                <div class="kpi-value-professional" th:text="${kpis.totalPacientes ?: 0}">0</div>
+            </div>
+            <div class="kpi-card-professional">
+                <i class="bi bi-person-badge kpi-icon-professional"></i>
+                <div class="kpi-label-professional">Total Médicos</div>
+                <div class="kpi-value-professional" th:text="${kpis.totalMedicos ?: 0}">0</div>
+            </div>
+            <div class="kpi-card-professional">
+                <i class="bi bi-heart-pulse kpi-icon-professional"></i>
+                <div class="kpi-label-professional">Especialidades</div>
+                <div class="kpi-value-professional" th:text="${kpis.totalEspecialidades ?: 0}">0</div>
+            </div>
+            <div class="kpi-card-professional">
+                <i class="bi bi-calendar-event kpi-icon-professional"></i>
+                <div class="kpi-label-professional">Citas Hoy</div>
+                <div class="kpi-value-professional" th:text="${kpis.citasHoy ?: 0}">0</div>
+            </div>
+        </div>
+
+        <!-- Status Cards -->
+        <div class="grid-professional grid-cols-2 mt-4">
+            <div class="kpi-card-professional" style="border-color: rgba(16,185,129,0.3); background: linear-gradient(135deg, rgba(16,185,129,0.12), rgba(16,185,129,0.05));">
+                <i class="bi bi-check-circle kpi-icon-professional" style="color:#10b981;"></i>
+                <div class="kpi-label-professional">Atendidas Hoy</div>
+                <div class="kpi-value-professional" style="color:#10b981;" th:text="${kpis.citasAtendidasHoy ?: 0}">0</div>
+            </div>
+            <div class="kpi-card-professional" style="border-color: rgba(245,158,11,0.3); background: linear-gradient(135deg, rgba(245,158,11,0.12), rgba(245,158,11,0.05));">
+                <i class="bi bi-clock-history kpi-icon-professional" style="color:#f59e0b;"></i>
+                <div class="kpi-label-professional">Pendientes Hoy</div>
+                <div class="kpi-value-professional" style="color:#f59e0b;" th:text="${kpis.citasPendientesHoy ?: 0}">0</div>
+            </div>
+        </div>
+
+        <!-- Quick Actions Section -->
+        <div class="card-professional mt-4 mb-4">
+            <div class="card-header-professional">
+                <h5><i class="bi bi-lightning-charge"></i>Acciones Rápidas</h5>
+            </div>
+            <div class="p-4">
+                <div class="grid-professional grid-cols-3">
+                    <a th:href="@{/citas/agendar}" class="btn-professional btn-primary-prof w-100 text-center" style="text-decoration:none;">
+                        <i class="bi bi-calendar-plus"></i>Agendar Cita
+                    </a>
+                    <a th:href="@{/pacientes}" class="btn-professional btn-outline-prof w-100 text-center" style="text-decoration:none;">
+                        <i class="bi bi-people"></i>Ver Pacientes
+                    </a>
+                    <a th:href="@{/medicos}" class="btn-professional btn-outline-prof w-100 text-center" style="text-decoration:none;">
+                        <i class="bi bi-person-badge"></i>Ver Médicos
+                    </a>
+                    <a th:href="@{/citas}" class="btn-professional btn-outline-prof w-100 text-center" style="text-decoration:none;">
+                        <i class="bi bi-calendar-event"></i>Ver Citas
+                    </a>
+                    <a th:href="@{/especialidades}" class="btn-professional btn-outline-prof w-100 text-center" style="text-decoration:none;">
+                        <i class="bi bi-heart-pulse"></i>Especialidades
+                    </a>
+                    <a th:href="@{/usuarios}" class="btn-professional btn-outline-prof w-100 text-center" style="text-decoration:none;">
+                        <i class="bi bi-person-gear"></i>Usuarios
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Welcome Alert -->
+        <div class="alert-professional alert-info-prof">
+            <i class="bi bi-info-circle"></i>
+            <div>
+                <strong>Bienvenido</strong> al sistema de gestión médica Trinidad. Utiliza el menú lateral para navegar entre los módulos y acceder a todas las funcionalidades.
+            </div>
+        </div>
+
+    </main>
+
+    <footer th:replace="~{fragments/header :: footer}"></footer>
+</div>
+
+</body>
+</html>

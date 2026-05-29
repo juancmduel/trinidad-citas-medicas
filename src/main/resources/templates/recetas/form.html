@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/header :: head(${titulo})}"></head>
+<body class="app-body">
+
+<nav th:replace="~{fragments/header :: navbar}"></nav>
+
+<div class="app-content">
+    <div th:replace="~{fragments/header :: topbar}"></div>
+
+    <main class="page-main">
+        <div class="container-xl">
+            <div class="page-header">
+                <div class="row align-items-center">
+                    <div class="col">
+                        <h2 class="page-title">
+                            <i class="fa-solid fa-prescription-bottle"></i> Nueva Receta
+                        </h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="page-wrapper">
+            <div class="container-xl">
+                <div class="row">
+                    <div class="col-md-8 offset-md-2">
+                        <div class="card">
+                            <div class="card-body">
+                                <form th:action="@{/recetas/guardar}" method="post" class="form-receta">
+                                    
+                                    <!-- SECCIÓN: INFORMACIÓN DE LA ATENCION -->
+                                    <div class="form-section">
+                                        <h3 class="form-section-title">
+                                            <i class="fa-solid fa-stethoscope"></i> Información de la Atención
+                                        </h3>
+                                        
+                                        <div class="form-field">
+                                            <label>Seleccionar Atención <span class="required">*</span></label>
+                                            <select name="idAtencion" class="form-select" required>
+                                                <option value="">-- Seleccionar --</option>
+                                                <option th:each="atencion : ${atenciones}" 
+                                                        th:value="${atencion.idAtencion}"
+                                                        th:text="${atencion.cita.paciente.nombres + ' ' + atencion.cita.paciente.apellidoPaterno + ' - ' + atencion.cita.medico.nombreCompleto}">
+                                                </option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <!-- SECCIÓN: DATOS DE LA RECETA -->
+                                    <div class="form-section">
+                                        <h3 class="form-section-title">
+                                            <i class="fa-solid fa-file-medical"></i> Datos de la Receta
+                                        </h3>
+                                        
+                                        <div class="form-field">
+                                            <label>Número de Receta <span class="required">*</span></label>
+                                            <input type="text" name="nroReceta" class="form-control" placeholder="REC-2026-001" required>
+                                        </div>
+
+                                        <div class="form-field">
+                                            <label>Observaciones / Indicaciones</label>
+                                            <textarea name="observaciones" class="form-control" rows="4" placeholder="Notas adicionales para el paciente..."></textarea>
+                                        </div>
+                                    </div>
+
+                                    <!-- SECCIÓN: MEDICAMENTOS -->
+                                    <div class="form-section">
+                                        <h3 class="form-section-title">
+                                            <i class="fa-solid fa-pills"></i> Medicamentos
+                                        </h3>
+                                        
+                                        <div id="detalles-container">
+                                            <div class="medicamento-item">
+                                                <div class="row">
+                                                    <div class="col-md-6">
+                                                        <div class="form-field">
+                                                            <label>Nombre Genérico <span class="required">*</span></label>
+                                                            <input type="text" name="detalles[0].nombreGenerico" class="form-control" placeholder="Ej: Amoxicilina" required>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="form-field">
+                                                            <label>Nombre Comercial</label>
+                                                            <input type="text" name="detalles[0].nombreComercial" class="form-control" placeholder="Ej: Amoxan">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                
+                                                <div class="row">
+                                                    <div class="col-md-6">
+                                                        <div class="form-field">
+                                                            <label>Presentación <span class="required">*</span></label>
+                                                            <input type="text" name="detalles[0].presentacion" class="form-control" placeholder="Ej: Cápsulas 500mg" required>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="form-field">
+                                                            <label>Dosis <span class="required">*</span></label>
+                                                            <input type="text" name="detalles[0].dosis" class="form-control" placeholder="Ej: 500mg" required>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="row">
+                                                    <div class="col-md-6">
+                                                        <div class="form-field">
+                                                            <label>Frecuencia <span class="required">*</span></label>
+                                                            <input type="text" name="detalles[0].frecuencia" class="form-control" placeholder="Ej: Cada 8 horas" required>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="form-field">
+                                                            <label>Duración (días) <span class="required">*</span></label>
+                                                            <input type="number" name="detalles[0].duracionDias" class="form-control" placeholder="7" min="1" required>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="row">
+                                                    <div class="col-md-6">
+                                                        <div class="form-field">
+                                                            <label>Vía de Administración <span class="required">*</span></label>
+                                                            <input type="text" name="detalles[0].viaAdministracion" class="form-control" placeholder="Ej: Oral" required>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="form-field">
+                                                            <label>Indicaciones Especiales</label>
+                                                            <input type="text" name="detalles[0].indicaciones" class="form-control" placeholder="Ej: Tomar con alimentos">
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <hr>
+                                            </div>
+                                        </div>
+
+                                        <button type="button" class="btn btn-sm btn-outline-primary" onclick="agregarMedicamento()">
+                                            <i class="fa-solid fa-plus"></i> Agregar Medicamento
+                                        </button>
+                                    </div>
+
+                                    <!-- BOTONES -->
+                                    <div class="form-footer">
+                                        <a href="/trinidad/recetas" class="btn btn-ghost">
+                                            <i class="fa-solid fa-arrow-left"></i> Cancelar
+                                        </a>
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fa-solid fa-save"></i> Guardar Receta
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<style>
+    .form-section { margin-bottom: 2rem; }
+    .form-section-title {
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        color: #06b6d4;
+        margin-bottom: 1.25rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 2px solid rgba(6,182,212,0.3);
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+    .form-field { margin-bottom: 1.5rem; }
+    .form-field label {
+        display: block;
+        font-size: 0.8rem;
+        font-weight: 700;
+        color: rgba(255,255,255,0.75);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 0.65rem;
+    }
+    .form-field .required { color: #ef4444; }
+    .form-control, .form-select {
+        background: linear-gradient(135deg, rgba(6,182,212,0.06), rgba(6,182,212,0.02)) !important;
+        border: 1.5px solid rgba(6,182,212,0.35) !important;
+        color: #fff !important;
+        border-radius: 10px !important;
+        padding: 0.75rem 1rem !important;
+        font-size: 0.95rem !important;
+        font-weight: 500;
+        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    }
+    .form-control:focus, .form-select:focus {
+        background: linear-gradient(135deg, rgba(6,182,212,0.15), rgba(6,182,212,0.1)) !important;
+        border-color: #06b6d4 !important;
+        box-shadow: 0 0 0 4px rgba(6,182,212,0.2) !important;
+    }
+    .medicamento-item { padding: 1rem; background: rgba(6,182,212,0.05); border-radius: 10px; margin-bottom: 1rem; }
+    .form-footer {
+        display: flex;
+        gap: 1rem;
+        justify-content: flex-end;
+        margin-top: 2rem;
+        padding-top: 2rem;
+        border-top: 2px solid rgba(6,182,212,0.2);
+    }
+    .btn { border-radius: 10px; font-weight: 600; transition: all 0.25s; }
+    .btn-primary { background: linear-gradient(135deg, #06b6d4, #0891b2); }
+    .btn-primary:hover { background: linear-gradient(135deg, #0891b2, #0e7490); }
+</style>
+
+<script>
+    let medicamentoCount = 1;
+    
+    function agregarMedicamento() {
+        const container = document.getElementById('detalles-container');
+        const newItem = document.createElement('div');
+        newItem.className = 'medicamento-item';
+        newItem.innerHTML = `
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-field">
+                        <label>Nombre Genérico <span class="required">*</span></label>
+                        <input type="text" name="detalles[${medicamentoCount}].nombreGenerico" class="form-control" placeholder="Ej: Amoxicilina" required>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-field">
+                        <label>Nombre Comercial</label>
+                        <input type="text" name="detalles[${medicamentoCount}].nombreComercial" class="form-control" placeholder="Ej: Amoxan">
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-field">
+                        <label>Presentación <span class="required">*</span></label>
+                        <input type="text" name="detalles[${medicamentoCount}].presentacion" class="form-control" placeholder="Ej: Cápsulas 500mg" required>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-field">
+                        <label>Dosis <span class="required">*</span></label>
+                        <input type="text" name="detalles[${medicamentoCount}].dosis" class="form-control" placeholder="Ej: 500mg" required>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-field">
+                        <label>Frecuencia <span class="required">*</span></label>
+                        <input type="text" name="detalles[${medicamentoCount}].frecuencia" class="form-control" placeholder="Ej: Cada 8 horas" required>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-field">
+                        <label>Duración (días) <span class="required">*</span></label>
+                        <input type="number" name="detalles[${medicamentoCount}].duracionDias" class="form-control" placeholder="7" min="1" required>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-field">
+                        <label>Vía de Administración <span class="required">*</span></label>
+                        <input type="text" name="detalles[${medicamentoCount}].viaAdministracion" class="form-control" placeholder="Ej: Oral" required>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-field">
+                        <label>Indicaciones Especiales</label>
+                        <input type="text" name="detalles[${medicamentoCount}].indicaciones" class="form-control" placeholder="Ej: Tomar con alimentos">
+                    </div>
+                </div>
+            </div>
+            <button type="button" class="btn btn-sm btn-danger" onclick="this.parentElement.remove()">
+                <i class="fa-solid fa-trash"></i> Eliminar
+            </button>
+            <hr>
+        `;
+        container.appendChild(newItem);
+        medicamentoCount++;
+    }
+</script>
+
+</body>
+</html>

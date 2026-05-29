@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: head('Orden de Examen')}"></head>
+<body class="app-body">
+<nav th:replace="~{fragments/header :: navbar}"></nav>
+<div class="app-content">
+    <div th:replace="~{fragments/header :: topbar}"></div>
+    <main class="page-main">
+        <div class="container-xl">
+            <div class="page-header">
+                <h2 class="page-title">
+                    <i class="fa-solid fa-flask"></i>
+                    <span th:text="${orden.idOrden != null} ? 'Editar Orden' : 'Nueva Orden de Examen'">Orden de Examen</span>
+                </h2>
+            </div>
+        </div>
+        <div class="page-wrapper">
+            <div class="container-xl">
+                <div class="row">
+                    <div class="col-md-8 offset-md-2">
+                        <div class="card">
+                            <div class="card-body">
+                                <form th:action="@{/ordenes-examen/guardar}" method="post">
+                                    <input type="hidden" name="idOrden" th:value="${orden.idOrden}">
+
+                                    <div class="form-field">
+                                        <label>Atención Médica <span class="required">*</span></label>
+                                        <select name="atencionId" class="form-control" required>
+                                            <option value="">-- Seleccionar atención --</option>
+                                            <option th:each="a : ${atenciones}"
+                                                    th:value="${a.idAtencion}"
+                                                    th:text="${a.cita?.paciente?.apellidoPaterno + ' ' + a.cita?.paciente?.nombres + ' | ' + #temporals.format(a.fechaAtencion, 'dd/MM/yyyy')}"
+                                                    th:selected="${orden.atencion != null and orden.atencion.idAtencion == a.idAtencion}">
+                                            </option>
+                                        </select>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-field">
+                                                <label>Tipo de Examen <span class="required">*</span></label>
+                                                <select name="tipoExamen" class="form-control" required>
+                                                    <option value="">-- Seleccionar tipo --</option>
+                                                    <option value="LABORATORIO" th:selected="${orden.tipoExamen == 'LABORATORIO'}">Laboratorio</option>
+                                                    <option value="IMAGEN" th:selected="${orden.tipoExamen == 'IMAGEN'}">Imagen (Rx / Eco / TAC)</option>
+                                                    <option value="PATOLOGIA" th:selected="${orden.tipoExamen == 'PATOLOGIA'}">Patología</option>
+                                                    <option value="OTRO" th:selected="${orden.tipoExamen == 'OTRO'}">Otro</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-field">
+                                                <label>Nombre del Examen <span class="required">*</span></label>
+                                                <input type="text" name="nombreExamen" class="form-control"
+                                                       th:value="${orden.nombreExamen}"
+                                                       placeholder="Ej: Hemograma completo" required>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-field">
+                                        <label>Indicaciones / Preparación</label>
+                                        <textarea name="indicaciones" class="form-control" rows="3"
+                                                  th:text="${orden.indicaciones}"
+                                                  placeholder="Indicaciones especiales para el paciente (ayuno, etc.)..."></textarea>
+                                    </div>
+
+                                    <div class="form-field">
+                                        <label>Estado</label>
+                                        <select name="estado" class="form-control">
+                                            <option value="SOLICITADO" th:selected="${orden.estado == null or orden.estado == 'SOLICITADO'}">Solicitado</option>
+                                            <option value="EN_PROCESO" th:selected="${orden.estado == 'EN_PROCESO'}">En Proceso</option>
+                                            <option value="COMPLETADO" th:selected="${orden.estado == 'COMPLETADO'}">Completado</option>
+                                            <option value="CANCELADO" th:selected="${orden.estado == 'CANCELADO'}">Cancelado</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="form-footer d-flex gap-2 justify-content-end mt-3">
+                                        <a th:href="@{/ordenes-examen}" class="btn btn-ghost">Cancelar</a>
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fa-solid fa-save"></i> Guardar Orden
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+</body>
+</html>

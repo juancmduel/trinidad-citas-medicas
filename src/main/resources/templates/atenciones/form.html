@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: head(${titulo})}"></head>
+<body class="app-body">
+<nav th:replace="~{fragments/header :: navbar}"></nav>
+<div class="app-content">
+    <div th:replace="~{fragments/header :: topbar}"></div>
+    <main class="page-main">
+        <div class="container-xl">
+            <div class="page-header">
+                <h2 class="page-title"><i class="fa-solid fa-stethoscope"></i> Nueva Atención Médica</h2>
+            </div>
+        </div>
+        <div class="page-wrapper">
+            <div class="container-xl">
+                <div class="row">
+                    <div class="col-md-10 offset-md-1">
+                        <div class="card">
+                            <div class="card-body">
+                                <form th:action="@{/atenciones/guardar}" method="post">
+
+                                    <h6 class="text-muted fw-bold mb-3" style="text-transform:uppercase;letter-spacing:1px;font-size:12px;">Datos de la Cita</h6>
+
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-field">
+                                                <label>Cita <span class="required">*</span></label>
+                                                <select name="citaId" class="form-control" required>
+                                                    <option value="">-- Seleccionar cita --</option>
+                                                    <option th:each="c : ${citas}"
+                                                            th:value="${c.idCita}"
+                                                            th:text="${c.paciente.apellidoPaterno + ' ' + c.paciente.nombres + ' | ' + c.fechaCita + ' ' + c.horaInicio}">
+                                                    </option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-field">
+                                                <label>Motivo de Consulta</label>
+                                                <input type="text" name="motivoConsulta" class="form-control" placeholder="Motivo de la atención">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <hr class="my-3">
+                                    <h6 class="text-muted fw-bold mb-3" style="text-transform:uppercase;letter-spacing:1px;font-size:12px;">Signos Vitales</h6>
+
+                                    <div class="row">
+                                        <div class="col-md-3">
+                                            <div class="form-field">
+                                                <label>Presión Arterial</label>
+                                                <input type="text" name="presionArterial" class="form-control" placeholder="120/80">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="form-field">
+                                                <label>Temperatura (°C)</label>
+                                                <input type="number" name="temperatura" class="form-control" step="0.1" placeholder="37.0">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="form-field">
+                                                <label>Frec. Cardíaca (bpm)</label>
+                                                <input type="number" name="frecuenciaCardiaca" class="form-control" placeholder="80">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="form-field">
+                                                <label>Saturación O2 (%)</label>
+                                                <input type="number" name="saturacionO2" class="form-control" min="0" max="100" placeholder="98">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="form-field">
+                                                <label>Peso (kg)</label>
+                                                <input type="number" name="pesoKg" class="form-control" step="0.01" placeholder="70.0">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="form-field">
+                                                <label>Talla (cm)</label>
+                                                <input type="number" name="tallaCm" class="form-control" step="0.01" placeholder="170.0">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <hr class="my-3">
+                                    <h6 class="text-muted fw-bold mb-3" style="text-transform:uppercase;letter-spacing:1px;font-size:12px;">Evaluación Clínica</h6>
+
+                                    <div class="form-field">
+                                        <label>Anamnesis</label>
+                                        <textarea name="anamnesis" class="form-control" rows="3" placeholder="Descripción de los síntomas referidos por el paciente..."></textarea>
+                                    </div>
+                                    <div class="form-field">
+                                        <label>Examen Físico</label>
+                                        <textarea name="examenFisico" class="form-control" rows="3" placeholder="Hallazgos del examen físico..."></textarea>
+                                    </div>
+                                    <div class="form-field">
+                                        <label>Diagnóstico <span class="required">*</span></label>
+                                        <textarea name="diagnosticoDesc" class="form-control" rows="2" required placeholder="Diagnóstico clínico..."></textarea>
+                                    </div>
+                                    <div class="form-field">
+                                        <label>Tratamiento <span class="required">*</span></label>
+                                        <textarea name="tratamiento" class="form-control" rows="3" required placeholder="Plan de tratamiento..."></textarea>
+                                    </div>
+                                    <div class="form-field">
+                                        <label>Observaciones</label>
+                                        <textarea name="observaciones" class="form-control" rows="2" placeholder="Notas adicionales..."></textarea>
+                                    </div>
+
+                                    <div class="form-footer d-flex gap-2 justify-content-end mt-3">
+                                        <a th:href="@{/atenciones}" class="btn btn-ghost">Cancelar</a>
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fa-solid fa-save"></i> Guardar Atención
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+</body>
+</html>

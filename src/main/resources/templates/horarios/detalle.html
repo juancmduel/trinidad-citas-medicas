@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: head('Detalle Horario')}"></head>
+<body class="app-body">
+<nav th:replace="~{fragments/header :: navbar}"></nav>
+<div class="app-content">
+    <div th:replace="~{fragments/header :: topbar}"></div>
+    <main class="page-main">
+
+        <div class="mb-4">
+            <h1 style="font-size:28px;font-weight:700;margin-bottom:6px;">
+                <i class="bi bi-calendar3 me-2" style="color:#06b6d4;"></i>Horario del Médico
+            </h1>
+        </div>
+
+        <div th:if="${horario != null}" class="card-professional mb-4">
+            <div class="card-header-professional d-flex justify-content-between">
+                <h5><i class="bi bi-clock"></i> Información del Horario</h5>
+                <span th:if="${horario.activo == 1}" class="badge-status badge-success">Activo</span>
+                <span th:unless="${horario.activo == 1}" class="badge-status badge-danger">Inactivo</span>
+            </div>
+            <div class="p-4">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label style="color:rgba(255,255,255,0.5);font-size:12px;">Médico</label>
+                        <p style="font-weight:700;color:#06b6d4;" th:text="${horario.medico.apellidoPaterno + ' ' + horario.medico.nombres}"></p>
+                    </div>
+                    <div class="col-md-2">
+                        <label style="color:rgba(255,255,255,0.5);font-size:12px;">Día</label>
+                        <p th:text="${{1:'Lunes', 2:'Martes', 3:'Miércoles', 4:'Jueves', 5:'Viernes', 6:'Sábado', 7:'Domingo'}[horario.diaSemana]}"></p>
+                    </div>
+                    <div class="col-md-2">
+                        <label style="color:rgba(255,255,255,0.5);font-size:12px;">Hora Inicio</label>
+                        <p th:text="${horario.horaInicio}"></p>
+                    </div>
+                    <div class="col-md-2">
+                        <label style="color:rgba(255,255,255,0.5);font-size:12px;">Hora Fin</label>
+                        <p th:text="${horario.horaFin}"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="d-flex gap-2">
+            <a th:href="@{/horarios/editar/{id}(id=${horario.idHorario})}" class="btn-professional btn-outline-prof">
+                <i class="bi bi-pencil"></i> Editar
+            </a>
+            <a th:href="@{/horarios/eliminar/{id}(id=${horario.idHorario})}"
+               class="btn-professional btn-danger-prof"
+               onclick="return confirm('¿Eliminar este horario?')">
+                <i class="bi bi-trash"></i> Eliminar
+            </a>
+            <a href="/trinidad/horarios" class="btn-professional btn-outline-prof">
+                <i class="bi bi-arrow-left"></i> Volver
+            </a>
+        </div>
+
+    </main>
+    <footer th:replace="~{fragments/header :: footer}"></footer>
+</div>
+</body>
+</html>

@@ -1,0 +1,383 @@
+﻿<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trinidad | Centro de Salud Integral</title>
+    <link rel="stylesheet" href="/webjars/bootstrap/5.3.3/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        :root {
+            --primary: #003d7a;
+            --secondary: #00a854;
+            --accent: #ff6b35;
+            --dark: #0f1419;
+            --light: #f0f3f7;
+            --gray: #a8adb5;
+        }
+        html, body { height: 100%; }
+        body { background: linear-gradient(135deg, #0f1419 0%, #1a2332 50%, #0f1419 100%); color: var(--light); }
+        #bg-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
+        .wrapper { position: relative; z-index: 10; }
+        section { scroll-margin-top: 80px; }
+
+        /* HERO */
+        .hero { padding: 120px 20px 80px; text-align: center; background: linear-gradient(180deg, rgba(0,61,122,0.2) 0%, transparent 100%); border-bottom: 1px solid rgba(0,168,84,0.2); }
+        .hero-content { max-width: 900px; margin: 0 auto; }
+        .logo-hero { width: 120px; height: 120px; margin: 0 auto 30px; background: linear-gradient(135deg, var(--primary), var(--secondary)); border-radius: 30px; display: flex; align-items: center; justify-content: center; font-size: 60px; box-shadow: 0 20px 60px rgba(0,61,122,0.3); }
+        .hero h1 { font-size: 3.5rem; font-weight: 800; margin-bottom: 15px; color: var(--light); letter-spacing: -1px; }
+        .hero .subtitle { font-size: 1.4rem; font-weight: 600; color: var(--secondary); margin-bottom: 25px; }
+        .hero .description { font-size: 1.1rem; color: var(--gray); line-height: 1.8; margin: 0 auto 50px; max-width: 650px; }
+        .cta-buttons { display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; }
+        .btn-cta { padding: 14px 40px; border-radius: 8px; font-size: 1rem; font-weight: 600; transition: all 0.3s; text-decoration: none; border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 10px; }
+        .btn-primary { background: linear-gradient(135deg, var(--primary), #0052a3); color: white; box-shadow: 0 10px 30px rgba(0,61,122,0.3); }
+        .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 15px 50px rgba(0,61,122,0.5); color: white; }
+        .btn-secondary { background: rgba(255,255,255,0.08); border: 2px solid var(--secondary); color: var(--secondary); }
+        .btn-secondary:hover { background: var(--secondary); color: white; }
+
+        /* STATS */
+        .stats-section { padding: 120px 20px; background: rgba(0,0,0,0.2); border-bottom: 1px solid rgba(0,61,122,0.2); }
+        .section-title { text-align: center; margin-bottom: 60px; }
+        .section-title h2 { font-size: 2.5rem; font-weight: 800; margin-bottom: 15px; color: var(--light); }
+        .section-title p { font-size: 1.05rem; color: var(--gray); }
+        .stats-container { max-width: 1200px; margin: 0 auto; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 30px; }
+        .stat-card { background: rgba(255,255,255,0.06); backdrop-filter: blur(20px); border: 1px solid rgba(0,61,122,0.3); border-radius: 16px; padding: 50px 30px; text-align: center; transition: all 0.3s; position: relative; overflow: hidden; }
+        .stat-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent)); opacity: 0; transition: opacity 0.3s; }
+        .stat-card:hover { transform: translateY(-10px); background: rgba(0,61,122,0.1); border-color: var(--secondary); }
+        .stat-card:hover::before { opacity: 1; }
+        .stat-icon { font-size: 3rem; margin-bottom: 20px; }
+        .stat-value { font-size: 3rem; font-weight: 800; color: var(--secondary); margin-bottom: 12px; }
+        .stat-label { font-size: 1.1rem; font-weight: 600; color: var(--light); margin-bottom: 8px; }
+        .stat-desc { font-size: 0.9rem; color: var(--gray); }
+
+        /* SERVICES */
+        .services-section { padding: 120px 20px; background: rgba(0,0,0,0.1); border-bottom: 1px solid rgba(0,61,122,0.2); }
+        .services-container { max-width: 1200px; margin: 0 auto; }
+        .services-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 30px; }
+        .service-card { background: rgba(255,255,255,0.06); backdrop-filter: blur(15px); border: 1px solid rgba(0,168,84,0.25); border-radius: 16px; padding: 45px; transition: all 0.3s; }
+        .service-card:hover { transform: translateY(-10px); background: rgba(0,168,84,0.08); border-color: var(--secondary); box-shadow: 0 20px 50px rgba(0,168,84,0.1); }
+        .service-header { display: flex; align-items: center; gap: 18px; margin-bottom: 25px; }
+        .service-icon-box { width: 70px; height: 70px; background: linear-gradient(135deg, rgba(0,61,122,0.2), rgba(0,168,84,0.2)); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 32px; color: var(--primary); }
+        .service-card:nth-child(2) .service-icon-box { color: var(--secondary); background: linear-gradient(135deg, rgba(0,168,84,0.2), rgba(0,168,84,0.1)); }
+        .service-card:nth-child(3) .service-icon-box { color: var(--accent); background: linear-gradient(135deg, rgba(255,107,53,0.2), rgba(255,107,53,0.1)); }
+        .service-title { font-size: 1.35rem; font-weight: 700; color: var(--light); }
+        .service-desc { font-size: 0.95rem; color: var(--gray); line-height: 1.7; margin-bottom: 25px; }
+        .service-link { display: inline-block; color: var(--secondary); text-decoration: none; font-weight: 600; font-size: 0.95rem; transition: all 0.3s; }
+        .service-link:hover { color: var(--accent); gap: 5px; }
+
+        /* TABLE ESPECIALIDADES */
+        .especialidades-section { padding: 120px 20px; background: rgba(0,0,0,0.2); border-bottom: 1px solid rgba(0,61,122,0.2); }
+        .table-container { max-width: 1150px; margin: 0 auto; }
+        .table-wrapper { background: rgba(255,255,255,0.06); backdrop-filter: blur(25px); border: 1px solid rgba(0,61,122,0.3); border-radius: 16px; overflow: hidden; box-shadow: 0 15px 50px rgba(0,0,0,0.3); }
+        table { width: 100%; border-collapse: collapse; color: var(--light); }
+        thead { background: linear-gradient(90deg, rgba(0,61,122,0.2), rgba(0,168,84,0.1)); border-bottom: 2px solid rgba(0,61,122,0.4); }
+        th { padding: 25px 20px; text-align: left; font-weight: 700; font-size: 0.95rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--light); }
+        th i { margin-right: 10px; color: var(--primary); }
+        tbody tr { border-bottom: 1px solid rgba(0,61,122,0.2); transition: all 0.3s; }
+        tbody tr:hover { background: rgba(0,61,122,0.1); }
+        td { padding: 22px 20px; font-size: 0.95rem; }
+        .badge-esp { display: inline-flex; align-items: center; gap: 10px; background: rgba(0,61,122,0.2); color: #60a5fa; padding: 8px 16px; border-radius: 8px; font-weight: 600; }
+        .badge-count { background: linear-gradient(135deg, var(--primary), #0052a3); color: white; padding: 6px 14px; border-radius: 6px; font-weight: 600; font-size: 0.9rem; }
+        .badge-duration { color: var(--secondary); font-weight: 600; }
+        .badge-price { color: var(--accent); font-weight: 700; font-size: 1.1rem; }
+
+        /* VENTAJAS */
+        .advantages-section { padding: 120px 20px; background: rgba(0,0,0,0.1); border-bottom: 1px solid rgba(0,61,122,0.2); }
+        .advantages-container { max-width: 1200px; margin: 0 auto; }
+        .advantages-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(270px, 1fr)); gap: 30px; }
+        .advantage-box { background: rgba(255,255,255,0.06); backdrop-filter: blur(15px); border: 1px solid rgba(0,168,84,0.25); border-radius: 16px; padding: 45px; text-align: center; transition: all 0.3s; }
+        .advantage-box:hover { transform: translateY(-10px); background: rgba(0,168,84,0.08); border-color: var(--secondary); }
+        .adv-icon { font-size: 3.5rem; margin-bottom: 25px; color: var(--primary); }
+        .advantage-box:nth-child(2) .adv-icon { color: var(--secondary); }
+        .advantage-box:nth-child(3) .adv-icon { color: var(--accent); }
+        .advantage-box:nth-child(4) .adv-icon { color: #0066cc; }
+        .advantage-title { font-size: 1.2rem; font-weight: 700; margin-bottom: 15px; color: var(--light); }
+        .advantage-desc { font-size: 0.9rem; color: var(--gray); line-height: 1.8; }
+
+        /* FOOTER */
+        .footer-main { background: linear-gradient(180deg, rgba(0,61,122,0.15) 0%, rgba(15,20,25,0.98) 100%); border-top: 2px solid rgba(0,61,122,0.3); padding: 80px 20px 40px; }
+        .footer-container { max-width: 1200px; margin: 0 auto; }
+        .footer-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 60px; margin-bottom: 50px; }
+        .footer-col h5 { font-size: 1.1rem; font-weight: 700; color: var(--secondary); margin-bottom: 25px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .footer-col p { font-size: 0.9rem; color: var(--gray); line-height: 1.8; margin-bottom: 15px; }
+        .footer-col ul { list-style: none; }
+        .footer-col ul li { margin-bottom: 15px; }
+        .footer-col ul li a { color: var(--gray); text-decoration: none; font-size: 0.9rem; transition: all 0.3s; }
+        .footer-col ul li a:hover { color: var(--secondary); padding-left: 5px; }
+        .contact-item { display: flex; align-items: flex-start; gap: 15px; margin-bottom: 20px; }
+        .contact-item i { color: var(--primary); margin-top: 2px; font-size: 1.2rem; flex-shrink: 0; }
+        .contact-item span { font-size: 0.9rem; color: var(--gray); line-height: 1.6; }
+        .footer-divider { height: 1px; background: rgba(0,61,122,0.3); margin: 40px 0; }
+        .footer-bottom { text-align: center; padding-top: 30px; border-top: 1px solid rgba(0,61,122,0.2); }
+        .footer-bottom p { font-size: 0.85rem; color: var(--gray); margin: 8px 0; }
+        .footer-bottom .highlight { color: var(--light); font-weight: 600; }
+
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 2.2rem; }
+            .section-title h2 { font-size: 1.8rem; }
+            th, td { padding: 15px 12px; font-size: 0.85rem; }
+            .footer-grid { gap: 40px; }
+        }
+    </style>
+</head>
+<body>
+<canvas id="bg-canvas"></canvas>
+
+<div class="wrapper">
+    <!-- HERO -->
+    <section class="hero">
+        <div class="hero-content">
+            <div class="logo-hero"><i class="bi bi-heart-pulse-fill"></i></div>
+            <h1>TRINIDAD</h1>
+            <p class="subtitle">Centro de Salud Integral</p>
+            <p class="description">Plataforma integral de gestión médica con atención especializada, agendamiento inteligente y acceso seguro a historias clínicas electrónicas. Cuidamos tu salud con tecnología certificada y profesionales de alto nivel.</p>
+            <div class="cta-buttons">
+                <a th:href="@{/login}" class="btn-cta btn-primary"><i class="bi bi-lock-fill"></i> Iniciar Sesión</a>
+                <a href="#servicios" class="btn-cta btn-secondary"><i class="bi bi-arrow-down"></i> Ver Servicios</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- STATS -->
+    <section class="stats-section">
+        <div class="stats-container">
+            <div class="section-title">
+                <h2>Nuestra Trayectoria</h2>
+                <p>Números que respaldan nuestro compromiso con la salud</p>
+            </div>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="bi bi-people-fill"></i></div>
+                    <div class="stat-value">500+</div>
+                    <div class="stat-label">Pacientes Activos</div>
+                    <div class="stat-desc">Confianza consolidada</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="bi bi-person-check-fill"></i></div>
+                    <div class="stat-value">50+</div>
+                    <div class="stat-label">Médicos Certificados</div>
+                    <div class="stat-desc">Profesionales calificados</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="bi bi-stethoscope"></i></div>
+                    <div class="stat-value">15+</div>
+                    <div class="stat-label">Especialidades</div>
+                    <div class="stat-desc">Cobertura médica completa</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="bi bi-clock-history"></i></div>
+                    <div class="stat-value">24/7</div>
+                    <div class="stat-label">Disponibilidad</div>
+                    <div class="stat-desc">Sin interrupciones</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SERVICIOS -->
+    <section class="services-section" id="servicios">
+        <div class="services-container">
+            <div class="section-title">
+                <h2>Nuestros Servicios</h2>
+                <p>Soluciones integrales para la gestión de tu salud</p>
+            </div>
+            <div class="services-grid">
+                <div class="service-card">
+                    <div class="service-header">
+                        <div class="service-icon-box"><i class="bi bi-calendar-check-fill"></i></div>
+                        <h3 class="service-title">Agendamiento Online</h3>
+                    </div>
+                    <p class="service-desc">Sistema inteligente de reserva de citas con disponibilidad en tiempo real. Confirma tu cita en segundos desde cualquier dispositivo.</p>
+                    <a href="#" class="service-link"><i class="bi bi-arrow-right"></i> Agendar Ahora</a>
+                </div>
+
+                <div class="service-card">
+                    <div class="service-header">
+                        <div class="service-icon-box"><i class="bi bi-file-medical-fill"></i></div>
+                        <h3 class="service-title">Historia Clínica Digital</h3>
+                    </div>
+                    <p class="service-desc">Acceso seguro a tu historial médico completo. Diagnósticos, tratamientos, exámenes y recetas digitales en una plataforma única.</p>
+                    <a href="#" class="service-link"><i class="bi bi-arrow-right"></i> Acceder Portal</a>
+                </div>
+
+                <div class="service-card">
+                    <div class="service-header">
+                        <div class="service-icon-box"><i class="bi bi-prescription2"></i></div>
+                        <h3 class="service-title">Recetas Digitales</h3>
+                    </div>
+                    <p class="service-desc">Prescripciones médicas certificadas y seguras. Válidas en todas las farmacias afiliadas con entrega a domicilio opcional.</p>
+                    <a href="#" class="service-link"><i class="bi bi-arrow-right"></i> Ver Más</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ESPECIALIDADES -->
+    <section class="especialidades-section">
+        <div class="table-container">
+            <div class="section-title">
+                <h2>Especialidades Disponibles</h2>
+                <p>Profesionales certificados en todas las áreas médicas</p>
+            </div>
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th><i class="bi bi-diagram-3"></i> Especialidad</th>
+                            <th><i class="bi bi-person-check-fill"></i> Médicos</th>
+                            <th><i class="bi bi-clock-fill"></i> Duración</th>
+                            <th><i class="bi bi-tag-fill"></i> Tarifa</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td><span class="badge-esp"><i class="bi bi-heart-fill"></i> Cardiología</span></td><td><span class="badge-count">8</span></td><td><span class="badge-duration">30 min</span></td><td><span class="badge-price">S/. 150</span></td></tr>
+                        <tr><td><span class="badge-esp"><i class="bi bi-capsule-pill"></i> Pediatría</span></td><td><span class="badge-count">12</span></td><td><span class="badge-duration">25 min</span></td><td><span class="badge-price">S/. 100</span></td></tr>
+                        <tr><td><span class="badge-esp"><i class="bi bi-brain"></i> Neurología</span></td><td><span class="badge-count">6</span></td><td><span class="badge-duration">40 min</span></td><td><span class="badge-price">S/. 180</span></td></tr>
+                        <tr><td><span class="badge-esp"><i class="bi bi-eye-fill"></i> Oftalmología</span></td><td><span class="badge-count">5</span></td><td><span class="badge-duration">20 min</span></td><td><span class="badge-price">S/. 120</span></td></tr>
+                        <tr><td><span class="badge-esp"><i class="bi bi-tooth"></i> Odontología</span></td><td><span class="badge-count">10</span></td><td><span class="badge-duration">45 min</span></td><td><span class="badge-price">S/. 80</span></td></tr>
+                        <tr><td><span class="badge-esp"><i class="bi bi-hospital"></i> Cirugía General</span></td><td><span class="badge-count">4</span></td><td><span class="badge-duration">60 min</span></td><td><span class="badge-price">S/. 250</span></td></tr>
+                        <tr><td><span class="badge-esp"><i class="bi bi-flower2"></i> Dermatología</span></td><td><span class="badge-count">7</span></td><td><span class="badge-duration">30 min</span></td><td><span class="badge-price">S/. 110</span></td></tr>
+                        <tr><td><span class="badge-esp"><i class="bi bi-lungs"></i> Neumología</span></td><td><span class="badge-count">5</span></td><td><span class="badge-duration">35 min</span></td><td><span class="badge-price">S/. 140</span></td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- VENTAJAS -->
+    <section class="advantages-section">
+        <div class="advantages-container">
+            <div class="section-title">
+                <h2>¿Por Qué Elegirnos?</h2>
+                <p>Estándares de calidad reconocidos a nivel nacional</p>
+            </div>
+            <div class="advantages-grid">
+                <div class="advantage-box">
+                    <div class="adv-icon"><i class="bi bi-shield-check"></i></div>
+                    <h4 class="advantage-title">100% Seguridad</h4>
+                    <p class="advantage-desc">Encriptación nivel hospitalario. Cumplimiento normativo HIPAA. Protección máxima de datos personales y médicos.</p>
+                </div>
+                <div class="advantage-box">
+                    <div class="adv-icon"><i class="bi bi-lightning-charge-fill"></i></div>
+                    <h4 class="advantage-title">Velocidad y Eficiencia</h4>
+                    <p class="advantage-desc">Agendamiento en segundos. Cero trámites burocráticos. Gestión automática de historiales clínicos.</p>
+                </div>
+                <div class="advantage-box">
+                    <div class="adv-icon"><i class="bi bi-award-fill"></i></div>
+                    <h4 class="advantage-title">Profesionales Certificados</h4>
+                    <p class="advantage-desc">Médicos especialistas con experiencia. Licencias actualizadas. Evaluación continua de competencias.</p>
+                </div>
+                <div class="advantage-box">
+                    <div class="adv-icon"><i class="bi bi-headset"></i></div>
+                    <h4 class="advantage-title">Soporte 24/7</h4>
+                    <p class="advantage-desc">Atención integral en cualquier momento. Equipo disponible sin interrupciones. Respuesta rápida a consultas.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="footer-main">
+        <div class="footer-container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <h5>TRINIDAD</h5>
+                    <p>Centro de Salud Integral de referencia en el norte del Perú. Comprometidos con la excelencia médica y la innovación tecnológica para el bienestar de nuestros pacientes.</p>
+                </div>
+
+                <div class="footer-col">
+                    <h5>NAVEGACIÓN</h5>
+                    <ul>
+                        <li><a th:href="@{/}"><i class="bi bi-house-fill"></i> Inicio</a></li>
+                        <li><a href="#servicios"><i class="bi bi-briefcase-fill"></i> Servicios</a></li>
+                        <li><a th:href="@{/login}"><i class="bi bi-person-circle"></i> Portal Paciente</a></li>
+                        <li><a href="#"><i class="bi bi-calendar-check"></i> Agendar Cita</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-col">
+                    <h5>CONTACTO</h5>
+                    <div class="contact-item">
+                        <i class="bi bi-telephone-fill"></i>
+                        <span><strong>+51 942 123 456</strong><br>Lunes a Viernes 8am - 8pm</span>
+                    </div>
+                    <div class="contact-item">
+                        <i class="bi bi-envelope-fill"></i>
+                        <span>info@trinidad-salud.pe</span>
+                    </div>
+                    <div class="contact-item">
+                        <i class="bi bi-geo-alt-fill"></i>
+                        <span>Tarapoto, San Martín - Perú<br>Emergencias 24/7</span>
+                    </div>
+                </div>
+
+                <div class="footer-col">
+                    <h5>INFORMACIÓN LEGAL</h5>
+                    <p><strong>Razón Social:</strong><br>Trinidad & Especialidades Médicas S.A.C.</p>
+                    <p><strong>RUC:</strong> 20494088208</p>
+                    <p style="margin-top: 20px; font-size: 0.85rem; color: var(--secondary);"><i class="bi bi-check-circle-fill"></i> Licencia Sanitaria Vigente<br><i class="bi bi-check-circle-fill"></i> Certificación ISO 9001<br><i class="bi bi-check-circle-fill"></i> MINSA Registrado</p>
+                </div>
+            </div>
+
+            <div class="footer-divider"></div>
+
+            <div class="footer-bottom">
+                <p>&copy; 2026 <span class="highlight">TRINIDAD & ESPECIALIDADES MÉDICAS S.A.C.</span> | RUC: 20494088208</p>
+                <p>Todos los derechos reservados | <a href="#" style="color: var(--secondary); text-decoration: none;">Política de Privacidad</a> | <a href="#" style="color: var(--secondary); text-decoration: none;">Términos de Servicio</a></p>
+                <p style="margin-top: 15px; color: var(--secondary);">Desarrollado con ❤️ para la salud integral de la comunidad</p>
+            </div>
+        </div>
+    </footer>
+</div>
+
+<script>
+    const canvas = document.getElementById(''bg-canvas'');
+    const ctx = canvas.getContext(''2d'');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    const particles = [];
+    const particleCount = 40;
+    class Particle {
+        constructor() {
+            this.x = Math.random() * canvas.width;
+            this.y = Math.random() * canvas.height;
+            this.vx = (Math.random() - 0.5) * 0.3;
+            this.vy = (Math.random() - 0.5) * 0.3;
+            this.radius = Math.random() * 1.2;
+            const colors = [''rgba(0,61,122,'', ''rgba(0,168,84,'', ''rgba(255,107,53,''];
+            this.color = colors[Math.floor(Math.random() * colors.length)];
+        }
+        update() {
+            this.x += this.vx;
+            this.y += this.vy;
+            if (this.x < 0) this.x = canvas.width;
+            if (this.x > canvas.width) this.x = 0;
+            if (this.y < 0) this.y = canvas.height;
+            if (this.y > canvas.height) this.y = 0;
+        }
+        draw() {
+            ctx.fillStyle = this.color + Math.random() * 0.2 + '')'';
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+            ctx.fill();
+        }
+    }
+    for (let i = 0; i < particleCount; i++) particles.push(new Particle());
+    function animate() {
+        ctx.fillStyle = ''rgba(15,20,25,0.01)'';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        particles.forEach(p => { p.update(); p.draw(); });
+        requestAnimationFrame(animate);
+    }
+    animate();
+    window.addEventListener(''resize'', () => {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    });
+</script>
+<script src="/webjars/bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

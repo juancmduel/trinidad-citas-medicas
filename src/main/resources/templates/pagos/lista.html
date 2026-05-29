@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: head('Pagos')}"></head>
+<body class="app-body">
+<nav th:replace="~{fragments/header :: navbar}"></nav>
+<div class="app-content">
+    <div th:replace="~{fragments/header :: topbar}"></div>
+    <main class="page-main">
+        <div class="container-xl">
+            <div class="page-header">
+                <div class="row align-items-center">
+                    <div class="col">
+                        <h2 class="page-title"><i class="fa-solid fa-credit-card"></i> Pagos</h2>
+                    </div>
+                    <div class="col-auto">
+                        <a th:href="@{/pagos/nuevo}" class="btn btn-primary">
+                            <i class="fa-solid fa-plus"></i> Nuevo Pago
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="page-wrapper">
+            <div class="container-xl">
+                <div th:if="${ok}" class="alert alert-success alert-dismissible mb-3" th:text="${ok}"></div>
+                <div class="card">
+                    <div class="table-responsive">
+                        <table class="table card-table table-vcenter">
+                            <thead>
+                                <tr>
+                                    <th>Paciente</th>
+                                    <th>Monto (S/.)</th>
+                                    <th>Método Pago</th>
+                                    <th>N° Comprobante</th>
+                                    <th>Fecha Pago</th>
+                                    <th>Estado</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:if="${pagos.isEmpty()}">
+                                    <td colspan="7" class="text-center py-4">No hay pagos registrados</td>
+                                </tr>
+                                <tr th:each="p : ${pagos}">
+                                    <td th:text="${p.cita?.paciente?.apellidoPaterno + ' ' + p.cita?.paciente?.nombres}">-</td>
+                                    <td><strong th:text="${'S/. ' + p.monto}"></strong></td>
+                                    <td th:text="${p.metodoPago}"></td>
+                                    <td th:text="${p.nroComprobante ?: '-'}"></td>
+                                    <td th:text="${p.fechaPago != null ? #temporals.format(p.fechaPago, 'dd/MM/yyyy HH:mm') : '-'}"></td>
+                                    <td>
+                                        <span class="badge"
+                                              th:classappend="${p.estado == 'PAGADO'} ? 'bg-success' : (${p.estado == 'PENDIENTE'} ? 'bg-warning text-dark' : 'bg-secondary')"
+                                              th:text="${p.estado}"></span>
+                                    </td>
+                                    <td>
+                                        <a th:href="@{/pagos/{id}(id=${p.idPago})}" class="btn btn-sm btn-outline-info"><i class="fa-solid fa-eye"></i></a>
+                                        <a th:href="@{/pagos/editar/{id}(id=${p.idPago})}" class="btn btn-sm btn-outline-warning"><i class="fa-solid fa-pencil"></i></a>
+                                        <a th:href="@{/pagos/eliminar/{id}(id=${p.idPago})}" class="btn btn-sm btn-outline-danger"
+                                           onclick="return confirm('¿Eliminar este pago?')"><i class="fa-solid fa-trash"></i></a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+</body>
+</html>

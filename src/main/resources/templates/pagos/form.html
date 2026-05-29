@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: head('Pago')}"></head>
+<body class="app-body">
+<nav th:replace="~{fragments/header :: navbar}"></nav>
+<div class="app-content">
+    <div th:replace="~{fragments/header :: topbar}"></div>
+    <main class="page-main">
+        <div class="container-xl">
+            <div class="page-header">
+                <h2 class="page-title">
+                    <i class="fa-solid fa-credit-card"></i>
+                    <span th:text="${pago.idPago != null} ? 'Editar Pago' : 'Registrar Pago'">Pago</span>
+                </h2>
+            </div>
+        </div>
+        <div class="page-wrapper">
+            <div class="container-xl">
+                <div class="row">
+                    <div class="col-md-7 offset-md-2">
+                        <div class="card">
+                            <div class="card-body">
+                                <form th:action="@{/pagos/guardar}" method="post">
+                                    <input type="hidden" name="idPago" th:value="${pago.idPago}">
+
+                                    <div class="form-field">
+                                        <label>Cita <span class="required">*</span></label>
+                                        <select name="citaId" class="form-control" required>
+                                            <option value="">-- Seleccionar cita --</option>
+                                            <option th:each="c : ${citas}"
+                                                    th:value="${c.idCita}"
+                                                    th:text="${c.paciente.apellidoPaterno + ' ' + c.paciente.nombres + ' | ' + c.fechaCita + ' ' + c.horaInicio}"
+                                                    th:selected="${pago.cita != null and pago.cita.idCita == c.idCita}">
+                                            </option>
+                                        </select>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-field">
+                                                <label>Monto (S/.) <span class="required">*</span></label>
+                                                <input type="number" name="monto" class="form-control"
+                                                       th:value="${pago.monto}" step="0.01" min="0" required>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-field">
+                                                <label>Método de Pago <span class="required">*</span></label>
+                                                <select name="metodoPago" class="form-control" required>
+                                                    <option value="">-- Seleccionar --</option>
+                                                    <option value="EFECTIVO" th:selected="${pago.metodoPago == 'EFECTIVO'}">Efectivo</option>
+                                                    <option value="TARJETA" th:selected="${pago.metodoPago == 'TARJETA'}">Tarjeta</option>
+                                                    <option value="TRANSFERENCIA" th:selected="${pago.metodoPago == 'TRANSFERENCIA'}">Transferencia</option>
+                                                    <option value="YAPE" th:selected="${pago.metodoPago == 'YAPE'}">Yape / Plin</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-field">
+                                                <label>Tipo Comprobante</label>
+                                                <select name="tipoComprobante" class="form-control">
+                                                    <option value="">-- Sin comprobante --</option>
+                                                    <option value="BOLETA" th:selected="${pago.tipoComprobante == 'BOLETA'}">Boleta</option>
+                                                    <option value="FACTURA" th:selected="${pago.tipoComprobante == 'FACTURA'}">Factura</option>
+                                                    <option value="RECIBO" th:selected="${pago.tipoComprobante == 'RECIBO'}">Recibo</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-field">
+                                                <label>N° Comprobante</label>
+                                                <input type="text" name="nroComprobante" class="form-control"
+                                                       th:value="${pago.nroComprobante}"
+                                                       placeholder="Ej: B001-000123">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-field">
+                                        <label>Estado</label>
+                                        <select name="estado" class="form-control">
+                                            <option value="PENDIENTE" th:selected="${pago.estado == null or pago.estado == 'PENDIENTE'}">Pendiente</option>
+                                            <option value="PAGADO" th:selected="${pago.estado == 'PAGADO'}">Pagado</option>
+                                            <option value="ANULADO" th:selected="${pago.estado == 'ANULADO'}">Anulado</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="form-footer d-flex gap-2 justify-content-end mt-3">
+                                        <a th:href="@{/pagos}" class="btn btn-ghost">Cancelar</a>
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fa-solid fa-save"></i> Guardar Pago
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+</body>
+</html>

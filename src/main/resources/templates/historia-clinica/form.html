@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: head('Historia Clínica')}"></head>
+<body class="app-body">
+<nav th:replace="~{fragments/header :: navbar}"></nav>
+<div class="app-content">
+    <div th:replace="~{fragments/header :: topbar}"></div>
+    <main class="page-main">
+
+        <div class="mb-4">
+            <h1 style="font-size:28px;font-weight:700;margin-bottom:6px;">
+                <i class="bi bi-journal-medical me-2" style="color:#06b6d4;"></i>
+                <span th:text="${historia.idHistoria != null} ? 'Editar Historia Clínica' : 'Nueva Historia Clínica'">Historia Clínica</span>
+            </h1>
+        </div>
+
+        <div class="card-professional">
+            <div class="card-header-professional">
+                <h5><i class="bi bi-pencil-square"></i> Formulario</h5>
+            </div>
+            <div class="p-4">
+                <form th:action="@{/historia-clinica/guardar}" method="post">
+                    <input type="hidden" th:name="idHistoria" th:value="${historia.idHistoria}">
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Paciente <span style="color:#ef4444;">*</span></label>
+                            <select name="pacienteId" class="form-select" required>
+                                <option value="">-- Seleccionar Paciente --</option>
+                                <option th:each="p : ${pacientes}"
+                                        th:value="${p.idPaciente}"
+                                        th:text="${p.apellidoPaterno + ' ' + p.nombres + ' - DNI: ' + p.dni}"
+                                        th:selected="${historia.paciente != null and historia.paciente.idPaciente == p.idPaciente}">
+                                </option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Nº Historia <span style="color:#ef4444;">*</span></label>
+                            <input type="text" name="nroHistoria" class="form-control"
+                                   th:value="${historia.nroHistoria}"
+                                   placeholder="HC-2026-001" maxlength="15" required>
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mb-4">
+                        <div class="col-12">
+                            <label class="form-label">Observaciones</label>
+                            <textarea name="observaciones" class="form-control" rows="4"
+                                      th:text="${historia.observaciones}"
+                                      placeholder="Observaciones generales sobre el paciente..." maxlength="1000"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn-professional btn-primary-prof">
+                            <i class="bi bi-save"></i> Guardar
+                        </button>
+                        <a href="/trinidad/historia-clinica" class="btn-professional btn-outline-prof">
+                            <i class="bi bi-x-lg"></i> Cancelar
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+    </main>
+    <footer th:replace="~{fragments/header :: footer}"></footer>
+</div>
+</body>
+</html>

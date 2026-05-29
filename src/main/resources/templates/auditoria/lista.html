@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: head('Auditoría')}"></head>
+<body class="app-body">
+
+<nav th:replace="~{fragments/header :: navbar}"></nav>
+
+<div class="app-content">
+    <div th:replace="~{fragments/header :: topbar}"></div>
+
+    <main class="page-main">
+        <!-- Page Header -->
+        <div class="mb-4">
+            <h1 style="font-size:28px;font-weight:700;margin-bottom:6px;">
+                <i class="bi bi-clock-history me-2" style="color:#06b6d4;"></i>Registro de Auditoría
+            </h1>
+            <p style="color:rgba(255,255,255,0.5);font-size:13px;">Historial de actividades del sistema</p>
+        </div>
+
+        <!-- Data Table -->
+        <div class="card-professional">
+            <div class="card-header-professional">
+                <h5><i class="bi bi-list"></i>Logs de Auditoría</h5>
+            </div>
+            <div class="p-4">
+                <div class="table-responsive">
+                    <table class="table-professional">
+                        <thead>
+                            <tr>
+                                <th>Fecha/Hora</th>
+                                <th>Usuario</th>
+                                <th>Acción</th>
+                                <th>Entidad</th>
+                                <th>Detalle</th>
+                                <th>IP Origen</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="log : ${logs}">
+                                <td th:text="${#temporals.format(log.fechaHora, 'dd/MM/yyyy HH:mm:ss')}"></td>
+                                <td th:text="${log.username}"></td>
+                                <td>
+                                    <span class="badge-status" 
+                                        th:classappend="${log.accion == 'CREATE' ? 'badge-success' : log.accion == 'DELETE' ? 'badge-danger' : 'badge-warning'}"
+                                        th:text="${log.accion}">
+                                    </span>
+                                </td>
+                                <td th:text="${log.entidad}"></td>
+                                <td th:text="${log.detalle}"></td>
+                                <td th:text="${log.ipOrigen}"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div th:if="${#lists.isEmpty(logs)}" style="text-align:center; padding:3rem 1.25rem; color:rgba(255,255,255,0.5);">
+                    <i class="bi bi-inbox" style="font-size:2.5rem;"></i>
+                    <p class="mt-2">No hay logs registrados</p>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <footer th:replace="~{fragments/header :: footer}"></footer>
+</div>
+
+</body>
+</html>

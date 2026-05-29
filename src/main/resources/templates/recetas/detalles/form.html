@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: head('Medicamento de Receta')}"></head>
+<body class="app-body">
+<nav th:replace="~{fragments/header :: navbar}"></nav>
+<div class="app-content">
+    <div th:replace="~{fragments/header :: topbar}"></div>
+    <main class="page-main">
+
+        <div class="mb-4">
+            <h1 style="font-size:28px;font-weight:700;margin-bottom:6px;">
+                <i class="bi bi-capsule me-2" style="color:#06b6d4;"></i>
+                <span th:text="${detalle.idDetalle != null} ? 'Editar Medicamento' : 'Nuevo Medicamento'">Medicamento</span>
+            </h1>
+        </div>
+
+        <div class="card-professional">
+            <div class="card-header-professional">
+                <h5><i class="bi bi-pencil-square"></i> Formulario de Medicamento</h5>
+            </div>
+            <div class="p-4">
+                <form th:action="@{/trinidad/recetas/{recetaId}/detalles/guardar(recetaId=${receta.idReceta})}" method="post">
+                    <input type="hidden" th:name="idDetalle" th:value="${detalle.idDetalle}">
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Nombre Genérico <span style="color:#ef4444;">*</span></label>
+                            <input type="text" name="nombreGenerico" class="form-control"
+                                   th:value="${detalle.nombreGenerico}"
+                                   maxlength="150" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Nombre Comercial</label>
+                            <input type="text" name="nombreComercial" class="form-control"
+                                   th:value="${detalle.nombreComercial}"
+                                   maxlength="150">
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-3">
+                            <label class="form-label">Presentación <span style="color:#ef4444;">*</span></label>
+                            <input type="text" name="presentacion" class="form-control"
+                                   th:value="${detalle.presentacion}"
+                                   placeholder="Tableta 500mg" maxlength="100" required>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Dosis <span style="color:#ef4444;">*</span></label>
+                            <input type="text" name="dosis" class="form-control"
+                                   th:value="${detalle.dosis}"
+                                   placeholder="1 tableta" maxlength="50" required>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Frecuencia <span style="color:#ef4444;">*</span></label>
+                            <input type="text" name="frecuencia" class="form-control"
+                                   th:value="${detalle.frecuencia}"
+                                   placeholder="Cada 8 horas" maxlength="50" required>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Duración (días) <span style="color:#ef4444;">*</span></label>
+                            <input type="number" name="duracionDias" class="form-control"
+                                   th:value="${detalle.duracionDias}"
+                                   min="1" max="365" required>
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label">Vía de Administración <span style="color:#ef4444;">*</span></label>
+                            <select name="viaAdministracion" class="form-select" required>
+                                <option value="">-- Seleccionar --</option>
+                                <option value="Oral" th:selected="${detalle.viaAdministracion == 'Oral'}">Oral</option>
+                                <option value="IV" th:selected="${detalle.viaAdministracion == 'IV'}">IV (Intravenosa)</option>
+                                <option value="IM" th:selected="${detalle.viaAdministracion == 'IM'}">IM (Intramuscular)</option>
+                                <option value="Subcutánea" th:selected="${detalle.viaAdministracion == 'Subcutánea'}">Subcutánea</option>
+                                <option value="Tópica" th:selected="${detalle.viaAdministracion == 'Tópica'}">Tópica</option>
+                                <option value="Inhalada" th:selected="${detalle.viaAdministracion == 'Inhalada'}">Inhalada</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Indicaciones</label>
+                            <textarea name="indicaciones" class="form-control" rows="2"
+                                      th:text="${detalle.indicaciones}"
+                                      maxlength="500"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn-professional btn-primary-prof">
+                            <i class="bi bi-save"></i> Guardar
+                        </button>
+                        <a th:href="@{/trinidad/recetas/{id}(id=${receta.idReceta})}" class="btn-professional btn-outline-prof">
+                            <i class="bi bi-x-lg"></i> Cancelar
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+    </main>
+    <footer th:replace="~{fragments/header :: footer}"></footer>
+</div>
+</body>
+</html>

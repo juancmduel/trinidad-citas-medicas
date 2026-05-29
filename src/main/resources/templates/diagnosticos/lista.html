@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: head(${titulo})}"></head>
+<body class="app-body">
+
+<nav th:replace="~{fragments/header :: navbar}"></nav>
+
+<div class="app-content">
+    <div th:replace="~{fragments/header :: topbar}"></div>
+
+    <main class="page-main">
+        <!-- Page Header -->
+        <div class="mb-4">
+            <h1 style="font-size:28px;font-weight:700;margin-bottom:6px;">
+                <i class="bi bi-hospital me-2" style="color:#06b6d4;"></i>Diagnósticos CIE-10
+            </h1>
+            <p style="color:rgba(255,255,255,0.5);font-size:13px;">Catálogo de diagnósticos clínicos clasificados por CIE-10</p>
+        </div>
+
+        <!-- Data Table -->
+        <div class="card-professional">
+            <div class="card-header-professional">
+                <h5><i class="bi bi-list"></i>Diagnósticos Disponibles</h5>
+                <a th:href="@{/diagnosticos/nuevo}" class="btn-professional btn-primary-prof btn-sm">
+                    <i class="bi bi-plus"></i> Nuevo Diagnóstico
+                </a>
+            </div>
+            <div class="p-4">
+                <div class="table-responsive">
+                    <table class="table-professional">
+                        <thead>
+                            <tr>
+                                <th>Código CIE-10</th>
+                                <th>Descripción</th>
+                                <th>Categoría</th>
+                                <th class="text-end">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="diagnostico : ${diagnosticos}">
+                                <td><strong th:text="${diagnostico.codigo}"></strong></td>
+                                <td th:text="${diagnostico.descripcion}"></td>
+                                <td th:text="${diagnostico.capitulo}"></td>
+                                <td class="text-end">
+                                    <a th:href="@{/diagnosticos/{id}(id=${diagnostico.codigo})}" class="btn-professional btn-outline-prof btn-sm">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    <a th:href="@{/diagnosticos/editar/{id}(id=${diagnostico.codigo})}" class="btn-professional btn-outline-prof btn-sm">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <a th:href="@{/diagnosticos/eliminar/{id}(id=${diagnostico.codigo})}"
+                                       class="btn-professional btn-danger-prof btn-sm"
+                                       onclick="return confirm('¿Eliminar este diagnóstico?')">
+                                        <i class="bi bi-trash"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div th:if="${#lists.isEmpty(diagnosticos)}" style="text-align:center; padding:3rem 1.25rem; color:rgba(255,255,255,0.5);">
+                    <i class="bi bi-inbox" style="font-size:2.5rem;"></i>
+                    <p class="mt-2">No hay diagnósticos registrados</p>
+                </div>
+            </div>
+        </div>
+    </main>
+    <footer th:replace="~{fragments/header :: footer}"></footer>
+</div>
+</body>
+</html>

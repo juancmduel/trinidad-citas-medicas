@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: head('Detalle Medicamento')}"></head>
+<body class="app-body">
+<nav th:replace="~{fragments/header :: navbar}"></nav>
+<div class="app-content">
+    <div th:replace="~{fragments/header :: topbar}"></div>
+    <main class="page-main">
+
+        <div class="mb-4">
+            <h1 style="font-size:28px;font-weight:700;margin-bottom:6px;">
+                <i class="bi bi-capsule me-2" style="color:#06b6d4;"></i>Detalle de Medicamento
+            </h1>
+        </div>
+
+        <div th:if="${detalle != null}" class="card-professional mb-4">
+            <div class="card-header-professional d-flex justify-content-between">
+                <h5><i class="bi bi-file-medical"></i></h5>
+                <div class="d-flex gap-2">
+                    <a th:href="@{/trinidad/recetas/{recetaId}/detalles/editar/{id}(recetaId=${receta.idReceta}, id=${detalle.idDetalle})}" class="btn-professional btn-outline-prof btn-sm">
+                        <i class="bi bi-pencil"></i> Editar
+                    </a>
+                    <a th:href="@{/trinidad/recetas/{recetaId}/detalles/eliminar/{id}(recetaId=${receta.idReceta}, id=${detalle.idDetalle})}"
+                       class="btn-professional btn-danger-prof btn-sm"
+                       onclick="return confirm('¿Eliminar este medicamento?')">
+                        <i class="bi bi-trash"></i> Eliminar
+                    </a>
+                </div>
+            </div>
+            <div class="p-4">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label style="color:rgba(255,255,255,0.5);font-size:12px;">Nombre Genérico</label>
+                        <p style="font-weight:700;color:#06b6d4;" th:text="${detalle.nombreGenerico}"></p>
+                    </div>
+                    <div class="col-md-6">
+                        <label style="color:rgba(255,255,255,0.5);font-size:12px;">Nombre Comercial</label>
+                        <p th:text="${detalle.nombreComercial ?: '-'}"></p>
+                    </div>
+                    <div class="col-md-3">
+                        <label style="color:rgba(255,255,255,0.5);font-size:12px;">Presentación</label>
+                        <p th:text="${detalle.presentacion}"></p>
+                    </div>
+                    <div class="col-md-3">
+                        <label style="color:rgba(255,255,255,0.5);font-size:12px;">Dosis</label>
+                        <p th:text="${detalle.dosis}"></p>
+                    </div>
+                    <div class="col-md-3">
+                        <label style="color:rgba(255,255,255,0.5);font-size:12px;">Frecuencia</label>
+                        <p th:text="${detalle.frecuencia}"></p>
+                    </div>
+                    <div class="col-md-3">
+                        <label style="color:rgba(255,255,255,0.5);font-size:12px;">Duración</label>
+                        <p th:text="${detalle.duracionDias + ' día(s)'}"></p>
+                    </div>
+                    <div class="col-md-6">
+                        <label style="color:rgba(255,255,255,0.5);font-size:12px;">Vía de Administración</label>
+                        <p th:text="${detalle.viaAdministracion ?: '-'}"></p>
+                    </div>
+                    <div class="col-md-6" th:if="${detalle.indicaciones}">
+                        <label style="color:rgba(255,255,255,0.5);font-size:12px;">Indicaciones</label>
+                        <p th:text="${detalle.indicaciones}"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <a th:href="@{/trinidad/recetas/{id}(id=${receta.idReceta})}" class="btn-professional btn-outline-prof">
+            <i class="bi bi-arrow-left"></i> Volver a Receta
+        </a>
+
+    </main>
+    <footer th:replace="~{fragments/header :: footer}"></footer>
+</div>
+</body>
+</html>
