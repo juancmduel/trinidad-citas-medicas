@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/header :: head('Órdenes de Examen')}"></head>
 <body class="app-body">
@@ -13,7 +13,7 @@
                         <h2 class="page-title"><i class="fa-solid fa-flask"></i> Órdenes de Examen</h2>
                     </div>
                     <div class="col-auto">
-                        <a th:href="@{/ordenes-examen/nueva}" class="btn btn-primary">
+                        <a th:href="@{/ordenes-examen/nueva}" class="btn-nuevo">
                             <i class="fa-solid fa-plus"></i> Nueva Orden
                         </a>
                     </div>
@@ -39,8 +39,7 @@
                             </thead>
                             <tbody>
                                 <tr th:if="${ordenes.isEmpty()}">
-                                    <td colspan="7" class="text-center py-4">No hay órdenes de examen registradas</td>
-                                </tr>
+                                    <td colspan="7" class="text-center py-4">No hay órdenes de examen registradas</td></tr>
                                 <tr th:each="o : ${ordenes}">
                                     <td th:text="${o.atencion?.cita?.paciente?.apellidoPaterno + ' ' + o.atencion?.cita?.paciente?.nombres}">-</td>
                                     <td th:text="${o.atencion?.cita?.medico?.nombreCompleto}">-</td>
@@ -53,16 +52,15 @@
                                               th:text="${o.estado}"></span>
                                     </td>
                                     <td>
-                                        <a th:href="@{/ordenes-examen/{id}(id=${o.idOrden})}" class="btn btn-sm btn-outline-info"><i class="fa-solid fa-eye"></i></a>
-                                        <a th:href="@{/ordenes-examen/editar/{id}(id=${o.idOrden})}" class="btn btn-sm btn-outline-warning"><i class="fa-solid fa-pencil"></i></a>
+                                        <a th:href="@{/ordenes-examen/{id}(id=${o.idOrden})}" class="btn-ver"><i class="fa-solid fa-eye"></i></a>
+                                        <a th:href="@{/ordenes-examen/editar/{id}(id=${o.idOrden})}" class="btn-editar"><i class="fa-solid fa-pencil"></i></a>
                                         <form th:action="@{/ordenes-examen/eliminar/{id}(id=${o.idOrden})}" method="post" style="display:inline;">
-                                            <button type="submit" class="btn btn-sm btn-outline-danger"
+                                            <button type="submit" class="btn-eliminar"
                                                     onclick="return confirm('¿Eliminar esta orden?')">
                                                 <i class="fa-solid fa-trash"></i>
                                             </button>
                                         </form>
-                                    </td>
-                                </tr>
+                                    </div></td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -73,3 +71,5 @@
 </div>
 </body>
 </html>
+
+

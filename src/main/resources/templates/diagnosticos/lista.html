@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/header :: head(${titulo})}"></head>
 <body class="app-body">
@@ -41,21 +41,20 @@
                                 <td><strong th:text="${diagnostico.codigo}"></strong></td>
                                 <td th:text="${diagnostico.descripcion}"></td>
                                 <td th:text="${diagnostico.capitulo}"></td>
-                                <td class="text-end">
-                                    <a th:href="@{/diagnosticos/{id}(id=${diagnostico.codigo})}" class="btn-professional btn-outline-prof btn-sm">
+                                <td><div class="acciones-tabla">
+                                    <a th:href="@{/diagnosticos/{id}(id=${diagnostico.codigo})}" class="btn-ver">
                                         <i class="bi bi-eye"></i>
                                     </a>
-                                    <a th:href="@{/diagnosticos/editar/{id}(id=${diagnostico.codigo})}" class="btn-professional btn-outline-prof btn-sm">
+                                    <a th:href="@{/diagnosticos/editar/{id}(id=${diagnostico.codigo})}" class="btn-editar">
                                         <i class="bi bi-pencil"></i>
                                     </a>
                                     <form th:action="@{/diagnosticos/eliminar/{id}(id=${diagnostico.codigo})}" method="post" style="display:inline;">
-                                        <button type="submit" class="btn-professional btn-danger-prof btn-sm"
+                                        <button type="submit" class="btn-eliminar"
                                                 onclick="return confirm('¿Eliminar este diagnóstico?')">
                                             <i class="bi bi-trash"></i>
                                         </button>
                                     </form>
-                                </td>
-                            </tr>
+                                </div></td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -70,3 +69,5 @@
 </div>
 </body>
 </html>
+
+

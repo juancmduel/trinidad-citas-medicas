@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/header :: head('Detalle Pago')}"></head>
 <body class="app-body">
@@ -49,16 +49,16 @@
         </div>
 
         <div class="d-flex gap-2">
-            <a th:href="@{/pagos/editar/{id}(id=${pago.idPago})}" class="btn-professional btn-outline-prof">
+            <a th:href="@{/pagos/editar/{id}(id=${pago.idPago})}" class="btn-editar">
                 <i class="bi bi-pencil"></i> Editar
             </a>
             <form th:action="@{/pagos/eliminar/{id}(id=${pago.idPago})}" method="post" style="display:inline;">
-                <button type="submit" class="btn-professional btn-danger-prof"
+                <button type="submit" class="btn-eliminar"
                         onclick="return confirm('¿Eliminar este pago?')">
                     <i class="bi bi-trash"></i> Eliminar
                 </button>
             </form>
-            <a href="/trinidad/pagos" class="btn-professional btn-outline-prof">
+            <a href="/trinidad/pagos" class="btn-ver">
                 <i class="bi bi-arrow-left"></i> Volver
             </a>
         </div>
@@ -68,3 +68,5 @@
 </div>
 </body>
 </html>
+
+

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/header :: head('Especialidad')}"></head>
 <body class="app-body">
@@ -11,7 +11,7 @@
                 <h1 class="page-title" th:text="${especialidad.idEspecialidad != null} ? 'Editar Especialidad' : 'Nueva Especialidad'">Especialidad</h1>
                 <p class="page-subtitle">Gestione las especialidades médicas disponibles</p>
             </div>
-            <a th:href="@{/especialidades}" class="btn btn-secondary"><i class="bi bi-arrow-left"></i>Volver</a>
+            <a th:href="@{/especialidades}" class="btn-volver"><i class="bi bi-arrow-left"></i>Volver</a>
         </div>
 
         <div class="form-container">
@@ -87,11 +87,11 @@
 
                 <!-- Botones de Acción -->
                 <div class="form-actions">
-                    <button type="submit" class="btn btn-success btn-lg">
+                    <button type="submit" class="btn-guardar">
                         <i class="bi bi-check-circle"></i>
                         <span th:text="${especialidad.idEspecialidad != null} ? 'Guardar Cambios' : 'Crear Especialidad'"></span>
                     </button>
-                    <a th:href="@{/especialidades}" class="btn btn-secondary btn-lg">
+                    <a th:href="@{/especialidades}" class="btn-volver">
                         <i class="bi bi-x-circle"></i>
                         Cancelar
                     </a>
@@ -103,3 +103,4 @@
 </div>
 </body>
 </html>
+

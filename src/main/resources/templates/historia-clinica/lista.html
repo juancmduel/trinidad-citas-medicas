@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head th:replace="~{fragments/header :: head('Historia Clínica')}"></head>
 <body class="app-body">
@@ -45,8 +45,7 @@
                                     </thead>
                                     <tbody>
                                         <tr th:if="${historias.isEmpty()}">
-                                            <td colspan="6" class="text-center">No hay historias clínicas registradas</td>
-                                        </tr>
+                                            <td colspan="6" class="text-center">No hay historias clínicas registradas</td></tr>
                                         <tr th:each="h : ${historias}">
                                             <td th:text="${h.nroHistoria}"></td>
                                             <td th:text="${h.paciente != null ? h.paciente.nombres + ' ' + h.paciente.apellidoPaterno : '-'}"></td>
@@ -57,20 +56,19 @@
                                                 <span th:if="${h.activo != 1}" class="badge bg-secondary">Inactiva</span>
                                             </td>
                                             <td>
-                                                <a th:href="@{/historia-clinica/{id}(id=${h.idHistoria})}" class="btn btn-sm btn-outline-info">
+                                                <a th:href="@{/historia-clinica/{id}(id=${h.idHistoria})}" class="btn-ver">
                                                     <i class="fa-solid fa-eye"></i>
                                                 </a>
-                                                <a th:href="@{/historia-clinica/editar/{id}(id=${h.idHistoria})}" class="btn btn-sm btn-outline-warning">
+                                                <a th:href="@{/historia-clinica/editar/{id}(id=${h.idHistoria})}" class="btn-editar">
                                                     <i class="fa-solid fa-pencil"></i>
                                                 </a>
                                                 <form th:action="@{/historia-clinica/eliminar/{id}(id=${h.idHistoria})}" method="post" style="display:inline;">
-                                                    <button type="submit" class="btn btn-sm btn-outline-danger"
+                                                    <button type="submit" class="btn-eliminar"
                                                             onclick="return confirm('¿Eliminar esta historia clínica?')">
                                                         <i class="fa-solid fa-trash"></i>
                                                     </button>
                                                 </form>
-                                            </td>
-                                        </tr>
+                                            </div></td></tr>
                                     </tbody>
                                 </table>
                             </div>
@@ -84,3 +82,5 @@
 
 </body>
 </html>
+
+

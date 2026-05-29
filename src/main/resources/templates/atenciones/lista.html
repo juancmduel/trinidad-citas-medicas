@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/header :: head(${titulo})}"></head>
 <body class="app-body">
@@ -54,12 +54,11 @@
                                         th:text="${atencion.cita.estado}">
                                     </span>
                                 </td>
-                                <td class="text-end">
-                                    <a th:href="@{/atenciones/{id}(id=${atencion.idAtencion})}" class="btn-professional btn-outline-prof btn-sm">
+                                <td><div class="acciones-tabla">
+                                    <a th:href="@{/atenciones/{id}(id=${atencion.idAtencion})}" class="btn-ver">
                                         <i class="bi bi-eye"></i>
                                     </a>
-                                </td>
-                            </tr>
+                                </div></td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -77,3 +76,4 @@
 
 </body>
 </html>
+

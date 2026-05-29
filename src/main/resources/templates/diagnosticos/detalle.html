@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/header :: head('Detalle Diagnóstico')}"></head>
 <body class="app-body">
@@ -17,11 +17,11 @@
             <div class="card-header-professional d-flex justify-content-between align-items-center">
                 <h5><i class="bi bi-info-circle"></i> Información del Diagnóstico</h5>
                 <div class="d-flex gap-2">
-                    <a th:href="@{/diagnosticos/editar/{id}(id=${diagnostico.codigo})}" class="btn-professional btn-outline-prof btn-sm">
+                    <a th:href="@{/diagnosticos/editar/{id}(id=${diagnostico.codigo})}" class="btn-editar">
                         <i class="bi bi-pencil"></i> Editar
                     </a>
                     <form th:action="@{/diagnosticos/eliminar/{id}(id=${diagnostico.codigo})}" method="post" style="display:inline;">
-                        <button type="submit" class="btn-professional btn-danger-prof btn-sm"
+                        <button type="submit" class="btn-eliminar"
                                 onclick="return confirm('¿Eliminar este diagnóstico?')">
                             <i class="bi bi-trash"></i> Eliminar
                         </button>
@@ -46,7 +46,7 @@
             </div>
         </div>
 
-        <a href="/trinidad/diagnosticos" class="btn-professional btn-outline-prof">
+        <a href="/trinidad/diagnosticos" class="btn-ver">
             <i class="bi bi-arrow-left"></i> Volver
         </a>
 
@@ -55,3 +55,5 @@
 </div>
 </body>
 </html>
+
+

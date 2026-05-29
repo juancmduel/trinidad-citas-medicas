@@ -18,7 +18,7 @@
                     </h1>
                     <p style="color:rgba(255,255,255,0.5);font-size:13px;">Gestión y registro de pacientes del sistema</p>
                 </div>
-                <a th:href="@{/pacientes/nuevo}" class="btn-professional btn-primary-prof">
+                <a th:href="@{/pacientes/nuevo}" class="btn-nuevo">
                     <i class="bi bi-plus-circle-fill"></i>Nuevo Paciente
                 </a>
             </div>
@@ -66,21 +66,19 @@
                                 <td>
                                     <span class="badge-status badge-primary" th:text="${p.tipoSangre ?: 'N/D'}"></span>
                                 </td>
-                                <td class="text-end">
-                                    <a th:href="@{/pacientes/{id}(id=${p.idPaciente})}" class="btn-professional btn-outline-prof btn-sm" title="Ver">
+                                <td><div class="acciones-tabla">
+                                    <a th:href="@{/pacientes/{id}(id=${p.idPaciente})}" class="btn-ver" title="Ver">
                                         <i class="bi bi-eye"></i>
                                     </a>
                                     <a th:href="@{/pacientes/{id}/editar(id=${p.idPaciente})}" class="btn-professional btn-outline-prof btn-sm ms-2" title="Editar">
                                         <i class="bi bi-pencil"></i>
                                     </a>
-                                </td>
-                            </tr>
+                                </div></td></tr>
                             <tr th:if="${#lists.isEmpty(pacientes)}">
                                 <td colspan="7" style="text-align:center; padding:3rem 1.25rem; color:rgba(255,255,255,0.5);">
                                     <i class="bi bi-inbox" style="font-size:2.5rem;"></i>
                                     <p class="mt-2">No hay pacientes registrados</p>
-                                </td>
-                            </tr>
+                                </div></td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -93,3 +91,4 @@
 
 </body>
 </html>
+

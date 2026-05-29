@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head th:replace="~{fragments/header :: head('Detalle Paciente')}"></head>
 <body class="app-body">
@@ -21,10 +21,10 @@
                 </div>
                 <div class="d-flex gap-2">
                     <a th:href="@{/pacientes/{id}/editar(id=${paciente.idPaciente})}"
-                       class="btn-professional btn-primary-prof">
+                       class="btn-nuevo">
                         <i class="bi bi-pencil-fill"></i>Editar
                     </a>
-                    <a th:href="@{/pacientes}" class="btn-professional btn-outline-prof">
+                    <a th:href="@{/pacientes}" class="btn-ver">
                         <i class="bi bi-arrow-left"></i>Volver
                     </a>
                 </div>
@@ -99,15 +99,15 @@
             <div class="p-4">
                 <div class="d-flex gap-3 flex-wrap">
                     <a th:href="@{/citas/agendar(idPaciente=${paciente.idPaciente})}"
-                       class="btn-professional btn-primary-prof">
+                       class="btn-nuevo">
                         <i class="bi bi-calendar-plus"></i>Agendar Cita
                     </a>
                     <a th:href="@{/citas/paciente/{id}(id=${paciente.idPaciente})}"
-                       class="btn-professional btn-outline-prof">
+                       class="btn-ver">
                         <i class="bi bi-calendar-event"></i>Ver Citas
                     </a>
                     <a th:href="@{/historias/paciente/{id}(id=${paciente.idPaciente})}"
-                       class="btn-professional btn-outline-prof">
+                       class="btn-ver">
                         <i class="bi bi-file-medical"></i>Historia Clínica
                     </a>
                 </div>
@@ -121,3 +121,4 @@
 
 </body>
 </html>
+

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head th:replace="~{fragments/header :: head('Horarios de Médicos')}"></head>
 <body class="app-body">
@@ -16,7 +16,7 @@
                         <h2 class="page-title"><i class="fa-solid fa-calendar"></i> Horarios de Médicos</h2>
                     </div>
                     <div class="col-auto">
-                        <a href="/trinidad/horarios/nuevo" class="btn btn-primary">
+                        <a href="/trinidad/horarios/nuevo" class="btn-nuevo">
                             <i class="fa-solid fa-plus"></i> Nuevo Horario
                         </a>
                     </div>
@@ -43,8 +43,7 @@
                                     </thead>
                                     <tbody>
                                         <tr th:if="${horarios.isEmpty()}">
-                                            <td colspan="6" class="text-center">No hay horarios configurados</td>
-                                        </tr>
+                                            <td colspan="6" class="text-center">No hay horarios configurados</td></tr>
                                         <tr th:each="h : ${horarios}">
                                             <td th:text="${h.medico != null ? h.medico.nombreCompleto : '-'}"></td>
                                             <td th:text="${h.diaSemana == 1 ? 'Lunes' :
@@ -60,20 +59,19 @@
                                                 <span th:if="${h.activo != 1}" class="badge bg-secondary">Inactivo</span>
                                             </td>
                                             <td>
-                                                <a th:href="@{/horarios/{id}(id=${h.idHorario})}" class="btn btn-sm btn-outline-info">
+                                                <a th:href="@{/horarios/{id}(id=${h.idHorario})}" class="btn-ver">
                                                     <i class="fa-solid fa-eye"></i>
                                                 </a>
-                                                <a th:href="@{/horarios/editar/{id}(id=${h.idHorario})}" class="btn btn-sm btn-outline-warning">
+                                                <a th:href="@{/horarios/editar/{id}(id=${h.idHorario})}" class="btn-editar">
                                                     <i class="fa-solid fa-pencil"></i>
                                                 </a>
                                                 <form th:action="@{/horarios/eliminar/{id}(id=${h.idHorario})}" method="post" style="display:inline;">
-                                                    <button type="submit" class="btn btn-sm btn-outline-danger"
+                                                    <button type="submit" class="btn-eliminar"
                                                             onclick="return confirm('¿Eliminar este horario?')">
                                                         <i class="fa-solid fa-trash"></i>
                                                     </button>
                                                 </form>
-                                            </td>
-                                        </tr>
+                                            </div></td></tr>
                                     </tbody>
                                 </table>
                             </div>
@@ -87,3 +85,5 @@
 
 </body>
 </html>
+
+

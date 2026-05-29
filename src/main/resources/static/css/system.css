@@ -501,3 +501,137 @@
         font-size: 0.85rem;
     }
 }
+
+/* ============================================================
+   SISTEMA DE BOTONES UNIFICADO - TRINIDAD
+   Clases: btn-ver | btn-editar | btn-eliminar | btn-nuevo
+           btn-guardar | btn-volver | btn-cancelar
+   ============================================================ */
+
+.btn-ver,
+.btn-editar,
+.btn-eliminar,
+.btn-nuevo,
+.btn-guardar,
+.btn-volver,
+.btn-cancelar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 7px 14px;
+    border-radius: 9px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none !important;
+    transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+    letter-spacing: 0.2px;
+    white-space: nowrap;
+    vertical-align: middle;
+    border: none;
+    line-height: 1;
+}
+
+.btn-ver,
+.btn-editar,
+.btn-eliminar {
+    padding: 6px 11px;
+    font-size: 13px;
+}
+
+/* ── VER (cyan) ── */
+.btn-ver {
+    background: rgba(6,182,212,0.12);
+    color: #06b6d4 !important;
+    border: 1.5px solid rgba(6,182,212,0.35);
+}
+.btn-ver:hover {
+    background: rgba(6,182,212,0.25);
+    border-color: #06b6d4;
+    color: #22d3ee !important;
+    box-shadow: 0 4px 14px rgba(6,182,212,0.25);
+    transform: translateY(-1px);
+}
+
+/* ── EDITAR (amber) ── */
+.btn-editar {
+    background: rgba(245,158,11,0.10);
+    color: #f59e0b !important;
+    border: 1.5px solid rgba(245,158,11,0.32);
+}
+.btn-editar:hover {
+    background: rgba(245,158,11,0.22);
+    border-color: #f59e0b;
+    color: #fbbf24 !important;
+    box-shadow: 0 4px 14px rgba(245,158,11,0.22);
+    transform: translateY(-1px);
+}
+
+/* ── ELIMINAR (red, suave) ── */
+.btn-eliminar {
+    background: rgba(239,68,68,0.10);
+    color: #ef4444 !important;
+    border: 1.5px solid rgba(239,68,68,0.30);
+}
+.btn-eliminar:hover {
+    background: rgba(239,68,68,0.22);
+    border-color: #ef4444;
+    color: #f87171 !important;
+    box-shadow: 0 4px 14px rgba(239,68,68,0.22);
+    transform: translateY(-1px);
+}
+
+/* ── NUEVO / CREAR (green) ── */
+.btn-nuevo {
+    background: linear-gradient(135deg, rgba(16,185,129,0.18), rgba(16,185,129,0.08));
+    color: #10b981 !important;
+    border: 1.5px solid rgba(16,185,129,0.38);
+    padding: 8px 18px;
+}
+.btn-nuevo:hover {
+    background: linear-gradient(135deg, rgba(16,185,129,0.30), rgba(16,185,129,0.18));
+    border-color: #10b981;
+    color: #34d399 !important;
+    box-shadow: 0 5px 16px rgba(16,185,129,0.22);
+    transform: translateY(-2px);
+}
+
+/* ── GUARDAR (primary cyan sólido) ── */
+.btn-guardar {
+    background: linear-gradient(135deg, #06b6d4, #0891b2);
+    color: #0a1628 !important;
+    border: none;
+    padding: 10px 26px;
+    font-size: 14px;
+    box-shadow: 0 4px 15px rgba(6,182,212,0.22);
+}
+.btn-guardar:hover {
+    background: linear-gradient(135deg, #0891b2, #0e7490);
+    color: #fff !important;
+    box-shadow: 0 7px 22px rgba(6,182,212,0.35);
+    transform: translateY(-2px);
+}
+
+/* ── VOLVER / CANCELAR ── */
+.btn-volver,
+.btn-cancelar {
+    background: rgba(255,255,255,0.06);
+    color: rgba(255,255,255,0.65) !important;
+    border: 1.5px solid rgba(255,255,255,0.14);
+    padding: 10px 20px;
+}
+.btn-volver:hover,
+.btn-cancelar:hover {
+    background: rgba(255,255,255,0.12);
+    color: rgba(255,255,255,0.9) !important;
+    border-color: rgba(255,255,255,0.28);
+    transform: translateY(-1px);
+}
+
+/* grupo de acciones en tabla */
+.acciones-tabla {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+}

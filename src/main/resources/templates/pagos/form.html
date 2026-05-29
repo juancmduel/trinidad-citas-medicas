@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/header :: head('Pago')}"></head>
 <body class="app-body">
@@ -89,8 +89,8 @@
                                     </div>
 
                                     <div class="form-footer d-flex gap-2 justify-content-end mt-3">
-                                        <a th:href="@{/pagos}" class="btn btn-ghost">Cancelar</a>
-                                        <button type="submit" class="btn btn-primary">
+                                        <a th:href="@{/pagos}" class="btn-volver">Cancelar</a>
+                                        <button type="submit" class="btn-nuevo">
                                             <i class="fa-solid fa-save"></i> Guardar Pago
                                         </button>
                                     </div>
@@ -105,3 +105,4 @@
 </div>
 </body>
 </html>
+

@@ -54,22 +54,20 @@
                                     <span th:unless="${m.activo == 1}" class="badge-status badge-danger">Inactivo</span>
                                 </td>
                                 <td>
-                                    <a th:href="@{/medicos/{id}(id=${m.idMedico})}" class="btn btn-sm btn-outline-info"><i class="bi bi-eye"></i></a>
-                                    <a th:href="@{/medicos/editar/{id}(id=${m.idMedico})}" class="btn btn-sm btn-outline-warning"><i class="bi bi-pencil"></i></a>
+                                    <a th:href="@{/medicos/{id}(id=${m.idMedico})}" class="btn-ver"><i class="bi bi-eye"></i></a>
+                                    <a th:href="@{/medicos/editar/{id}(id=${m.idMedico})}" class="btn-editar"><i class="bi bi-pencil"></i></a>
                                     <form th:action="@{/medicos/eliminar/{id}(id=${m.idMedico})}" method="post" style="display:inline;">
-                                        <button type="submit" class="btn btn-sm btn-outline-danger"
+                                        <button type="submit" class="btn-eliminar"
                                                 onclick="return confirm('¿Eliminar este médico?')">
                                             <i class="bi bi-trash"></i>
                                         </button>
                                     </form>
-                                </td>
-                            </tr>
+                                </div></td></tr>
                             <tr th:if="${#lists.isEmpty(medicos)}">
                                 <td colspan="7" style="text-align:center; padding:3rem 1.25rem; color:rgba(255,255,255,0.5);">
                                     <i class="bi bi-person-badge" style="font-size:2.5rem;"></i>
                                     <p class="mt-2">No hay médicos registrados</p>
-                                </td>
-                            </tr>
+                                </div></td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -82,3 +80,4 @@
 
 </body>
 </html>
+

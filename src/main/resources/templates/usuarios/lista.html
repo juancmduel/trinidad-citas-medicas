@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/header :: head('Usuarios')}"></head>
 <body class="app-body">
@@ -49,12 +49,11 @@
                                     </span>
                                 </td>
                                 <td th:text="${usuario.fechaUltLogin ? #temporals.format(usuario.fechaUltLogin, 'dd/MM/yyyy HH:mm') : 'Nunca'}"></td>
-                                <td class="text-end">
-                                    <a th:href="@{/usuarios/{id}(id=${usuario.idUsuario})}" class="btn-professional btn-outline-prof btn-sm">
+                                <td><div class="acciones-tabla">
+                                    <a th:href="@{/usuarios/{id}(id=${usuario.idUsuario})}" class="btn-ver">
                                         <i class="bi bi-eye"></i>
                                     </a>
-                                </td>
-                            </tr>
+                                </div></td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -72,3 +71,4 @@
 
 </body>
 </html>
+

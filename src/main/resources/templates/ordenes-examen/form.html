@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/header :: head('Orden de Examen')}"></head>
 <body class="app-body">
@@ -76,8 +76,8 @@
                                     </div>
 
                                     <div class="form-footer d-flex gap-2 justify-content-end mt-3">
-                                        <a th:href="@{/ordenes-examen}" class="btn btn-ghost">Cancelar</a>
-                                        <button type="submit" class="btn btn-primary">
+                                        <a th:href="@{/ordenes-examen}" class="btn-volver">Cancelar</a>
+                                        <button type="submit" class="btn-nuevo">
                                             <i class="fa-solid fa-save"></i> Guardar Orden
                                         </button>
                                     </div>
@@ -92,3 +92,4 @@
 </div>
 </body>
 </html>
+

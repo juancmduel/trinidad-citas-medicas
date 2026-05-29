@@ -33,8 +33,21 @@
                         <span class="badge-status badge-primary">
                             S/. <span th:text="${#numbers.formatDecimal(e.precioConsulta, 1, 2, 'DEFAULT')}">0.00</span>
                         </span>
-                        <span th:if="${e.activo}" class="badge-status badge-success">Activo</span>
-                        <span th:unless="${e.activo}" class="badge-status badge-danger">Inactivo</span>
+                        <span th:if="${e.activo == 1}" class="badge-status badge-success">Activo</span>
+                        <span th:unless="${e.activo == 1}" class="badge-status badge-danger">Inactivo</span>
+                    </div>
+                    <div class="d-flex gap-2 mt-3">
+                        <a th:href="@{/especialidades/editar/{id}(id=${e.idEspecialidad})}"
+                           class="btn btn-sm btn-outline-warning w-50">
+                            <i class="bi bi-pencil"></i> Editar
+                        </a>
+                        <form th:action="@{/especialidades/eliminar/{id}(id=${e.idEspecialidad})}"
+                              method="post" style="display:inline;width:50%;"
+                              onsubmit="return confirm('¿Eliminar esta especialidad?')">
+                            <button type="submit" class="btn btn-sm btn-outline-danger w-100">
+                                <i class="bi bi-trash"></i> Eliminar
+                            </button>
+                        </form>
                     </div>
                 </div>
             </div>

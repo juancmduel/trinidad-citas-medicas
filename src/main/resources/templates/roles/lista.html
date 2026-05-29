@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/header :: head('Roles')}"></head>
 <body class="app-body">
@@ -43,12 +43,11 @@
                                         th:text="${rol.activo ? 'Activo' : 'Inactivo'}">
                                     </span>
                                 </td>
-                                <td class="text-end">
-                                    <a th:href="@{/roles/{id}(id=${rol.idRol})}" class="btn-professional btn-outline-prof btn-sm">
+                                <td><div class="acciones-tabla">
+                                    <a th:href="@{/roles/{id}(id=${rol.idRol})}" class="btn-ver">
                                         <i class="bi bi-eye"></i>
                                     </a>
-                                </td>
-                            </tr>
+                                </div></td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -66,3 +65,4 @@
 
 </body>
 </html>
+

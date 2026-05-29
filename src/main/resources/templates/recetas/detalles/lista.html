@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/header :: head('Medicamentos de Receta')}"></head>
 <body class="app-body">
@@ -43,17 +43,16 @@
                                 <td th:text="${detalle.frecuencia}"></td>
                                 <td th:text="${detalle.duracionDias + ' día(s)'}"></td>
                                 <td th:text="${detalle.viaAdministracion ?: '-'}"></td>
-                                <td class="text-end">
+                                <td><div class="acciones-tabla">
                                     <a th:href="@{/trinidad/recetas/{recetaId}/detalles/editar/{id}(recetaId=${receta.idReceta}, id=${detalle.idDetalle})}" class="btn-professional btn-outline-prof btn-sm me-1">
                                         <i class="bi bi-pencil"></i>
                                     </a>
                                     <a th:href="@{/trinidad/recetas/{recetaId}/detalles/eliminar/{id}(recetaId=${receta.idReceta}, id=${detalle.idDetalle})}"
-                                       class="btn-professional btn-danger-prof btn-sm"
+                                       class="btn-eliminar"
                                        onclick="return confirm('¿Eliminar este medicamento?')">
                                         <i class="bi bi-trash"></i>
                                     </a>
-                                </td>
-                            </tr>
+                                </div></td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -64,7 +63,7 @@
             </div>
         </div>
 
-        <a th:href="@{/trinidad/recetas/{id}(id=${receta.idReceta})}" class="btn-professional btn-outline-prof">
+        <a th:href="@{/trinidad/recetas/{id}(id=${receta.idReceta})}" class="btn-ver">
             <i class="bi bi-arrow-left"></i> Volver a Receta
         </a>
 
@@ -73,3 +72,4 @@
 </div>
 </body>
 </html>
+

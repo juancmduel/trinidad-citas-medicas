@@ -18,7 +18,7 @@
                     </h1>
                     <p style="color:rgba(255,255,255,0.5);font-size:13px;">Gestión integral de citas del sistema</p>
                 </div>
-                <a th:href="@{/citas/agendar}" class="btn-professional btn-primary-prof">
+                <a th:href="@{/citas/agendar}" class="btn-nuevo">
                     <i class="bi bi-plus-circle-fill"></i>Nueva Cita
                 </a>
             </div>
@@ -71,18 +71,16 @@
                                     <span th:if="${c.estado == 'CANCELADA'}" class="badge-status badge-danger">Cancelada</span>
                                     <span th:if="${c.estado == 'NO_ASISTIO'}" class="badge-status badge-warning">No Asistió</span>
                                 </td>
-                                <td class="text-end">
-                                    <a th:href="@{/citas/{id}(id=${c.idCita})}" class="btn-professional btn-outline-prof btn-sm" title="Ver detalle">
+                                <td><div class="acciones-tabla">
+                                    <a th:href="@{/citas/{id}(id=${c.idCita})}" class="btn-ver" title="Ver detalle">
                                         <i class="bi bi-eye"></i>
                                     </a>
-                                </td>
-                            </tr>
+                                </div></td></tr>
                             <tr th:if="${#lists.isEmpty(citas)}">
                                 <td colspan="8" style="text-align:center; padding:3rem 1.25rem; color:rgba(255,255,255,0.5);">
                                     <i class="bi bi-inbox" style="font-size:2.5rem;"></i>
                                     <p class="mt-2">No hay citas registradas</p>
-                                </td>
-                            </tr>
+                                </div></td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -95,3 +93,4 @@
 
 </body>
 </html>
+

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/header :: head('Medicamento de Receta')}"></head>
 <body class="app-body">
@@ -86,10 +86,10 @@
                     </div>
 
                     <div class="d-flex gap-2">
-                        <button type="submit" class="btn-professional btn-primary-prof">
+                        <button type="submit" class="btn-nuevo">
                             <i class="bi bi-save"></i> Guardar
                         </button>
-                        <a th:href="@{/trinidad/recetas/{id}(id=${receta.idReceta})}" class="btn-professional btn-outline-prof">
+                        <a th:href="@{/trinidad/recetas/{id}(id=${receta.idReceta})}" class="btn-ver">
                             <i class="bi bi-x-lg"></i> Cancelar
                         </a>
                     </div>
@@ -102,3 +102,4 @@
 </div>
 </body>
 </html>
+

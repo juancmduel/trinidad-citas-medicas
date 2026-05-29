@@ -108,9 +108,27 @@
 </nav>
 
 <div th:fragment="topbar" id="topbar">
-    <button class="topbar-toggle d-lg-none" onclick="document.getElementById('sidebar').classList.toggle('open');document.getElementById('sidebarOverlay').classList.toggle('show')">
+    <button class="topbar-toggle d-lg-none" onclick="toggleSidebar()">
         <i class="bi bi-list"></i>
     </button>
+    <script>
+        function toggleSidebar() {
+            var sidebar = document.getElementById('sidebar');
+            var overlay = document.getElementById('sidebarOverlay');
+            sidebar.classList.toggle('open');
+            overlay.classList.toggle('show');
+            localStorage.setItem('sidebarOpen', sidebar.classList.contains('open'));
+        }
+        document.addEventListener('DOMContentLoaded', function() {
+            if (window.innerWidth <= 991.98) {
+                var isOpen = localStorage.getItem('sidebarOpen') === 'true';
+                if (isOpen) {
+                    document.getElementById('sidebar').classList.add('open');
+                    document.getElementById('sidebarOverlay').classList.add('show');
+                }
+            }
+        });
+    </script>
     <div class="topbar-title">
         <i class="bi bi-hospital me-2"></i>TRINIDAD MEDICAL
     </div>

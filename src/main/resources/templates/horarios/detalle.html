@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/header :: head('Detalle Horario')}"></head>
 <body class="app-body">
@@ -42,16 +42,16 @@
         </div>
 
         <div class="d-flex gap-2">
-            <a th:href="@{/horarios/editar/{id}(id=${horario.idHorario})}" class="btn-professional btn-outline-prof">
+            <a th:href="@{/horarios/editar/{id}(id=${horario.idHorario})}" class="btn-editar">
                 <i class="bi bi-pencil"></i> Editar
             </a>
             <form th:action="@{/horarios/eliminar/{id}(id=${horario.idHorario})}" method="post" style="display:inline;">
-                <button type="submit" class="btn-professional btn-danger-prof"
+                <button type="submit" class="btn-eliminar"
                         onclick="return confirm('¿Eliminar este horario?')">
                     <i class="bi bi-trash"></i> Eliminar
                 </button>
             </form>
-            <a href="/trinidad/horarios" class="btn-professional btn-outline-prof">
+            <a href="/trinidad/horarios" class="btn-ver">
                 <i class="bi bi-arrow-left"></i> Volver
             </a>
         </div>
@@ -61,3 +61,5 @@
 </div>
 </body>
 </html>
+
+

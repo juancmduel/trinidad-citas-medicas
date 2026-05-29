@@ -11,7 +11,7 @@
                 <h1 class="page-title" th:text="${modo == 'crear'} ? 'Nuevo Paciente' : 'Editar Paciente'">Paciente</h1>
                 <p class="page-subtitle">Complete los datos del paciente en el sistema</p>
             </div>
-            <a th:href="@{/pacientes}" class="btn btn-secondary"><i class="bi bi-arrow-left"></i>Volver</a>
+            <a th:href="@{/pacientes}" class="btn-volver"><i class="bi bi-arrow-left"></i>Volver</a>
         </div>
 
         <div th:if="${error}" class="alert alert-danger" style="border: 1px solid rgba(239,68,68,0.3); background: rgba(239,68,68,0.1); color: #fca5a5;">
@@ -168,11 +168,11 @@
 
                 <!-- Botones de Acción -->
                 <div class="form-actions">
-                    <button type="submit" class="btn btn-success btn-lg">
+                    <button type="submit" class="btn-guardar">
                         <i class="bi bi-check-circle"></i>
                         <span th:text="${modo == 'crear'} ? 'Registrar Paciente' : 'Guardar Cambios'"></span>
                     </button>
-                    <a th:href="@{/pacientes}" class="btn btn-secondary btn-lg">
+                    <a th:href="@{/pacientes}" class="btn-volver">
                         <i class="bi bi-x-circle"></i>
                         Cancelar
                     </a>
@@ -184,3 +184,4 @@
 </div>
 </body>
 </html>
+

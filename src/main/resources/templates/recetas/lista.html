@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/header :: head(${titulo})}"></head>
 <body class="app-body">
@@ -51,12 +51,11 @@
                                 <td>
                                     <span class="badge-status badge-info" th:text="${receta.detalles.size()} + ' medicamento(s)'"></span>
                                 </td>
-                                <td class="text-end">
-                                    <a th:href="@{/recetas/{id}(id=${receta.idReceta})}" class="btn-professional btn-outline-prof btn-sm">
+                                <td><div class="acciones-tabla">
+                                    <a th:href="@{/recetas/{id}(id=${receta.idReceta})}" class="btn-ver">
                                         <i class="bi bi-eye"></i>
                                     </a>
-                                </td>
-                            </tr>
+                                </div></td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -74,3 +73,4 @@
 
 </body>
 </html>
+

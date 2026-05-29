@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head th:replace="~{fragments/header :: head(${titulo})}"></head>
 <body class="app-body">
@@ -143,10 +143,10 @@
 
                                     <!-- BOTONES -->
                                     <div class="form-footer">
-                                        <a href="/trinidad/recetas" class="btn btn-ghost">
+                                        <a href="/trinidad/recetas" class="btn-volver">
                                             <i class="fa-solid fa-arrow-left"></i> Cancelar
                                         </a>
-                                        <button type="submit" class="btn btn-primary">
+                                        <button type="submit" class="btn-nuevo">
                                             <i class="fa-solid fa-save"></i> Guardar Receta
                                         </button>
                                     </div>
@@ -291,3 +291,4 @@
 
 </body>
 </html>
+
