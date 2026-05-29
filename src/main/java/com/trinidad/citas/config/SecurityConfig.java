@@ -54,21 +54,32 @@ public class SecurityConfig {
             )
             .headers(headers -> headers.frameOptions(frame -> frame.sameOrigin()))
             .authorizeHttpRequests(auth -> auth
+                // ── Rutas públicas (sin login) ──────────────────────────
                 .requestMatchers(
                     "/", "/index", "/login", "/registro",
                     "/css/**", "/js/**", "/img/**", "/webjars/**",
-                    "/h2-console/**",
-                    "/api/auth/**", "/api/v1/auth/**",
-                    "/api/v1/**",
-                    "/error",
-                    // Web pages - acceso sin autenticacion
-                    "/dashboard/**", "/pacientes/**", "/medicos/**",
-                    "/citas/**", "/especialidades/**", "/atenciones/**",
-                    "/recetas/**", "/diagnosticos/**", "/horarios/**",
-                    "/historias/**", "/ordenes/**", "/pagos/**",
-                    "/auditorias/**", "/reportes/**", "/roles/**",
-                    "/usuarios/**", "/configuracion/**"
+                    "/h2-console/**", "/error",
+                    "/api/auth/**", "/api/v1/auth/**"
                 ).permitAll()
+
+                // ── Solo ADMINISTRADOR o GERENTE ────────────────────────
+                .requestMatchers(
+                    "/usuarios/**", "/roles/**",
+                    "/auditoria/**", "/reportes/**", "/configuracion/**"
+                ).hasAnyRole("ADMINISTRADOR", "GERENTE")
+
+                // ── API REST (autenticación JWT) ─────────────────────────
+                .requestMatchers("/api/v1/**").authenticated()
+
+                // ── Módulos web: requieren login ─────────────────────────
+                .requestMatchers(
+                    "/dashboard/**",
+                    "/pacientes/**", "/medicos/**", "/especialidades/**",
+                    "/horarios/**", "/citas/**", "/atenciones/**",
+                    "/recetas/**", "/diagnosticos/**",
+                    "/historia-clinica/**", "/ordenes-examen/**", "/pagos/**"
+                ).authenticated()
+
                 .anyRequest().authenticated()
             )
             .formLogin(form -> form
