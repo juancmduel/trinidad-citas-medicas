@@ -67,7 +67,6 @@ public class JwtService {
     }
 
     private SecretKey getKey() {
-        // Si la clave es texto plano, la convertimos a bytes
         byte[] keyBytes = secret.length() >= 64
             ? secret.getBytes()
             : Decoders.BASE64.decode(secret);

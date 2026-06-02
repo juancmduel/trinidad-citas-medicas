@@ -15,11 +15,6 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
-/**
- * Jobs automáticos del sistema de citas.
- * RN-11: Marcar NO_ASISTIO si el paciente no hace check-in en 30 minutos.
- * RN-12: Enviar recordatorio 24h antes (log de auditoría en esta versión).
- */
 @Component
 @RequiredArgsConstructor
 @Slf4j
@@ -30,15 +25,10 @@ public class CitaScheduler {
 
     private static final DateTimeFormatter HORA_FMT = DateTimeFormatter.ofPattern("HH:mm");
 
-    /**
-     * RN-11: Cada minuto revisa citas sin check-in pasados 30 minutos
-     * y las marca como NO_ASISTIO.
-     */
     @Scheduled(fixedRate = 60_000)
     @Transactional
     public void marcarNoAsistidas() {
         LocalDate hoy = LocalDate.now();
-        // Límite: hora actual menos 30 minutos
         String limiteHora = LocalTime.now().minusMinutes(30).format(HORA_FMT);
 
         List<Cita> pendientes = citaRepository.findCitasParaMarcarNoShow(hoy, limiteHora);
@@ -55,10 +45,6 @@ public class CitaScheduler {
         }
     }
 
-    /**
-     * RN-12: Cada día a las 08:00 AM registra en log las citas del día siguiente
-     * que están CONFIRMADAS (base para envío de recordatorios cuando se integre email/SMS).
-     */
     @Scheduled(cron = "0 0 8 * * *")
     @Transactional(readOnly = true)
     public void registrarRecordatoriosPendientes() {

@@ -1,7 +1,4 @@
--- =========================================================
--- TRINIDAD - Schema Oracle 21c XE
--- Ejecutar conectado como TRINIDAD_DB en SQL Developer
--- =========================================================
+-- Schema Oracle 21c XE - Ejecutar como TRINIDAD_DB en SQL Developer
 SET DEFINE OFF;
 
 -- 1) ROL

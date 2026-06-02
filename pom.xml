@@ -25,9 +25,7 @@
     </properties>
 
     <dependencies>
-        <!-- ============================================ -->
-        <!-- Spring Web + Thymeleaf (Unidad 2)            -->
-        <!-- ============================================ -->
+        <!-- Spring Web + Thymeleaf -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
@@ -37,9 +35,7 @@
             <artifactId>spring-boot-starter-thymeleaf</artifactId>
         </dependency>
 
-        <!-- ============================================ -->
-        <!-- Spring Data JPA + Validacion (Unidad 3)      -->
-        <!-- ============================================ -->
+        <!-- Spring Data JPA + Validacion -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
@@ -49,28 +45,21 @@
             <artifactId>spring-boot-starter-validation</artifactId>
         </dependency>
 
-        <!-- ============================================ -->
-        <!-- Oracle JDBC Driver                            -->
-        <!-- ============================================ -->
+        <!-- Oracle JDBC -->
         <dependency>
             <groupId>com.oracle.database.jdbc</groupId>
             <artifactId>ojdbc11</artifactId>
             <version>23.3.0.23.09</version>
         </dependency>
 
-        <!-- ============================================ -->
-        <!-- H2 Database (perfil dev, para desarrollo)    -->
-        <!-- Permite arrancar el proyecto sin Oracle      -->
-        <!-- ============================================ -->
+        <!-- H2 para desarrollo sin Oracle -->
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
             <scope>runtime</scope>
         </dependency>
 
-        <!-- ============================================ -->
-        <!-- Spring Security + JWT (Unidad 4)             -->
-        <!-- ============================================ -->
+        <!-- Spring Security + JWT -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-security</artifactId>
@@ -97,9 +86,7 @@
             <scope>runtime</scope>
         </dependency>
 
-        <!-- ============================================ -->
-        <!-- Bootstrap via WebJars                        -->
-        <!-- ============================================ -->
+        <!-- Bootstrap via WebJars -->
         <dependency>
             <groupId>org.webjars</groupId>
             <artifactId>bootstrap</artifactId>
@@ -115,9 +102,7 @@
             <artifactId>webjars-locator-core</artifactId>
         </dependency>
 
-        <!-- ============================================ -->
-        <!-- Lombok                                        -->
-        <!-- ============================================ -->
+        <!-- Lombok -->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
@@ -125,17 +110,13 @@
             <optional>true</optional>
         </dependency>
 
-        <!-- ============================================ -->
-        <!-- Spring Mail (SMTP / notificaciones)          -->
-        <!-- ============================================ -->
+        <!-- Spring Mail -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-mail</artifactId>
         </dependency>
 
-        <!-- ============================================ -->
-        <!-- ZXing - Generación de códigos QR             -->
-        <!-- ============================================ -->
+        <!-- ZXing - Codigos QR -->
         <dependency>
             <groupId>com.google.zxing</groupId>
             <artifactId>core</artifactId>
@@ -147,9 +128,7 @@
             <version>3.5.3</version>
         </dependency>
 
-        <!-- ============================================ -->
-        <!-- DevTools (hot reload en desarrollo)          -->
-        <!-- ============================================ -->
+        <!-- DevTools -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-devtools</artifactId>
@@ -157,9 +136,7 @@
             <optional>true</optional>
         </dependency>
 
-        <!-- ============================================ -->
-        <!-- Tests                                         -->
-        <!-- ============================================ -->
+        <!-- Tests -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>

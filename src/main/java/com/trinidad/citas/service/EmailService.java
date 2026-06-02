@@ -80,8 +80,6 @@ public class EmailService {
         enviarHtml(pacienteEmail, "🔔 Recordatorio: Cita Mañana – Trinidad Salud", html, qrContenido);
     }
 
-    // ─── Templates HTML ───────────────────────────────────────────────────────
-
     private String plantillaConfirmacion(String nombre, String medico, String especialidad,
                                           String nroCita, String fecha, String hora, String estado) {
         return baseHtml("✅ Cita Confirmada",
@@ -205,8 +203,6 @@ public class EmailService {
             + "font-weight:700;'>" + valor + "</td>"
             + "</tr>";
     }
-
-    // ─── Envío y QR ───────────────────────────────────────────────────────────
 
     private void enviarHtml(String destino, String asunto, String htmlBody, String qrContenido) {
         try {
