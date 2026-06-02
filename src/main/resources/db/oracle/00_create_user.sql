@@ -1,7 +1,4 @@
--- =========================================================
--- Crear usuario TRINIDAD_DB en Oracle 21c XE
--- Ejecutar como SYS o SYSTEM en SQL Developer
--- =========================================================
+-- Crear usuario TRINIDAD_DB - Ejecutar como SYS o SYSTEM en SQL Developer
 ALTER SESSION SET CONTAINER = XE;
 
 CREATE USER TRINIDAD_DB IDENTIFIED BY "Trinidad2026"

@@ -18,9 +18,15 @@ El proyecto trae configurado un perfil **`dev`** con base de datos **H2 en memor
 
 ### Pasos
 
-1. **Abrir el proyecto en VS Code:** `File > Open Folder...` y selecciona la carpeta `trinidad-citas-medicas`.
-2. **Esperar a que Maven descargue las dependencias** (verás el spinner de "Resolving Maven dependencies" abajo a la derecha; tarda 1-3 minutos la primera vez).
-3. **Ejecutar la aplicación** de cualquiera de estas formas:
+1. **Cambiar el perfil a H2** en `src/main/resources/application.properties`:
+   ```properties
+   spring.profiles.active=dev,api,web
+   ```
+   *(el perfil por defecto usa Oracle; cámbialo a `dev` para usar H2)*
+
+2. **Abrir el proyecto en VS Code:** `File > Open Folder...` y selecciona la carpeta `trinidad-citas-medicas`.
+3. **Esperar a que Maven descargue las dependencias** (verás el spinner de "Resolving Maven dependencies" abajo a la derecha; tarda 1-3 minutos la primera vez).
+4. **Ejecutar la aplicación** de cualquiera de estas formas:
 
    **Opción A - Desde VS Code:**
    - Abre `TrinidadCitasApplication.java`
@@ -32,8 +38,8 @@ El proyecto trae configurado un perfil **`dev`** con base de datos **H2 en memor
    ```
 
 4. **Abrir en el navegador:**
-   - 🌐 Aplicación: http://localhost:8080
-   - 🛠️ Consola H2 (BD en memoria): http://localhost:8080/h2-console
+   - 🌐 Aplicación: http://localhost:8081/trinidad
+   - 🛠️ Consola H2 (BD en memoria): http://localhost:8081/trinidad/h2-console
      - JDBC URL: `jdbc:h2:mem:trinidaddb`
      - Usuario: `sa`
      - Sin contraseña
@@ -153,14 +159,14 @@ trinidad-citas-medicas/
 
 **Ejemplo de login con curl:**
 ```bash
-curl -X POST http://localhost:8080/api/auth/login \
+curl -X POST http://localhost:8081/trinidad/api/auth/login \
   -H "Content-Type: application/json" \
   -d '{"username":"admin","password":"admin123"}'
 ```
 
 Luego usa el `token` recibido como header en las llamadas:
 ```bash
-curl http://localhost:8080/api/v1/pacientes \
+curl http://localhost:8081/trinidad/api/v1/pacientes \
   -H "Authorization: Bearer eyJhbGc..."
 ```
 
