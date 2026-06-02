@@ -8,6 +8,5 @@ class TrinidadCitasApplicationTests {
 
     @Test
     void contextLoads() {
-        // Verifica que el contexto Spring carga correctamente
     }
 }
