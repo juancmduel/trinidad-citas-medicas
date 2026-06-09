@@ -62,12 +62,6 @@ public class SecurityConfig {
                     "/api/auth/**", "/api/v1/auth/**"
                 ).permitAll()
 
-                // ── Solo ADMINISTRADOR o GERENTE ────────────────────────
-                .requestMatchers(
-                    "/usuarios/**", "/roles/**",
-                    "/auditoria/**", "/reportes/**", "/configuracion/**"
-                ).hasAnyRole("ADMINISTRADOR", "GERENTE")
-
                 // ── API REST (autenticación JWT) ─────────────────────────
                 .requestMatchers("/api/v1/**").authenticated()
 
