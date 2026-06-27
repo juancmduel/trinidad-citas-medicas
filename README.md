@@ -61,12 +61,12 @@ Abre tu terminal en la raíz del proyecto y ejecuta el siguiente comando (sustit
 
 **En Windows (CMD):**
 ```cmd
-set DB_PASSWORD=TuPasswordSQL && set JWT_SECRET=CAMBIAR_ESTA_CLAVE_MUY_LARGA_Y_SEGURA_EN_PROD_2026_TRINIDAD_MEDICINAS_SA && mvn spring-boot:run
+set DB_PASSWORD="su password" && mvnd spring-boot:run
 ```
 
 **En Windows (PowerShell):**
 ```powershell
-set DB_PASSWORD="su password" && mvnd spring-boot:run
+$env:DB_PASSWORD="su password"; mvnd spring-boot:run
 ```
 
 ### 4. Acceder al Sistema
