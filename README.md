@@ -61,7 +61,7 @@ Abre tu terminal en la raíz del proyecto y ejecuta el siguiente comando (sustit
 
 **En Windows (CMD):**
 ```cmd
-set DB_PASSWORD="su password" && mvnd spring-boot:run
+set DB_PASSWORD="su password"&& mvnd spring-boot:run
 ```
 
 **En Windows (PowerShell):**
