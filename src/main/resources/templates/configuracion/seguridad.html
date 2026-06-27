@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: head('Seguridad')}"></head>
+<body class="app-body">
+<nav th:replace="~{fragments/header :: navbar}"></nav>
+<div class="app-content">
+    <div th:replace="~{fragments/header :: topbar}"></div>
+    <main class="page-main">
+
+        <div class="d-flex align-items-center justify-content-between mb-4">
+            <div>
+                <h1 style="font-size:26px;font-weight:700;margin-bottom:4px;">
+                    <i class="bi bi-shield-check me-2" style="color:var(--accent);"></i>Seguridad
+                </h1>
+                <p style="color:var(--text-muted);font-size:13px;margin:0;">Políticas de seguridad del sistema</p>
+            </div>
+            <a th:href="@{/configuracion}" class="btn-volver">
+                <i class="bi bi-arrow-left me-1"></i>Volver
+            </a>
+        </div>
+
+        <div class="form-section-card">
+            <div class="d-flex align-items-center gap-3 mb-3">
+                <div class="fs-icon"><i class="bi bi-lock-fill"></i></div>
+                <div>
+                    <h5 class="mb-1" style="font-weight:700;">Política de Contraseñas</h5>
+                    <p style="color:var(--text-muted);font-size:13px;margin:0;">Requisitos de seguridad para cuentas de usuario</p>
+                </div>
+            </div>
+            <div class="row g-3">
+                <div class="col-md-4 form-field">
+                    <label>Longitud Mínima</label>
+                    <input type="number" class="form-control" value="8" disabled>
+                </div>
+                <div class="col-md-4 form-field">
+                    <label>Máx. Intentos Fallidos</label>
+                    <input type="number" class="form-control" value="5" disabled>
+                </div>
+                <div class="col-md-4 form-field">
+                    <label>Días para Expiración</label>
+                    <input type="number" class="form-control" value="90" disabled>
+                </div>
+            </div>
+        </div>
+
+    </main>
+    <footer th:replace="~{fragments/header :: footer}"></footer>
+</div>
+</body>
+</html>

@@ -9,149 +9,224 @@
     <div th:replace="~{fragments/header :: topbar}"></div>
 
     <main class="page-main">
-        <div class="mb-4 d-flex align-items-center justify-content-between">
+        <div class="page-header">
             <div>
-                <h1 style="font-size:28px;font-weight:700;margin-bottom:6px;">
-                    <i class="bi bi-calendar-check me-2" style="color:#06b6d4;"></i>Detalle de Cita
-                </h1>
-                <p style="color:rgba(255,255,255,0.5);font-size:13px;">
-                    Cita #<span th:text="${cita.idCita}"></span>
-                </p>
+                <h1><i class="bi bi-calendar-check"></i>Detalle de Cita</h1>
+                <p>Cita #<span th:text="${cita.idCita}"></span></p>
             </div>
             <div class="d-flex gap-2">
-                <a th:href="@{/citas}" class="btn btn-outline-secondary">
-                    <i class="bi bi-arrow-left me-1"></i>Volver
+                <a th:href="@{/citas}" class="btn-volver">
+                    <i class="bi bi-arrow-left"></i>Volver
                 </a>
+                <a th:if="${cita.estado.name() == 'PROGRAMADA'}"
+                   th:href="@{/pagos/nuevo(citaId=${cita.idCita})}" class="btn-nuevo">
+                    <i class="bi bi-credit-card"></i>Registrar Pago
+                </a>
+                <a th:if="${cita.estado.name() == 'CONFIRMADA'}"
+                   th:href="@{/citas/{id}/checkin(id=${cita.idCita})}" class="btn-professional btn-primary-prof">
+                    <i class="bi bi-box-arrow-in-right"></i>Check-in / Llegada
+                </a>
+                <a th:if="${cita.estado.name() == 'EN_ATENCION'}"
+                   th:href="@{/atenciones/cita/{citaId}/nuevo(citaId=${cita.idCita})}" class="btn-professional btn-primary-prof">
+                    <i class="bi bi-stethoscope"></i>Iniciar Atencion
+                </a>
+                <form th:if="${cita.estado.name() == 'EN_ATENCION'}"
+                      th:action="@{/citas/{id}/finalizar(id=${cita.idCita})}" method="post" class="d-inline"
+                      onsubmit="return confirm('¿Finalizar la atencion de esta cita?')">
+                    <button class="btn-professional btn-success-prof">
+                        <i class="bi bi-check-circle"></i>Finalizar Atencion
+                    </button>
+                </form>
                 <form th:if="${cita.estado.name() == 'PROGRAMADA' or cita.estado.name() == 'CONFIRMADA'}"
                       th:action="@{/citas/{id}/cancelar(id=${cita.idCita})}" method="post" class="d-inline"
                       onsubmit="return confirm('¿Cancelar esta cita?')">
-                    <button class="btn btn-danger">
-                        <i class="bi bi-x-circle me-1"></i>Cancelar Cita
+                    <button class="btn-professional btn-danger-prof">
+                        <i class="bi bi-x-circle"></i>Cancelar Cita
                     </button>
                 </form>
             </div>
         </div>
 
         <div class="row g-4">
-            <!-- Info principal -->
             <div class="col-md-8">
-                <div class="card border-0 shadow-sm mb-4">
-                    <div class="card-header border-0 p-4">
-                        <h5 class="mb-0 fw-bold">
-                            <i class="bi bi-info-circle me-2" style="color:#06b6d4;"></i>Información de la Cita
-                        </h5>
+                <!-- Informacion de la Cita -->
+                <div class="detail-card">
+                    <div class="detail-card-head">
+                        <span class="dch-icon"><i class="bi bi-info-circle"></i></span>
+                        <span style="font-weight:700;font-size:1rem;color:var(--text-primary);">Información de la Cita</span>
                     </div>
-                    <div class="card-body p-4">
+                    <div class="detail-card-body">
                         <div class="row g-3">
                             <div class="col-sm-6">
-                                <small class="text-muted d-block">Fecha</small>
-                                <strong th:text="${#temporals.format(cita.fechaCita, 'dd/MM/yyyy')}"></strong>
+                                <div class="detail-field">
+                                    <span class="df-label">Fecha</span>
+                                    <span class="df-value" th:text="${#temporals.format(cita.fechaCita, 'dd/MM/yyyy')}"></span>
+                                </div>
                             </div>
                             <div class="col-sm-6">
-                                <small class="text-muted d-block">Horario</small>
-                                <strong th:text="${cita.horaInicio} + ' - ' + ${cita.horaFin}"></strong>
+                                <div class="detail-field">
+                                    <span class="df-label">Horario</span>
+                                    <span class="df-value" th:text="${cita.horaInicio} + ' - ' + ${cita.horaFin}"></span>
+                                </div>
                             </div>
                             <div class="col-sm-6">
-                                <small class="text-muted d-block">Estado</small>
-                                <span class="badge"
-                                      th:classappend="${cita.estado.name() == 'PROGRAMADA'} ? 'bg-warning text-dark' :
-                                                      (${cita.estado.name() == 'CONFIRMADA'} ? 'bg-info' :
-                                                      (${cita.estado.name() == 'ATENDIDA'} ? 'bg-success' :
-                                                      (${cita.estado.name() == 'CANCELADA'} ? 'bg-danger' : 'bg-secondary')))"
-                                      th:text="${cita.estado}"></span>
+                                <div class="detail-field">
+                                    <span class="df-label">Estado</span>
+                                    <span class="badge-estado badge-estado-lg"
+                                          th:classappend="${cita.estado.name() == 'PROGRAMADA'} ? 'badge-estado-warning' :
+                                                          (${cita.estado.name() == 'CONFIRMADA'} ? 'badge-estado-primary' :
+                                                          (${cita.estado.name() == 'ATENDIDA'} ? 'badge-estado-success' :
+                                                          (${cita.estado.name() == 'CANCELADA'} ? 'badge-estado-danger' : 'badge-estado-info')))"
+                                          th:text="${cita.estado}"></span>
+                                </div>
                             </div>
                             <div class="col-sm-6">
-                                <small class="text-muted d-block">Canal de Reserva</small>
-                                <strong th:text="${cita.canalReserva}"></strong>
+                                <div class="detail-field">
+                                    <span class="df-label">Canal de Reserva</span>
+                                    <span class="df-value" th:text="${cita.canalReserva}"></span>
+                                </div>
                             </div>
                             <div class="col-12" th:if="${cita.motivoConsulta}">
-                                <small class="text-muted d-block">Motivo de Consulta</small>
-                                <strong th:text="${cita.motivoConsulta}"></strong>
+                                <div class="detail-field">
+                                    <span class="df-label">Motivo de Consulta</span>
+                                    <span class="df-value" th:text="${cita.motivoConsulta}"></span>
+                                </div>
                             </div>
                             <div class="col-12" th:if="${cita.observaciones}">
-                                <small class="text-muted d-block">Observaciones</small>
-                                <span th:text="${cita.observaciones}"></span>
+                                <div class="detail-field">
+                                    <span class="df-label">Observaciones</span>
+                                    <span class="df-value" th:text="${cita.observaciones}"></span>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Paciente -->
-                <div class="card border-0 shadow-sm mb-4">
-                    <div class="card-header border-0 p-4">
-                        <h5 class="mb-0 fw-bold">
-                            <i class="bi bi-person me-2" style="color:#06b6d4;"></i>Paciente
-                        </h5>
+                <div class="detail-card">
+                    <div class="detail-card-head">
+                        <span class="dch-icon"><i class="bi bi-person"></i></span>
+                        <span style="font-weight:700;font-size:1rem;color:var(--text-primary);">Paciente</span>
                     </div>
-                    <div class="card-body p-4">
+                    <div class="detail-card-body">
                         <div class="row g-3">
                             <div class="col-sm-6">
-                                <small class="text-muted d-block">Nombre</small>
-                                <strong th:text="${cita.paciente.nombres + ' ' + cita.paciente.apellidoPaterno + ' ' + cita.paciente.apellidoMaterno}"></strong>
+                                <div class="detail-field">
+                                    <span class="df-label">Nombre</span>
+                                    <span class="df-value" th:text="${cita.paciente.nombres + ' ' + cita.paciente.apellidoPaterno + ' ' + cita.paciente.apellidoMaterno}"></span>
+                                </div>
                             </div>
                             <div class="col-sm-6">
-                                <small class="text-muted d-block">DNI</small>
-                                <strong th:text="${cita.paciente.dni}"></strong>
+                                <div class="detail-field">
+                                    <span class="df-label">DNI</span>
+                                    <span class="df-value" th:text="${cita.paciente.dni}"></span>
+                                </div>
                             </div>
                             <div class="col-sm-6" th:if="${cita.paciente.telefono}">
-                                <small class="text-muted d-block">Teléfono</small>
-                                <strong th:text="${cita.paciente.telefono}"></strong>
+                                <div class="detail-field">
+                                    <span class="df-label">Teléfono</span>
+                                    <span class="df-value" th:text="${cita.paciente.telefono}"></span>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Médico y Especialidad -->
             <div class="col-md-4">
-                <div class="card border-0 shadow-sm mb-4">
-                    <div class="card-header border-0 p-4">
-                        <h5 class="mb-0 fw-bold">
-                            <i class="bi bi-person-badge me-2" style="color:#06b6d4;"></i>Médico
-                        </h5>
+                <!-- Medico -->
+                <div class="detail-card">
+                    <div class="detail-card-head">
+                        <span class="dch-icon"><i class="bi bi-person-badge"></i></span>
+                        <span style="font-weight:700;font-size:1rem;color:var(--text-primary);">Médico</span>
                     </div>
-                    <div class="card-body p-4">
-                        <div class="mb-3">
-                            <small class="text-muted d-block">Nombre</small>
-                            <strong th:text="${'Dr. ' + cita.medico.nombres + ' ' + cita.medico.apellidoPaterno}"></strong>
+                    <div class="detail-card-body">
+                        <div class="detail-field mb-3">
+                            <span class="df-label">Nombre</span>
+                            <span class="df-value" th:text="${'Dr. ' + cita.medico.nombres + ' ' + cita.medico.apellidoPaterno}"></span>
                         </div>
-                        <div class="mb-3">
-                            <small class="text-muted d-block">CMP</small>
-                            <strong th:text="${cita.medico.cmp}"></strong>
+                        <div class="detail-field mb-3">
+                            <span class="df-label">CMP</span>
+                            <span class="df-value" th:text="${cita.medico.cmp}"></span>
                         </div>
-                        <div>
-                            <small class="text-muted d-block">Consultorio</small>
-                            <strong th:text="${cita.medico.consultorio}"></strong>
+                        <div class="detail-field">
+                            <span class="df-label">Consultorio</span>
+                            <span class="df-value" th:text="${cita.medico.consultorio}"></span>
                         </div>
                     </div>
                 </div>
 
-                <div class="card border-0 shadow-sm">
-                    <div class="card-header border-0 p-4">
-                        <h5 class="mb-0 fw-bold">
-                            <i class="bi bi-heart-pulse me-2" style="color:#06b6d4;"></i>Especialidad
-                        </h5>
+                <!-- Especialidad -->
+                <div class="detail-card">
+                    <div class="detail-card-head">
+                        <span class="dch-icon"><i class="bi bi-heart-pulse"></i></span>
+                        <span style="font-weight:700;font-size:1rem;color:var(--text-primary);">Especialidad</span>
                     </div>
-                    <div class="card-body p-4">
-                        <div class="mb-3">
-                            <small class="text-muted d-block">Especialidad</small>
-                            <strong th:text="${cita.especialidad.nombre}"></strong>
+                    <div class="detail-card-body">
+                        <div class="detail-field mb-3">
+                            <span class="df-label">Especialidad</span>
+                            <span class="df-value" th:text="${cita.especialidad.nombre}"></span>
                         </div>
-                        <div class="mb-3">
-                            <small class="text-muted d-block">Duración</small>
-                            <strong th:text="${cita.especialidad.duracionMinutos} + ' minutos'"></strong>
+                        <div class="detail-field mb-3">
+                            <span class="df-label">Duración</span>
+                            <span class="df-value" th:text="${cita.especialidad.duracionMinutos} + ' minutos'"></span>
                         </div>
-                        <div>
-                            <small class="text-muted d-block">Precio</small>
-                            <span class="badge" style="background:#06b6d4;color:#000;font-size:0.9rem;">
-                                S/. <span th:text="${cita.especialidad.precioConsulta}"></span>
-                            </span>
+                        <div class="detail-field">
+                            <span class="df-label">Precio</span>
+                            <span class="df-value df-value-accent" th:text="'S/. ' + ${cita.especialidad.precioConsulta}"></span>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
+        <!-- Timeline del flujo -->
+        <div class="detail-card mt-4">
+            <div class="detail-card-head">
+                <span class="dch-icon"><i class="bi bi-diagram-3"></i></span>
+                <span style="font-weight:700;font-size:1rem;color:var(--text-primary);">Flujo de Atencion</span>
+            </div>
+            <div class="detail-card-body">
+                <div class="flow-row">
+                    <div class="flow-step">
+                        <span class="flow-step-icon"><i class="bi bi-calendar-check"></i></span>
+                        <small class="flow-step-label">Agendada</small>
+                        <span class="flow-badge-ok" th:if="${cita.estado.name() == 'PROGRAMADA' or cita.estado.name() == 'CONFIRMADA' or cita.estado.name() == 'EN_ATENCION' or cita.estado.name() == 'ATENDIDA'}">OK</span>
+                        <span class="flow-badge-pending" th:unless="${cita.estado.name() == 'PROGRAMADA' or cita.estado.name() == 'CONFIRMADA' or cita.estado.name() == 'EN_ATENCION' or cita.estado.name() == 'ATENDIDA'}">-</span>
+                    </div>
+                    <span class="flow-arrow">&#8594;</span>
+                    <div class="flow-step">
+                        <span class="flow-step-icon"><i class="bi bi-credit-card"></i></span>
+                        <small class="flow-step-label">Pago</small>
+                        <span class="flow-badge-ok" th:if="${pago != null and pago.estado == 'PAGADO'}">PAGADO</span>
+                        <span class="badge-estado badge-estado-warning" th:if="${pago != null and pago.estado != 'PAGADO'}" th:text="${pago.estado}"></span>
+                        <span class="flow-badge-pending" th:unless="${pago != null}">Pendiente</span>
+                    </div>
+                    <span class="flow-arrow">&#8594;</span>
+                    <div class="flow-step">
+                        <span class="flow-step-icon"><i class="bi bi-box-arrow-in-right"></i></span>
+                        <small class="flow-step-label">Check-in</small>
+                        <span class="flow-badge-ok" th:if="${cita.fechaCheckin != null}">OK</span>
+                        <span class="flow-badge-pending" th:unless="${cita.fechaCheckin != null}">Pendiente</span>
+                    </div>
+                    <span class="flow-arrow">&#8594;</span>
+                    <div class="flow-step">
+                        <span class="flow-step-icon"><i class="bi bi-stethoscope"></i></span>
+                        <small class="flow-step-label">Atencion</small>
+                        <span class="flow-badge-ok" th:if="${cita.estado.name() == 'EN_ATENCION' or cita.estado.name() == 'ATENDIDA'}">OK</span>
+                        <span class="flow-badge-pending" th:unless="${cita.estado.name() == 'EN_ATENCION' or cita.estado.name() == 'ATENDIDA'}">Pendiente</span>
+                    </div>
+                    <span class="flow-arrow">&#8594;</span>
+                    <div class="flow-step">
+                        <span class="flow-step-icon"><i class="bi bi-check-circle"></i></span>
+                        <small class="flow-step-label">Finalizada</small>
+                        <span class="flow-badge-ok" th:if="${cita.estado.name() == 'ATENDIDA'}">ATENDIDA</span>
+                        <span class="badge-estado badge-estado-danger" th:if="${cita.estado.name() == 'CANCELADA' or cita.estado.name() == 'NO_ASISTIO'}" th:text="${cita.estado.name()}"></span>
+                        <span class="flow-badge-pending" th:unless="${cita.estado.name() == 'ATENDIDA' or cita.estado.name() == 'CANCELADA' or cita.estado.name() == 'NO_ASISTIO'}">Pendiente</span>
+                    </div>
+                </div>
+            </div>
+        </div>
     </main>
 
     <footer th:replace="~{fragments/header :: footer}"></footer>

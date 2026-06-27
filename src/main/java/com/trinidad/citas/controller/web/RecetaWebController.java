@@ -2,14 +2,13 @@ package com.trinidad.citas.controller.web;
 
 import org.springframework.context.annotation.Profile;
 import com.trinidad.citas.dto.RecetaDTO;
-import com.trinidad.citas.repository.RecetaRepository;
-import com.trinidad.citas.repository.AtencionRepository;
 import com.trinidad.citas.service.RecetaService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import com.trinidad.citas.repository.AtencionRepository;
 
 @Profile({"web", "default"})
 @Controller
@@ -17,20 +16,19 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 @RequiredArgsConstructor
 public class RecetaWebController {
 
-    private final RecetaRepository recetaRepository;
-    private final AtencionRepository atencionRepository;
     private final RecetaService recetaService;
+    private final AtencionRepository atencionRepository;
 
     @GetMapping
     public String lista(Model model) {
-        model.addAttribute("recetas", recetaRepository.findAllWithRelations());
+        model.addAttribute("recetas", recetaService.listarEntidades());
         model.addAttribute("titulo", "Recetas Médicas");
         return "recetas/lista";
     }
 
     @GetMapping("/{id}")
     public String detalle(@PathVariable Long id, Model model) {
-        recetaRepository.findByIdWithRelations(id).ifPresent(r -> model.addAttribute("receta", r));
+        model.addAttribute("receta", recetaService.obtenerEntidadPorId(id));
         model.addAttribute("titulo", "Detalle de Receta");
         return "recetas/detalle";
     }

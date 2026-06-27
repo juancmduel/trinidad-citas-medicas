@@ -47,6 +47,15 @@ public interface CitaRepository extends JpaRepository<Cita, Long> {
 
     List<Cita> findByFechaCitaAndEstado(LocalDate fecha, EstadoCita estado);
 
+    @Query("SELECT c.fechaCita, COUNT(c) FROM Cita c " +
+           "WHERE c.fechaCita BETWEEN :inicio AND :fin " +
+           "GROUP BY c.fechaCita ORDER BY c.fechaCita")
+    List<Object[]> countByFechaCitaBetween(@Param("inicio") LocalDate inicio, @Param("fin") LocalDate fin);
+
+    @Query("SELECT c FROM Cita c JOIN FETCH c.paciente JOIN FETCH c.medico JOIN FETCH c.especialidad " +
+           "WHERE c.fechaCita BETWEEN :inicio AND :fin ORDER BY c.fechaCita, c.horaInicio")
+    List<Cita> findByFechaCitaBetweenConRelaciones(@Param("inicio") LocalDate inicio, @Param("fin") LocalDate fin);
+
     /** RN-11: citas PROGRAMADA/CONFIRMADA sin check-in cuya hora ya pasó hace > 30 min */
     @Query("SELECT c FROM Cita c WHERE c.estado IN ('PROGRAMADA', 'CONFIRMADA') " +
            "AND c.fechaCita = :hoy " +

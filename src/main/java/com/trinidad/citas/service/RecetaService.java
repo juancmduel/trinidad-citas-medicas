@@ -50,6 +50,17 @@ public class RecetaService {
     }
 
     @Transactional(readOnly = true)
+    public List<Receta> listarEntidades() {
+        return recetaRepository.findAllWithRelations();
+    }
+
+    @Transactional(readOnly = true)
+    public Receta obtenerEntidadPorId(Long id) {
+        return recetaRepository.findByIdWithRelations(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Receta", id));
+    }
+
+    @Transactional(readOnly = true)
     public List<RecetaDTO> listarPorAtencion(Long idAtencion) {
         return recetaRepository.findByAtencion_IdAtencion(idAtencion)
                 .stream().map(this::toDTO).collect(Collectors.toList());
@@ -57,8 +68,7 @@ public class RecetaService {
 
     @Transactional(readOnly = true)
     public RecetaDTO obtenerPorId(Long id) {
-        return toDTO(recetaRepository.findByIdWithRelations(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Receta", id)));
+        return toDTO(obtenerEntidadPorId(id));
     }
 
     public RecetaDTO crear(RecetaDTO dto) {

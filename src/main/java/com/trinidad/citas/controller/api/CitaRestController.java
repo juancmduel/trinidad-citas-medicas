@@ -51,4 +51,14 @@ public class CitaRestController {
     public CitaDTO cancelar(@PathVariable Long id) {
         return citaService.cancelar(id);
     }
+
+    @PostMapping("/{id}/checkin")
+    public CitaDTO checkin(@PathVariable Long id) {
+        return citaService.checkin(id);
+    }
+
+    @PostMapping("/{id}/finalizar")
+    public CitaDTO finalizar(@PathVariable Long id) {
+        return citaService.finalizar(id);
+    }
 }

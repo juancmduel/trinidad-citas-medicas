@@ -44,3 +44,8 @@ Thumbs.db
 *.db
 *.trace.db
 *.lock.db
+
+### Local overrides (credentials no compartidos) ###
+application-local.properties
+application-local.yml
+.env

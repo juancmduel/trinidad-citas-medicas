@@ -6,90 +6,151 @@
 <div class="app-content">
     <div th:replace="~{fragments/header :: topbar}"></div>
     <main class="page-main">
-        <div class="container-xl">
-            <div class="page-header">
-                <h2 class="page-title">
-                    <i class="fa-solid fa-flask"></i>
-                    <span th:text="${orden.idOrden != null} ? 'Editar Orden' : 'Nueva Orden de Examen'">Orden de Examen</span>
-                </h2>
+
+        <div class="page-header">
+            <div>
+                <h1><i class="bi bi-clipboard-check"></i>
+                    <span th:text="${orden.idOrden != null} ? 'Editar Orden de Examen' : 'Nueva Orden de Examen'">Orden de Examen</span>
+                </h1>
+                <p>Registra una orden de laboratorio, imagen u otro examen</p>
             </div>
+            <a th:href="@{/ordenes-examen}" class="btn-volver">
+                <i class="bi bi-arrow-left"></i>Volver
+            </a>
         </div>
-        <div class="page-wrapper">
-            <div class="container-xl">
-                <div class="row">
-                    <div class="col-md-8 offset-md-2">
-                        <div class="card">
-                            <div class="card-body">
-                                <form th:action="@{/ordenes-examen/guardar}" method="post">
-                                    <input type="hidden" name="idOrden" th:value="${orden.idOrden}">
 
-                                    <div class="form-field">
-                                        <label>Atención Médica <span class="required">*</span></label>
-                                        <select name="atencionId" class="form-control" required>
-                                            <option value="">-- Seleccionar atención --</option>
-                                            <option th:each="a : ${atenciones}"
-                                                    th:value="${a.idAtencion}"
-                                                    th:text="${a.cita?.paciente?.apellidoPaterno + ' ' + a.cita?.paciente?.nombres + ' | ' + #temporals.format(a.fechaAtencion, 'dd/MM/yyyy')}"
-                                                    th:selected="${orden.atencion != null and orden.atencion.idAtencion == a.idAtencion}">
-                                            </option>
-                                        </select>
-                                    </div>
+        <form th:action="@{/ordenes-examen/guardar}" th:object="${orden}" method="post" class="oe-form">
+            <div th:if="${#fields.hasErrors()}" class="alert-professional alert-danger-prof mb-4">
+                <i class="bi bi-exclamation-triangle-fill"></i>
+                <span>Corrige los errores en el formulario antes de guardar.</span>
+            </div>
 
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <div class="form-field">
-                                                <label>Tipo de Examen <span class="required">*</span></label>
-                                                <select name="tipoExamen" class="form-control" required>
-                                                    <option value="">-- Seleccionar tipo --</option>
-                                                    <option value="LABORATORIO" th:selected="${orden.tipoExamen == 'LABORATORIO'}">Laboratorio</option>
-                                                    <option value="IMAGEN" th:selected="${orden.tipoExamen == 'IMAGEN'}">Imagen (Rx / Eco / TAC)</option>
-                                                    <option value="PATOLOGIA" th:selected="${orden.tipoExamen == 'PATOLOGIA'}">Patología</option>
-                                                    <option value="OTRO" th:selected="${orden.tipoExamen == 'OTRO'}">Otro</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="form-field">
-                                                <label>Nombre del Examen <span class="required">*</span></label>
-                                                <input type="text" name="nombreExamen" class="form-control"
-                                                       th:value="${orden.nombreExamen}"
-                                                       placeholder="Ej: Hemograma completo" required>
-                                            </div>
-                                        </div>
-                                    </div>
+            <input type="hidden" th:field="*{idOrden}">
 
-                                    <div class="form-field">
-                                        <label>Indicaciones / Preparación</label>
-                                        <textarea name="indicaciones" class="form-control" rows="3"
-                                                  th:text="${orden.indicaciones}"
-                                                  placeholder="Indicaciones especiales para el paciente (ayuno, etc.)..."></textarea>
-                                    </div>
+            <div class="row g-4">
+                <div class="col-lg-8">
 
-                                    <div class="form-field">
-                                        <label>Estado</label>
-                                        <select name="estado" class="form-control">
-                                            <option value="SOLICITADO" th:selected="${orden.estado == null or orden.estado == 'SOLICITADO'}">Solicitado</option>
-                                            <option value="EN_PROCESO" th:selected="${orden.estado == 'EN_PROCESO'}">En Proceso</option>
-                                            <option value="COMPLETADO" th:selected="${orden.estado == 'COMPLETADO'}">Completado</option>
-                                            <option value="CANCELADO" th:selected="${orden.estado == 'CANCELADO'}">Cancelado</option>
-                                        </select>
-                                    </div>
-
-                                    <div class="form-footer d-flex gap-2 justify-content-end mt-3">
-                                        <a th:href="@{/ordenes-examen}" class="btn-volver">Cancelar</a>
-                                        <button type="submit" class="btn-nuevo">
-                                            <i class="fa-solid fa-save"></i> Guardar Orden
-                                        </button>
-                                    </div>
-                                </form>
+                    <!-- Atención -->
+                    <div class="form-section-card">
+                        <div class="d-flex align-items-center gap-3 mb-3">
+                            <div class="fs-icon"><i class="bi bi-hospital-fill"></i></div>
+                            <div>
+                                <h5 class="mb-1" style="font-weight:700;">Atención Médica</h5>
+                                <p style="color:var(--text-muted);font-size:13px;margin:0;">Selecciona la atención asociada a esta orden</p>
                             </div>
                         </div>
+                        <div class="form-field">
+                            <label for="idAtencion" class="required">Atención</label>
+                            <select id="idAtencion" th:field="*{idAtencion}" class="form-select-professional" required>
+                                <option value="">— Seleccionar atención —</option>
+                                <option th:each="a : ${atenciones}"
+                                        th:value="${a.idAtencion}"
+                                        th:text="${a.cita?.paciente?.apellidoPaterno + ' ' + a.cita?.paciente?.nombres + ' | ' + #temporals.format(a.fechaAtencion, 'dd/MM/yyyy')}"></option>
+                            </select>
+                        </div>
                     </div>
+
+                    <!-- Datos del Examen -->
+                    <div class="form-section-card">
+                        <div class="d-flex align-items-center gap-3 mb-3">
+                            <div class="fs-icon"><i class="bi bi-flask-fill"></i></div>
+                            <div>
+                                <h5 class="mb-1" style="font-weight:700;">Datos del Examen</h5>
+                                <p style="color:var(--text-muted);font-size:13px;margin:0;">Tipo, nombre e indicaciones del examen</p>
+                            </div>
+                        </div>
+                        <div class="row g-3">
+                            <div class="col-md-6 form-field">
+                                <label for="tipoExamen" class="required">Tipo de Examen</label>
+                                <select id="tipoExamen" th:field="*{tipoExamen}" class="form-select-professional" required>
+                                    <option value="">— Seleccionar tipo —</option>
+                                    <option value="LABORATORIO">Laboratorio</option>
+                                    <option value="IMAGEN">Imagen (Rx / Eco / TAC)</option>
+                                    <option value="PATOLOGIA">Patología</option>
+                                    <option value="OTRO">Otro</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 form-field">
+                                <label for="nombreExamen" class="required">Nombre del Examen</label>
+                                <input type="text" id="nombreExamen" th:field="*{nombreExamen}" class="form-input-professional"
+                                       placeholder="Ej: Hemograma completo" required>
+                            </div>
+                        </div>
+                        <div class="form-field mt-3">
+                            <label for="indicaciones">Indicaciones / Preparación</label>
+                             <textarea id="indicaciones" th:field="*{indicaciones}" class="form-input-professional" rows="3"
+                                      placeholder="Indicaciones especiales para el paciente (ayuno, etc.)..."></textarea>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="col-lg-4">
+
+                    <!-- Estado -->
+                    <div class="form-section-card">
+                        <div class="d-flex align-items-center gap-3 mb-3">
+                            <div class="fs-icon"><i class="bi bi-flag-fill"></i></div>
+                            <div>
+                                <h5 class="mb-1" style="font-weight:700;">Estado</h5>
+                                <p style="color:var(--text-muted);font-size:13px;margin:0;">Situación actual de la orden</p>
+                            </div>
+                        </div>
+                        <div class="status-grid">
+                            <label class="status-card" th:classappend="${orden.estado == null or orden.estado == 'SOLICITADO'} ? 'selected' : ''">
+                                <input type="radio" name="estado" value="SOLICITADO"
+                                       th:checked="${orden.estado == null or orden.estado == 'SOLICITADO'}">
+                                <i class="bi bi-clock"></i>
+                                <span>Solicitado</span>
+                            </label>
+                            <label class="status-card" th:classappend="${orden.estado == 'EN_PROCESO'} ? 'selected' : ''">
+                                <input type="radio" name="estado" value="EN_PROCESO"
+                                       th:checked="${orden.estado == 'EN_PROCESO'}">
+                                <i class="bi bi-arrow-repeat"></i>
+                                <span>En Proceso</span>
+                            </label>
+                            <label class="status-card" th:classappend="${orden.estado == 'COMPLETADO'} ? 'selected' : ''">
+                                <input type="radio" name="estado" value="COMPLETADO"
+                                       th:checked="${orden.estado == 'COMPLETADO'}">
+                                <i class="bi bi-check2-all"></i>
+                                <span>Completado</span>
+                            </label>
+                            <label class="status-card" th:classappend="${orden.estado == 'CANCELADO'} ? 'selected' : ''">
+                                <input type="radio" name="estado" value="CANCELADO"
+                                       th:checked="${orden.estado == 'CANCELADO'}">
+                                <i class="bi bi-x-circle"></i>
+                                <span>Cancelado</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Acciones -->
+                    <div class="form-section-card">
+                        <div class="d-flex align-items-center gap-3 mb-3">
+                            <div class="fs-icon"><i class="bi bi-lightning-fill"></i></div>
+                            <div>
+                                <h5 class="mb-1" style="font-weight:700;">Acciones</h5>
+                                <p style="color:var(--text-muted);font-size:13px;margin:0;">Finaliza o descarta los cambios</p>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn-guardar w-100 mb-2" style="justify-content:center;padding:12px;">
+                            <i class="bi bi-check-circle"></i>
+                            <span th:text="${orden.idOrden != null} ? 'Guardar Cambios' : 'Crear Orden'"></span>
+                        </button>
+                        <a th:href="@{/ordenes-examen}" class="btn-volver w-100 text-center" style="justify-content:center;padding:12px;">
+                            <i class="bi bi-x-circle"></i>Cancelar
+                        </a>
+                    </div>
+
                 </div>
             </div>
-        </div>
+
+        </form>
+
+        
+
     </main>
+    <footer th:replace="~{fragments/header :: footer}"></footer>
 </div>
 </body>
 </html>
-

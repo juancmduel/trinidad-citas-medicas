@@ -6,70 +6,153 @@
 <div class="app-content">
     <div th:replace="~{fragments/header :: topbar}"></div>
     <main class="page-main">
-        <div class="container-xl">
-            <div class="page-header">
-                <div class="row align-items-center">
-                    <div class="col">
-                        <h2 class="page-title"><i class="fa-solid fa-flask"></i> Órdenes de Examen</h2>
-                    </div>
-                    <div class="col-auto">
-                        <a th:href="@{/ordenes-examen/nueva}" class="btn-nuevo">
-                            <i class="fa-solid fa-plus"></i> Nueva Orden
-                        </a>
-                    </div>
+
+        <div class="page-header">
+            <div>
+                <h1><i class="bi bi-clipboard-check"></i>Órdenes de Examen</h1>
+                <p>Gestiona las órdenes de laboratorio, imágenes y otros exámenes</p>
+            </div>
+            <a th:href="@{/ordenes-examen/nueva}" class="btn-nuevo">
+                <i class="bi bi-plus-lg"></i>Nueva Orden
+            </a>
+        </div>
+
+        <div th:if="${ok}" class="alert-professional alert-success-prof mb-4">
+            <i class="bi bi-check-circle-fill"></i> <span th:text="${ok}"></span>
+        </div>
+        <div th:if="${error}" class="alert-professional alert-danger-prof mb-4">
+            <i class="bi bi-exclamation-triangle-fill"></i> <span th:text="${error}"></span>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats-grid mb-4">
+            <div class="stat-card">
+                <div class="stat-icon stat-icon-total"><i class="bi bi-file-earmark-text"></i></div>
+                <div>
+                    <div class="stat-value" th:text="${#lists.size(ordenes)}">0</div>
+                    <div class="stat-label">Total Órdenes</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon stat-icon-solicitado"><i class="bi bi-clock"></i></div>
+                <div>
+                    <div class="stat-value" th:text="${#lists.size(ordenes.?[estado == 'SOLICITADO'])}">0</div>
+                    <div class="stat-label">Solicitados</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon stat-icon-proceso"><i class="bi bi-arrow-repeat"></i></div>
+                <div>
+                    <div class="stat-value" th:text="${#lists.size(ordenes.?[estado == 'EN_PROCESO'])}">0</div>
+                    <div class="stat-label">En Proceso</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon stat-icon-completado"><i class="bi bi-check2-all"></i></div>
+                <div>
+                    <div class="stat-value" th:text="${#lists.size(ordenes.?[estado == 'COMPLETADO'])}">0</div>
+                    <div class="stat-label">Completados</div>
                 </div>
             </div>
         </div>
-        <div class="page-wrapper">
-            <div class="container-xl">
-                <div th:if="${ok}" class="alert alert-success alert-dismissible mb-3" th:text="${ok}"></div>
-                <div class="card">
-                    <div class="table-responsive">
-                        <table class="table card-table table-vcenter">
-                            <thead>
-                                <tr>
-                                    <th>Paciente</th>
-                                    <th>Médico</th>
-                                    <th>Tipo Examen</th>
-                                    <th>Nombre Examen</th>
-                                    <th>Fecha Solicitud</th>
-                                    <th>Estado</th>
-                                    <th>Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr th:if="${ordenes.isEmpty()}">
-                                    <td colspan="7" class="text-center py-4">No hay órdenes de examen registradas</td></tr>
-                                <tr th:each="o : ${ordenes}">
-                                    <td th:text="${o.atencion?.cita?.paciente?.apellidoPaterno + ' ' + o.atencion?.cita?.paciente?.nombres}">-</td>
-                                    <td th:text="${o.atencion?.cita?.medico?.nombreCompleto}">-</td>
-                                    <td th:text="${o.tipoExamen}"></td>
-                                    <td th:text="${o.nombreExamen}"></td>
-                                    <td th:text="${#temporals.format(o.fechaSolicitud, 'dd/MM/yyyy HH:mm')}"></td>
-                                    <td>
-                                        <span class="badge"
-                                              th:classappend="${o.estado == 'SOLICITADO'} ? 'bg-warning text-dark' : (${o.estado == 'COMPLETADO'} ? 'bg-success' : 'bg-secondary')"
-                                              th:text="${o.estado}"></span>
-                                    </td>
-                                    <td>
-                                        <a th:href="@{/ordenes-examen/{id}(id=${o.idOrden})}" class="btn-ver"><i class="fa-solid fa-eye"></i></a>
-                                        <a th:href="@{/ordenes-examen/editar/{id}(id=${o.idOrden})}" class="btn-editar"><i class="fa-solid fa-pencil"></i></a>
-                                        <form th:action="@{/ordenes-examen/eliminar/{id}(id=${o.idOrden})}" method="post" style="display:inline;">
-                                            <button type="submit" class="btn-eliminar"
-                                                    onclick="return confirm('¿Eliminar esta orden?')">
-                                                <i class="fa-solid fa-trash"></i>
-                                            </button>
+
+        <!-- Búsqueda -->
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap;">
+            <div class="search-bar" style="flex:1;min-width:200px;">
+                <i class="bi bi-search"></i>
+                <input type="text" id="searchInput" class="form-input-professional" placeholder="Buscar paciente, examen, médico..." oninput="filterTable()">
+            </div>
+            <select id="estadoFilter" class="form-select-professional" style="width:auto;min-width:150px;" onchange="filterTable()">
+                <option value="">Todos los estados</option>
+                <option value="SOLICITADO">Solicitado</option>
+                <option value="EN_PROCESO">En Proceso</option>
+                <option value="COMPLETADO">Completado</option>
+                <option value="CANCELADO">Cancelado</option>
+            </select>
+        </div>
+
+        <!-- Tabla -->
+        <div class="table-container">
+            <table class="table-modern">
+                <thead>
+                    <tr>
+                        <th>Paciente</th>
+                        <th>Médico</th>
+                        <th>Tipo</th>
+                        <th>Examen</th>
+                        <th>Fecha Solicitud</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:if="${#lists.isEmpty(ordenes)}">
+                        <td colspan="7" class="table-empty">No hay órdenes de examen registradas</td>
+                    </tr>
+                    <tr th:each="o : ${ordenes}" th:data-search="${o.atencion?.cita?.paciente?.apellidoPaterno + ' ' + o.atencion?.cita?.paciente?.nombres + ' ' + o.nombreExamen + ' ' + o.atencion?.cita?.medico?.nombreCompleto}" th:data-estado="${o.estado}">
+                        <td th:text="${o.atencion?.cita?.paciente?.apellidoPaterno + ' ' + o.atencion?.cita?.paciente?.apellidoMaterno + ', ' + o.atencion?.cita?.paciente?.nombres}">-</td>
+                        <td th:text="${o.atencion?.cita?.medico?.nombreCompleto}">-</td>
+                        <td><span class="badge-tipo" th:text="${o.tipoExamen}">LABORATORIO</span></td>
+                        <td style="font-weight:600;" th:text="${o.nombreExamen}">Hemograma</td>
+                        <td th:text="${#temporals.format(o.fechaSolicitud, 'dd/MM/yyyy HH:mm')}">-</td>
+                        <td>
+                            <span class="badge-estado"
+                                  th:classappend="${o.estado == 'SOLICITADO'} ? 'badge-solicitado' : (${o.estado == 'EN_PROCESO'} ? 'badge-proceso' : (${o.estado == 'COMPLETADO'} ? 'badge-completado' : 'badge-cancelado'))"
+                                  th:text="${o.estado == 'SOLICITADO'} ? 'Solicitado' : (${o.estado == 'EN_PROCESO'} ? 'En Proceso' : (${o.estado == 'COMPLETADO'} ? 'Completado' : 'Cancelado'))"></span>
+                        </td>
+                        <td>
+                            <div class="action-group" style="justify-content:center;">
+                                <a th:href="@{/ordenes-examen/{id}(id=${o.idOrden})}" class="action-btn action-view" title="Ver detalle"><i class="bi bi-eye"></i></a>
+                                <a th:href="@{/ordenes-examen/editar/{id}(id=${o.idOrden})}" class="action-btn action-edit" title="Editar"><i class="bi bi-pencil"></i></a>
+                                <div class="action-dropdown">
+                                    <button class="action-btn action-state" title="Cambiar estado"><i class="bi bi-arrow-repeat"></i></button>
+                                    <div class="dropdown-menu-custom">
+                                        <form th:action="@{/ordenes-examen/{id}/estado(id=${o.idOrden})}" method="post" style="display:contents;">
+                                            <input type="hidden" name="estado" value="SOLICITADO">
+                                            <button type="submit" class="dropdown-item">Solicitado</button>
                                         </form>
-                                    </div></td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
+                                        <form th:action="@{/ordenes-examen/{id}/estado(id=${o.idOrden})}" method="post" style="display:contents;">
+                                            <input type="hidden" name="estado" value="EN_PROCESO">
+                                            <button type="submit" class="dropdown-item">En Proceso</button>
+                                        </form>
+                                        <form th:action="@{/ordenes-examen/{id}/estado(id=${o.idOrden})}" method="post" style="display:contents;">
+                                            <input type="hidden" name="estado" value="COMPLETADO">
+                                            <button type="submit" class="dropdown-item">Completado</button>
+                                        </form>
+                                        <form th:action="@{/ordenes-examen/{id}/estado(id=${o.idOrden})}" method="post" style="display:contents;">
+                                            <input type="hidden" name="estado" value="CANCELADO">
+                                            <button type="submit" class="dropdown-item">Cancelado</button>
+                                        </form>
+                                    </div>
+                                </div>
+                                <form th:action="@{/ordenes-examen/eliminar/{id}(id=${o.idOrden})}" method="post" style="display:inline;" onsubmit="return confirm('¿Eliminar esta orden de examen?')">
+                                    <button type="submit" class="action-btn action-delete" title="Eliminar"><i class="bi bi-trash3"></i></button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
+
+        
+
+        <script>
+        function filterTable() {
+            var q = document.getElementById('searchInput').value.toLowerCase();
+            var est = document.getElementById('estadoFilter').value;
+            document.querySelectorAll('.table-modern tbody tr').forEach(function(r) {
+                if (r.classList.contains('table-empty')) return;
+                var data = (r.getAttribute('data-search') || '').toLowerCase();
+                var estado = r.getAttribute('data-estado') || '';
+                var match = (!q || data.indexOf(q) !== -1) && (!est || estado === est);
+                r.classList.toggle('hidden', !match);
+            });
+        }
+        </script>
+
     </main>
+    <footer th:replace="~{fragments/header :: footer}"></footer>
 </div>
 </body>
 </html>
-
-

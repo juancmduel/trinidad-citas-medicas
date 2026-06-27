@@ -2,67 +2,118 @@
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/header :: head('Auditoría')}"></head>
 <body class="app-body">
-
 <nav th:replace="~{fragments/header :: navbar}"></nav>
-
 <div class="app-content">
     <div th:replace="~{fragments/header :: topbar}"></div>
-
     <main class="page-main">
-        <!-- Page Header -->
-        <div class="mb-4">
-            <h1 style="font-size:28px;font-weight:700;margin-bottom:6px;">
-                <i class="bi bi-clock-history me-2" style="color:#06b6d4;"></i>Registro de Auditoría
-            </h1>
-            <p style="color:rgba(255,255,255,0.5);font-size:13px;">Historial de actividades del sistema</p>
+
+        <div class="d-flex align-items-center justify-content-between mb-4">
+            <div>
+                <h1 style="font-size:26px;font-weight:700;margin-bottom:4px;">
+                    <i class="bi bi-clock-history me-2" style="color:var(--accent);"></i>Auditoría del Sistema
+                </h1>
+                <p style="color:var(--text-muted);font-size:13px;margin:0;">Registro de eventos y actividades del sistema</p>
+            </div>
         </div>
 
-        <!-- Data Table -->
-        <div class="card-professional">
-            <div class="card-header-professional">
-                <h5><i class="bi bi-list"></i>Logs de Auditoría</h5>
-            </div>
-            <div class="p-4">
-                <div class="table-responsive">
-                    <table class="table-professional">
-                        <thead>
-                            <tr>
-                                <th>Fecha/Hora</th>
-                                <th>Usuario</th>
-                                <th>Acción</th>
-                                <th>Entidad</th>
-                                <th>Detalle</th>
-                                <th>IP Origen</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr th:each="log : ${logs}">
-                                <td th:text="${#temporals.format(log.fechaHora, 'dd/MM/yyyy HH:mm:ss')}"></td>
-                                <td th:text="${log.username}"></td>
-                                <td>
-                                    <span class="badge-status" 
-                                        th:classappend="${log.accion == 'CREATE' ? 'badge-success' : log.accion == 'DELETE' ? 'badge-danger' : 'badge-warning'}"
-                                        th:text="${log.accion}">
-                                    </span>
-                                </td>
-                                <td th:text="${log.entidad}"></td>
-                                <td th:text="${log.detalle}"></td>
-                                <td th:text="${log.ipOrigen}"></div></td></tr>
-                        </tbody>
-                    </table>
+        <div class="stats-grid mb-4">
+            <div class="stat-card">
+                <div class="stat-icon stat-icon-total"><i class="bi bi-journal-text"></i></div>
+                <div>
+                    <div class="stat-value" th:text="${#lists.size(logs)}">0</div>
+                    <div class="stat-label">Total Eventos</div>
                 </div>
-                <div th:if="${#lists.isEmpty(logs)}" style="text-align:center; padding:3rem 1.25rem; color:rgba(255,255,255,0.5);">
-                    <i class="bi bi-inbox" style="font-size:2.5rem;"></i>
-                    <p class="mt-2">No hay logs registrados</p>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon stat-icon-create"><i class="bi bi-plus-circle"></i></div>
+                <div>
+                    <div class="stat-value" th:text="${#lists.size(logs.?[accion == 'CREATE'])}">0</div>
+                    <div class="stat-label">Creaciones</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon stat-icon-update"><i class="bi bi-pencil-circle"></i></div>
+                <div>
+                    <div class="stat-value" th:text="${#lists.size(logs.?[accion == 'UPDATE'])}">0</div>
+                    <div class="stat-label">Actualizaciones</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon stat-icon-delete"><i class="bi bi-x-circle"></i></div>
+                <div>
+                    <div class="stat-value" th:text="${#lists.size(logs.?[accion == 'DELETE'])}">0</div>
+                    <div class="stat-label">Eliminaciones</div>
                 </div>
             </div>
         </div>
+
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap;">
+            <div class="search-bar" style="flex:1;min-width:200px;">
+                <i class="bi bi-search"></i>
+                <input type="text" id="searchInput" class="form-control" placeholder="Buscar usuario, acción, entidad..." oninput="filterTable()">
+            </div>
+            <select id="accionFilter" class="form-select" style="width:auto;min-width:150px;" onchange="filterTable()">
+                <option value="">Todas las acciones</option>
+                <option value="CREATE">Creación</option>
+                <option value="UPDATE">Actualización</option>
+                <option value="DELETE">Eliminación</option>
+            </select>
+        </div>
+
+        <div class="table-container">
+            <table class="table-modern">
+                <thead>
+                    <tr>
+                        <th>Fecha / Hora</th>
+                        <th>Usuario</th>
+                        <th>Acción</th>
+                        <th>Entidad</th>
+                        <th>Detalle</th>
+                        <th>IP Origen</th>
+                        <th style="text-align:center;">Acción</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:if="${#lists.isEmpty(logs)}">
+                        <td colspan="7" class="table-empty">No hay eventos de auditoría registrados</td>
+                    </tr>
+                    <tr th:each="l : ${logs}" th:data-search="${l.username + ' ' + l.accion + ' ' + l.entidad + ' ' + l.detalle}" th:data-accion="${l.accion}">
+                        <td style="white-space:nowrap;" th:text="${#temporals.format(l.fechaHora, 'dd/MM/yyyy HH:mm:ss')}">-</td>
+                        <td><span class="badge-usuario" th:text="${l.username ?: '-'}">-</span></td>
+                        <td>
+                            <span class="badge-accion"
+                                  th:classappend="${l.accion == 'CREATE'} ? 'ba-create' : (${l.accion == 'UPDATE'} ? 'ba-update' : (${l.accion == 'DELETE'} ? 'ba-delete' : 'ba-other'))"
+                                  th:text="${l.accion}">CREATE</span>
+                        </td>
+                        <td th:text="${l.entidad ?: '-'}">-</td>
+                        <td style="max-width:250px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" th:text="${l.detalle ?: '-'}">-</td>
+                        <td style="font-size:12px;color:var(--text-muted);" th:text="${l.ipOrigen ?: '-'}">-</td>
+                        <td style="text-align:center;">
+                            <a th:href="@{/auditoria/{id}(id=${l.idLog})}" class="action-btn action-view" title="Ver detalle"><i class="bi bi-eye"></i></a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        
+
+        <script>
+        function filterTable() {
+            var q = document.getElementById('searchInput').value.toLowerCase();
+            var acc = document.getElementById('accionFilter').value;
+            document.querySelectorAll('.table-modern tbody tr').forEach(function(r) {
+                if (r.classList.contains('table-empty')) return;
+                var data = (r.getAttribute('data-search') || '').toLowerCase();
+                var accion = r.getAttribute('data-accion') || '';
+                var match = (!q || data.indexOf(q) !== -1) && (!acc || accion === acc);
+                r.classList.toggle('hidden', !match);
+            });
+        }
+        </script>
 
     </main>
-
     <footer th:replace="~{fragments/header :: footer}"></footer>
 </div>
-
 </body>
 </html>
-

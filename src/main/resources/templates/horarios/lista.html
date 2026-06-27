@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head th:replace="~{fragments/header :: head('Horarios de Médicos')}"></head>
 <body class="app-body">
@@ -9,81 +9,110 @@
     <div th:replace="~{fragments/header :: topbar}"></div>
 
     <main class="page-main">
-        <div class="container-xl">
-            <div class="page-header">
-                <div class="row align-items-center">
-                    <div class="col">
-                        <h2 class="page-title"><i class="fa-solid fa-calendar"></i> Horarios de Médicos</h2>
-                    </div>
-                    <div class="col-auto">
-                        <a href="/trinidad/horarios/nuevo" class="btn-nuevo">
-                            <i class="fa-solid fa-plus"></i> Nuevo Horario
-                        </a>
-                    </div>
+
+        <div class="page-header">
+            <div>
+                <h1><i class="bi bi-calendar3"></i>Horarios de Médicos</h1>
+                <p>Gestión de horarios de atención médica</p>
+            </div>
+            <a th:href="@{/horarios/nuevo}" class="btn-nuevo">
+                <i class="bi bi-plus-lg"></i>Nuevo Horario
+            </a>
+        </div>
+
+        <div th:if="${param.ok}" class="alert-professional alert-success-prof mb-4">
+            <i class="bi bi-check-circle-fill"></i> <span th:text="${param.ok}"></span>
+        </div>
+        <div th:if="${param.error}" class="alert-professional alert-danger-prof mb-4">
+            <i class="bi bi-exclamation-triangle-fill"></i> <span th:text="${param.error}"></span>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats-grid mb-4">
+            <div class="stat-card">
+                <div class="stat-icon stat-icon-total"><i class="bi bi-calendar-week-fill"></i></div>
+                <div>
+                    <div class="stat-value" th:text="${#lists.size(horarios)}">0</div>
+                    <div class="stat-label">Total Horarios</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon stat-icon-activo"><i class="bi bi-check-circle-fill"></i></div>
+                <div>
+                    <div class="stat-value" th:text="${#lists.size(horarios.?[activo == 1])}">0</div>
+                    <div class="stat-label">Activos</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon stat-icon-inactivo"><i class="bi bi-x-circle-fill"></i></div>
+                <div>
+                    <div class="stat-value" th:text="${#lists.size(horarios.?[activo == 0])}">0</div>
+                    <div class="stat-label">Inactivos</div>
                 </div>
             </div>
         </div>
 
-        <div class="page-wrapper">
-            <div class="container-xl">
-                <div class="row">
-                    <div class="col-12">
-                        <div class="card">
-                            <div class="table-responsive">
-                                <table class="table card-table table-vcenter">
-                                    <thead>
-                                        <tr>
-                                            <th>Médico</th>
-                                            <th>Día</th>
-                                            <th>Hora Inicio</th>
-                                            <th>Hora Fin</th>
-                                            <th>Estado</th>
-                                            <th>Acciones</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr th:if="${horarios.isEmpty()}">
-                                            <td colspan="6" class="text-center">No hay horarios configurados</td></tr>
-                                        <tr th:each="h : ${horarios}">
-                                            <td th:text="${h.medico != null ? h.medico.nombreCompleto : '-'}"></td>
-                                            <td th:text="${h.diaSemana == 1 ? 'Lunes' :
-                                                           h.diaSemana == 2 ? 'Martes' :
-                                                           h.diaSemana == 3 ? 'Miércoles' :
-                                                           h.diaSemana == 4 ? 'Jueves' :
-                                                           h.diaSemana == 5 ? 'Viernes' :
-                                                           h.diaSemana == 6 ? 'Sábado' : 'Domingo'}"></td>
-                                            <td th:text="${h.horaInicio}"></td>
-                                            <td th:text="${h.horaFin}"></td>
-                                            <td>
-                                                <span th:if="${h.activo == 1}" class="badge bg-success">Activo</span>
-                                                <span th:if="${h.activo != 1}" class="badge bg-secondary">Inactivo</span>
-                                            </td>
-                                            <td>
-                                                <a th:href="@{/horarios/{id}(id=${h.idHorario})}" class="btn-ver">
-                                                    <i class="fa-solid fa-eye"></i>
-                                                </a>
-                                                <a th:href="@{/horarios/editar/{id}(id=${h.idHorario})}" class="btn-editar">
-                                                    <i class="fa-solid fa-pencil"></i>
-                                                </a>
-                                                <form th:action="@{/horarios/eliminar/{id}(id=${h.idHorario})}" method="post" style="display:inline;">
-                                                    <button type="submit" class="btn-eliminar"
-                                                            onclick="return confirm('¿Eliminar este horario?')">
-                                                        <i class="fa-solid fa-trash"></i>
-                                                    </button>
-                                                </form>
-                                            </div></td></tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+        <!-- Search -->
+        <div class="search-bar mb-4">
+            <i class="bi bi-search"></i>
+            <input type="text" id="searchInput" class="form-input-professional" placeholder="Buscar por médico, día..." oninput="filterTable()">
         </div>
+
+        <!-- Table -->
+        <div class="table-container">
+            <table class="table-modern">
+                <thead>
+                    <tr>
+                        <th>Médico</th>
+                        <th>Día</th>
+                        <th>Hora Inicio</th>
+                        <th>Hora Fin</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:if="${#lists.isEmpty(horarios)}">
+                        <td colspan="6" class="table-empty">No hay horarios configurados</td>
+                    </tr>
+                    <tr th:each="h : ${horarios}" th:data-search="${h.medicoNombreCompleto + ' ' + h.diaSemanaDescripcion}">
+                        <td style="font-weight:700;" th:text="${h.medicoNombreCompleto ?: '-'}">-</td>
+                        <td th:text="${h.diaSemanaDescripcion}">-</td>
+                        <td th:text="${h.horaInicio}">-</td>
+                        <td th:text="${h.horaFin}">-</td>
+                        <td>
+                            <span class="badge-estado" th:classappend="${h.activo == 1} ? 'badge-activo' : 'badge-inactivo'"
+                                  th:text="${h.activo == 1} ? 'Activo' : 'Inactivo'"></span>
+                        </td>
+                        <td>
+                            <div class="action-group" style="justify-content:center;">
+                                <a th:href="@{/horarios/{id}(id=${h.idHorario})}" class="action-btn action-view" title="Ver"><i class="bi bi-eye"></i></a>
+                                <a th:href="@{/horarios/editar/{id}(id=${h.idHorario})}" class="action-btn action-edit" title="Editar"><i class="bi bi-pencil"></i></a>
+                                <form th:action="@{/horarios/eliminar/{id}(id=${h.idHorario})}" method="post" style="display:inline;" onsubmit="return confirm('¿Eliminar este horario?')">
+                                    <button type="submit" class="action-btn action-delete" title="Eliminar"><i class="bi bi-trash3"></i></button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <script>
+        function filterTable() {
+            var q = document.getElementById('searchInput').value.toLowerCase();
+            document.querySelectorAll('.table-modern tbody tr').forEach(function(r) {
+                if (r.classList.contains('table-empty')) return;
+                var data = (r.getAttribute('data-search') || '').toLowerCase();
+                r.classList.toggle('hidden', q.length > 0 && data.indexOf(q) === -1);
+            });
+        }
+        </script>
+
     </main>
+
+    <footer th:replace="~{fragments/header :: footer}"></footer>
 </div>
 
 </body>
 </html>
-
-

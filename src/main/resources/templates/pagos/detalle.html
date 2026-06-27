@@ -7,66 +7,107 @@
     <div th:replace="~{fragments/header :: topbar}"></div>
     <main class="page-main">
 
-        <div class="mb-4">
-            <h1 style="font-size:28px;font-weight:700;margin-bottom:6px;">
-                <i class="bi bi-credit-card me-2" style="color:#06b6d4;"></i>Detalle del Pago
-            </h1>
+        <div class="page-header">
+            <div>
+                <h1><i class="bi bi-credit-card"></i>Detalle del Pago</h1>
+                <p>Información completa del pago registrado</p>
+            </div>
+            <span class="badge-estado-lg"
+                  th:classappend="${pago.estado == 'PAGADO'} ? 'be-pagado' : (${pago.estado == 'PENDIENTE'} ? 'be-pendiente' : 'be-anulado')"
+                  th:text="${pago.estado == 'PAGADO'} ? 'Pagado' : (${pago.estado == 'PENDIENTE'} ? 'Pendiente' : 'Anulado')"></span>
         </div>
 
-        <div th:if="${pago != null}" class="card-professional mb-4">
-            <div class="card-header-professional d-flex justify-content-between">
-                <h5><i class="bi bi-cash-coin"></i> Información del Pago</h5>
-                <span th:classappend="${pago.estado == 'PAGADO' ? 'badge-success' : pago.estado == 'PENDIENTE' ? 'badge-warning' : 'badge-danger'}" class="badge-status" th:text="${pago.estado}"></span>
+        <div class="row g-4">
+            <div class="col-lg-8">
+                <div class="detail-card">
+                    <div class="detail-card-head">
+                        <div class="dch-icon"><i class="bi bi-cash-coin"></i></div>
+                        <div><h5 class="mb-0" style="font-weight:700;">Información del Pago</h5></div>
+                    </div>
+                    <div class="detail-card-body">
+                        <div class="row g-4">
+                            <div class="col-md-6">
+                                <div class="detail-field">
+                                    <span class="df-label">Monto</span>
+                                    <span class="df-value df-value-accent" style="font-size:1.2rem;">
+                                        S/. <span th:text="${#numbers.formatDecimal(pago.monto, 1, 2, 'DEFAULT')}">0.00</span>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="detail-field">
+                                    <span class="df-label">Método de Pago</span>
+                                    <span class="df-value" th:text="${pago.metodoPago}">-</span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="detail-field">
+                                    <span class="df-label">N° Comprobante</span>
+                                    <span class="df-value" th:text="${pago.nroComprobante ?: '-'}">-</span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="detail-field">
+                                    <span class="df-label">Tipo Comprobante</span>
+                                    <span class="df-value" th:text="${pago.tipoComprobante ?: '-'}">-</span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="detail-field">
+                                    <span class="df-label">Fecha Registro</span>
+                                    <span class="df-value" th:text="${#temporals.format(pago.fechaRegistro, 'dd/MM/yyyy HH:mm')}">-</span>
+                                </div>
+                            </div>
+                            <div class="col-md-6" th:if="${pago.fechaPago}">
+                                <div class="detail-field">
+                                    <span class="df-label">Fecha de Pago</span>
+                                    <span class="df-value" th:text="${#temporals.format(pago.fechaPago, 'dd/MM/yyyy HH:mm')}">-</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="p-4">
-                <div class="row g-3">
-                    <div class="col-md-4">
-                        <label style="color:rgba(255,255,255,0.5);font-size:12px;">Monto</label>
-                        <p style="font-weight:700;color:#06b6d4;">S/. <span th:text="${#numbers.formatDecimal(pago.monto, 1, 2, 'DEFAULT')}">0.00</span></p>
+
+            <div class="col-lg-4">
+                <div class="detail-card">
+                    <div class="detail-card-head">
+                        <div class="dch-icon"><i class="bi bi-person-fill"></i></div>
+                        <div><h5 class="mb-0" style="font-weight:700;">Paciente</h5></div>
                     </div>
-                    <div class="col-md-4">
-                        <label style="color:rgba(255,255,255,0.5);font-size:12px;">Método de Pago</label>
-                        <p th:text="${pago.metodoPago}"></p>
+                    <div class="detail-card-body">
+                        <div class="detail-field">
+                            <span class="df-label">Nombre</span>
+                            <span class="df-value" style="font-size:1rem;"
+                                  th:text="${pago.cita?.paciente?.apellidoPaterno + ' ' + pago.cita?.paciente?.apellidoMaterno + ', ' + pago.cita?.paciente?.nombres}">-</span>
+                        </div>
+                        <div class="detail-field" th:if="${pago.cita?.paciente?.dni}">
+                            <span class="df-label">DNI</span>
+                            <span class="df-value" th:text="${pago.cita?.paciente?.dni}">-</span>
+                        </div>
                     </div>
-                    <div class="col-md-4">
-                        <label style="color:rgba(255,255,255,0.5);font-size:12px;">Nº Comprobante</label>
-                        <p th:text="${pago.nroComprobante ?: '-'}"></p>
-                    </div>
-                    <div class="col-md-4">
-                        <label style="color:rgba(255,255,255,0.5);font-size:12px;">Tipo Comprobante</label>
-                        <p th:text="${pago.tipoComprobante ?: '-'}"></p>
-                    </div>
-                    <div class="col-md-4">
-                        <label style="color:rgba(255,255,255,0.5);font-size:12px;">Fecha Registro</label>
-                        <p th:text="${#temporals.format(pago.fechaRegistro, 'dd/MM/yyyy HH:mm')}"></p>
-                    </div>
-                    <div class="col-md-4" th:if="${pago.fechaPago}">
-                        <label style="color:rgba(255,255,255,0.5);font-size:12px;">Fecha Pago</label>
-                        <p th:text="${#temporals.format(pago.fechaPago, 'dd/MM/yyyy HH:mm')}"></p>
-                    </div>
+                </div>
+
+                <div class="detail-actions">
+                    <a th:href="@{/pagos/editar/{id}(id=${pago.idPago})}" class="btn-editar w-100 text-center mb-2" style="padding:12px;">
+                        <i class="bi bi-pencil"></i>Editar Pago
+                    </a>
+                    <form th:action="@{/pagos/eliminar/{id}(id=${pago.idPago})}" method="post" onsubmit="return confirm('¿Eliminar este pago?')">
+                        <button type="submit" class="btn-eliminar w-100 mb-2" style="padding:12px;">
+                            <i class="bi bi-trash3"></i>Eliminar
+                        </button>
+                    </form>
+                    <a th:href="@{/pagos}" class="btn-volver w-100 text-center">
+                        <i class="bi bi-arrow-left"></i>Volver al listado
+                    </a>
                 </div>
             </div>
         </div>
 
-        <div class="d-flex gap-2">
-            <a th:href="@{/pagos/editar/{id}(id=${pago.idPago})}" class="btn-editar">
-                <i class="bi bi-pencil"></i> Editar
-            </a>
-            <form th:action="@{/pagos/eliminar/{id}(id=${pago.idPago})}" method="post" style="display:inline;">
-                <button type="submit" class="btn-eliminar"
-                        onclick="return confirm('¿Eliminar este pago?')">
-                    <i class="bi bi-trash"></i> Eliminar
-                </button>
-            </form>
-            <a href="/trinidad/pagos" class="btn-ver">
-                <i class="bi bi-arrow-left"></i> Volver
-            </a>
-        </div>
+        
 
     </main>
     <footer th:replace="~{fragments/header :: footer}"></footer>
 </div>
 </body>
 </html>
-
-

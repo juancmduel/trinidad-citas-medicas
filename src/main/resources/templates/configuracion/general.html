@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: head('Configuración General')}"></head>
+<body class="app-body">
+<nav th:replace="~{fragments/header :: navbar}"></nav>
+<div class="app-content">
+    <div th:replace="~{fragments/header :: topbar}"></div>
+    <main class="page-main">
+
+        <div class="d-flex align-items-center justify-content-between mb-4">
+            <div>
+                <h1 style="font-size:26px;font-weight:700;margin-bottom:4px;">
+                    <i class="bi bi-building me-2" style="color:var(--accent);"></i>Configuración General
+                </h1>
+                <p style="color:var(--text-muted);font-size:13px;margin:0;">Ajustes generales de la clínica</p>
+            </div>
+            <a th:href="@{/configuracion}" class="btn-volver">
+                <i class="bi bi-arrow-left me-1"></i>Volver
+            </a>
+        </div>
+
+        <div class="form-section-card">
+            <div class="d-flex align-items-center gap-3 mb-3">
+                <div class="fs-icon"><i class="bi bi-hospital-fill"></i></div>
+                <div>
+                    <h5 class="mb-1" style="font-weight:700;">Información de la Clínica</h5>
+                    <p style="color:var(--text-muted);font-size:13px;margin:0;">Datos principales del centro de salud</p>
+                </div>
+            </div>
+            <div class="row g-3">
+                <div class="col-md-6 form-field">
+                    <label>Nombre de la Clínica</label>
+                    <input type="text" class="form-control" value="Trinidad Citas Médicas" disabled>
+                </div>
+                <div class="col-md-3 form-field">
+                    <label>Hora de Apertura</label>
+                    <input type="time" class="form-control" value="08:00" disabled>
+                </div>
+                <div class="col-md-3 form-field">
+                    <label>Hora de Cierre</label>
+                    <input type="time" class="form-control" value="18:00" disabled>
+                </div>
+                <div class="col-md-4 form-field">
+                    <label>Duración de Cita (min)</label>
+                    <input type="number" class="form-control" value="30" disabled>
+                </div>
+                <div class="col-md-4 form-field">
+                    <label>Días de Atención</label>
+                    <input type="text" class="form-control" value="Lun - Vie" disabled>
+                </div>
+                <div class="col-md-4 form-field">
+                    <label>Teléfono</label>
+                    <input type="text" class="form-control" value="(01) 123-4567" disabled>
+                </div>
+            </div>
+            <div style="margin-top:16px;padding:12px 16px;background:var(--hover-bg);border-radius:10px;font-size:13px;color:var(--text-muted);">
+                <i class="bi bi-info-circle me-2"></i>Los valores de configuración se cargarán desde la base de datos próximamente.
+            </div>
+        </div>
+
+    </main>
+    <footer th:replace="~{fragments/header :: footer}"></footer>
+</div>
+</body>
+</html>

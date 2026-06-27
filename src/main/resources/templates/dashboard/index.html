@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head th:replace="~{fragments/header :: head('Dashboard')}"></head>
 <body class="app-body">
@@ -12,9 +12,9 @@
         <!-- Page Header -->
         <div class="mb-4">
             <h1 style="font-size:28px;font-weight:700;margin-bottom:6px;">
-                <i class="bi bi-speedometer2 me-2" style="color:#06b6d4;"></i>Dashboard
+                <i class="bi bi-speedometer2 me-2" style="color:var(--accent);"></i>Dashboard
             </h1>
-            <p style="color:rgba(255,255,255,0.5);font-size:13px;">Resumen en tiempo real del sistema médico</p>
+            <p style="color:var(--text-muted);font-size:13px;">Resumen en tiempo real del sistema médico</p>
         </div>
 
         <!-- KPI Grid -->
@@ -44,14 +44,14 @@
         <!-- Status Cards -->
         <div class="grid-professional grid-cols-2 mt-4">
             <div class="kpi-card-professional" style="border-color: rgba(16,185,129,0.3); background: linear-gradient(135deg, rgba(16,185,129,0.12), rgba(16,185,129,0.05));">
-                <i class="bi bi-check-circle kpi-icon-professional" style="color:#10b981;"></i>
+                <i class="bi bi-check-circle kpi-icon-professional" style="color:var(--success);"></i>
                 <div class="kpi-label-professional">Atendidas Hoy</div>
-                <div class="kpi-value-professional" style="color:#10b981;" th:text="${kpis.citasAtendidasHoy ?: 0}">0</div>
+                <div class="kpi-value-professional" style="color:var(--success);" th:text="${kpis.citasAtendidasHoy ?: 0}">0</div>
             </div>
             <div class="kpi-card-professional" style="border-color: rgba(245,158,11,0.3); background: linear-gradient(135deg, rgba(245,158,11,0.12), rgba(245,158,11,0.05));">
-                <i class="bi bi-clock-history kpi-icon-professional" style="color:#f59e0b;"></i>
+                <i class="bi bi-clock-history kpi-icon-professional" style="color:var(--warning);"></i>
                 <div class="kpi-label-professional">Pendientes Hoy</div>
-                <div class="kpi-value-professional" style="color:#f59e0b;" th:text="${kpis.citasPendientesHoy ?: 0}">0</div>
+                <div class="kpi-value-professional" style="color:var(--warning);" th:text="${kpis.citasPendientesHoy ?: 0}">0</div>
             </div>
         </div>
 

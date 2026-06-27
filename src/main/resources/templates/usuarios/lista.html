@@ -2,73 +2,135 @@
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/header :: head('Usuarios')}"></head>
 <body class="app-body">
-
 <nav th:replace="~{fragments/header :: navbar}"></nav>
-
 <div class="app-content">
     <div th:replace="~{fragments/header :: topbar}"></div>
-
     <main class="page-main">
-        <!-- Page Header -->
-        <div class="mb-4">
-            <h1 style="font-size:28px;font-weight:700;margin-bottom:6px;">
-                <i class="bi bi-person-gear me-2" style="color:#06b6d4;"></i>Gestión de Usuarios
-            </h1>
-            <p style="color:rgba(255,255,255,0.5);font-size:13px;">Administración de cuentas de usuario del sistema</p>
+
+        <div class="d-flex align-items-center justify-content-between mb-4">
+            <div>
+                <h1 style="font-size:26px;font-weight:700;margin-bottom:4px;">
+                    <i class="bi bi-person-gear me-2" style="color:var(--accent);"></i>Usuarios
+                </h1>
+                <p style="color:var(--text-muted);font-size:13px;margin:0;">Gestión de usuarios del sistema</p>
+            </div>
+            <a th:href="@{/usuarios/nuevo}" class="btn-nuevo">
+                <i class="bi bi-plus-lg"></i>Nuevo Usuario
+            </a>
         </div>
 
-        <!-- Data Table -->
-        <div class="card-professional">
-            <div class="card-header-professional">
-                <h5><i class="bi bi-list"></i>Usuarios del Sistema</h5>
-            </div>
-            <div class="p-4">
-                <div class="table-responsive">
-                    <table class="table-professional">
-                        <thead>
-                            <tr>
-                                <th>Usuario</th>
-                                <th>Email</th>
-                                <th>Roles</th>
-                                <th>Estado</th>
-                                <th>Último Acceso</th>
-                                <th class="text-end">Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr th:each="usuario : ${usuarios}">
-                                <td><strong th:text="${usuario.username}"></strong></td>
-                                <td th:text="${usuario.email}"></td>
-                                <td>
-                                    <span class="badge-status badge-primary" th:each="rol : ${usuario.roles}" th:text="${rol.nombre}"></span>
-                                </td>
-                                <td>
-                                    <span class="badge-status" 
-                                        th:classappend="${usuario.activo ? 'badge-success' : 'badge-danger'}"
-                                        th:text="${usuario.activo ? 'Activo' : 'Inactivo'}">
-                                    </span>
-                                </td>
-                                <td th:text="${usuario.fechaUltLogin ? #temporals.format(usuario.fechaUltLogin, 'dd/MM/yyyy HH:mm') : 'Nunca'}"></td>
-                                <td><div class="acciones-tabla">
-                                    <a th:href="@{/usuarios/{id}(id=${usuario.idUsuario})}" class="btn-ver">
-                                        <i class="bi bi-eye"></i>
-                                    </a>
-                                </div></td></tr>
-                        </tbody>
-                    </table>
+        <div th:if="${ok}" class="alert-professional alert-success-prof mb-4">
+            <i class="bi bi-check-circle-fill"></i> <span th:text="${ok}"></span>
+        </div>
+        <div th:if="${error}" class="alert-professional alert-danger-prof mb-4">
+            <i class="bi bi-exclamation-triangle-fill"></i> <span th:text="${error}"></span>
+        </div>
+
+        <div class="stats-grid mb-4">
+            <div class="stat-card">
+                <div class="stat-icon stat-icon-total"><i class="bi bi-people-fill"></i></div>
+                <div>
+                    <div class="stat-value" th:text="${#lists.size(usuarios)}">0</div>
+                    <div class="stat-label">Total Usuarios</div>
                 </div>
-                <div th:if="${#lists.isEmpty(usuarios)}" style="text-align:center; padding:3rem 1.25rem; color:rgba(255,255,255,0.5);">
-                    <i class="bi bi-inbox" style="font-size:2.5rem;"></i>
-                    <p class="mt-2">No hay usuarios registrados</p>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon stat-icon-activo"><i class="bi bi-check-circle-fill"></i></div>
+                <div>
+                    <div class="stat-value" th:text="${#lists.size(usuarios.?[activo == 1])}">0</div>
+                    <div class="stat-label">Activos</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon stat-icon-inactivo"><i class="bi bi-x-circle-fill"></i></div>
+                <div>
+                    <div class="stat-value" th:text="${#lists.size(usuarios.?[activo == 0])}">0</div>
+                    <div class="stat-label">Inactivos</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon stat-icon-bloqueado"><i class="bi bi-lock-fill"></i></div>
+                <div>
+                    <div class="stat-value" th:text="${#lists.size(usuarios.?[bloqueado == 1])}">0</div>
+                    <div class="stat-label">Bloqueados</div>
                 </div>
             </div>
         </div>
+
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap;">
+            <div class="search-bar" style="flex:1;min-width:200px;">
+                <i class="bi bi-search"></i>
+                <input type="text" id="searchInput" class="form-control" placeholder="Buscar usuario, email..." oninput="filterTable()">
+            </div>
+        </div>
+
+        <div class="table-container">
+            <table class="table-modern">
+                <thead>
+                    <tr>
+                        <th>Usuario</th>
+                        <th>Email</th>
+                        <th>Roles</th>
+                        <th>Estado</th>
+                        <th>Bloqueado</th>
+                        <th>Último Acceso</th>
+                        <th style="text-align:center;">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:if="${#lists.isEmpty(usuarios)}">
+                        <td colspan="7" class="table-empty">No hay usuarios registrados</td>
+                    </tr>
+                    <tr th:each="u : ${usuarios}" th:data-search="${u.username + ' ' + u.email}">
+                        <td style="font-weight:700;" th:text="${u.username}">-</td>
+                        <td th:text="${u.email}">-</td>
+                        <td>
+                            <span th:each="rol : ${u.rolesNombres}" class="badge-rol" th:text="${rol}"></span>
+                            <span th:if="${#lists.isEmpty(u.rolesNombres)}" style="color:var(--text-muted);font-size:12px;">Sin roles</span>
+                        </td>
+                        <td>
+                            <span class="badge-estado" th:classappend="${u.activo == 1} ? 'badge-activo' : 'badge-inactivo'"
+                                  th:text="${u.activo == 1} ? 'Activo' : 'Inactivo'"></span>
+                        </td>
+                        <td>
+                            <span th:if="${u.bloqueado == 1}" class="badge-estado badge-bloqueado">Bloqueado</span>
+                            <span th:unless="${u.bloqueado == 1}" style="color:var(--text-muted);font-size:12px;">—</span>
+                        </td>
+                        <td th:text="${u.fechaUltLogin != null ? #temporals.format(u.fechaUltLogin, 'dd/MM/yyyy HH:mm') : 'Nunca'}">-</td>
+                        <td style="text-align:center;">
+                            <div class="action-group">
+                                <a th:href="@{/usuarios/{id}(id=${u.idUsuario})}" class="action-btn action-view" title="Ver"><i class="bi bi-eye"></i></a>
+                                <a th:href="@{/usuarios/editar/{id}(id=${u.idUsuario})}" class="action-btn action-edit" title="Editar"><i class="bi bi-pencil"></i></a>
+                                <form th:action="@{/usuarios/toggle/{id}(id=${u.idUsuario})}" method="post" style="display:inline;" onsubmit="return confirm('¿Cambiar estado de este usuario?')">
+                                    <button type="submit" class="action-btn" th:classappend="${u.activo == 1} ? 'action-state' : 'action-activate'" th:title="${u.activo == 1} ? 'Desactivar' : 'Activar'">
+                                        <i class="bi" th:classappend="${u.activo == 1} ? 'bi-pause-fill' : 'bi-play-fill'"></i>
+                                    </button>
+                                </form>
+                                <form th:action="@{/usuarios/eliminar/{id}(id=${u.idUsuario})}" method="post" style="display:inline;" onsubmit="return confirm('¿Eliminar este usuario?')">
+                                    <button type="submit" class="action-btn action-delete" title="Eliminar"><i class="bi bi-trash3"></i></button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        
+
+        <script>
+        function filterTable() {
+            var q = document.getElementById('searchInput').value.toLowerCase();
+            document.querySelectorAll('.table-modern tbody tr').forEach(function(r) {
+                if (r.classList.contains('table-empty')) return;
+                var data = (r.getAttribute('data-search') || '').toLowerCase();
+                r.classList.toggle('hidden', q.length > 0 && data.indexOf(q) === -1);
+            });
+        }
+        </script>
 
     </main>
-
     <footer th:replace="~{fragments/header :: footer}"></footer>
 </div>
-
 </body>
 </html>
-

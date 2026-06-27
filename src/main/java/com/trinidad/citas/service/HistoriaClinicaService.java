@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -19,6 +20,17 @@ public class HistoriaClinicaService {
 
     private final HistoriaClinicaRepository historiaClinicaRepository;
     private final PacienteRepository pacienteRepository;
+
+    @Transactional(readOnly = true)
+    public List<HistoriaClinica> listarEntidadesConRelaciones() {
+        return historiaClinicaRepository.findAllWithPaciente();
+    }
+
+    @Transactional(readOnly = true)
+    public HistoriaClinica obtenerEntidad(Long id) {
+        return historiaClinicaRepository.findByIdWithPaciente(id)
+                .orElseThrow(() -> new ResourceNotFoundException("HistoriaClinica", id));
+    }
 
     public HistoriaClinicaDTO toDTO(HistoriaClinica h) {
         HistoriaClinicaDTO dto = new HistoriaClinicaDTO();
@@ -49,6 +61,12 @@ public class HistoriaClinicaService {
         return historiaClinicaRepository.findByPaciente_IdPaciente(idPaciente)
                 .map(this::toDTO)
                 .orElseThrow(() -> new ResourceNotFoundException("HistoriaClinica para paciente", idPaciente));
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<Long> buscarIdHistoriaPorPaciente(Long idPaciente) {
+        return historiaClinicaRepository.findByPaciente_IdPaciente(idPaciente)
+                .map(HistoriaClinica::getIdHistoria);
     }
 
     @Transactional(readOnly = true)

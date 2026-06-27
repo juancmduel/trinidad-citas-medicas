@@ -1,8 +1,10 @@
 package com.trinidad.citas.service;
 
 import com.trinidad.citas.dto.AtencionDTO;
+import com.trinidad.citas.exception.BusinessException;
 import com.trinidad.citas.exception.ResourceNotFoundException;
 import com.trinidad.citas.model.Atencion;
+import com.trinidad.citas.model.EstadoCita;
 import com.trinidad.citas.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -22,6 +24,7 @@ public class AtencionService {
     private final HistoriaClinicaRepository historiaClinicaRepository;
     private final MedicoRepository medicoRepository;
     private final DiagnosticoCie10Repository diagnosticoCie10Repository;
+    private final PagoRepository pagoRepository;
 
     public AtencionDTO toDTO(Atencion a) {
         AtencionDTO dto = new AtencionDTO();
@@ -46,6 +49,11 @@ public class AtencionService {
     }
 
     @Transactional(readOnly = true)
+    public List<Atencion> listarEntidadesConRelaciones() {
+        return atencionRepository.findAllWithRelations();
+    }
+
+    @Transactional(readOnly = true)
     public List<AtencionDTO> listarTodos() {
         return atencionRepository.findAll().stream().map(this::toDTO).collect(Collectors.toList());
     }
@@ -57,6 +65,12 @@ public class AtencionService {
     }
 
     @Transactional(readOnly = true)
+    public Atencion obtenerEntidadConRelaciones(Long id) {
+        return atencionRepository.findByIdWithRelations(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Atencion", id));
+    }
+
+    @Transactional(readOnly = true)
     public AtencionDTO obtenerPorCita(Long idCita) {
         return atencionRepository.findByCita_IdCita(idCita)
                 .map(this::toDTO)
@@ -64,9 +78,18 @@ public class AtencionService {
     }
 
     public AtencionDTO crear(AtencionDTO dto) {
+        com.trinidad.citas.model.Cita cita = citaRepository.findById(dto.getIdCita())
+                .orElseThrow(() -> new ResourceNotFoundException("Cita", dto.getIdCita()));
+        if (cita.getEstado() != EstadoCita.EN_ATENCION) {
+            throw new BusinessException("La cita debe estar en estado EN_ATENCION para registrar una atencion");
+        }
+        com.trinidad.citas.model.Pago pago = pagoRepository.findByCita_IdCita(dto.getIdCita())
+                .orElseThrow(() -> new BusinessException("La cita no tiene un pago registrado"));
+        if (!"PAGADO".equals(pago.getEstado())) {
+            throw new BusinessException("El pago de la cita no esta confirmado (estado: " + pago.getEstado() + ")");
+        }
         Atencion a = new Atencion();
-        a.setCita(citaRepository.findById(dto.getIdCita())
-                .orElseThrow(() -> new ResourceNotFoundException("Cita", dto.getIdCita())));
+        a.setCita(cita);
         a.setHistoria(historiaClinicaRepository.findById(dto.getIdHistoria())
                 .orElseThrow(() -> new ResourceNotFoundException("HistoriaClinica", dto.getIdHistoria())));
         a.setMedico(medicoRepository.findById(dto.getIdMedico())
@@ -85,7 +108,10 @@ public class AtencionService {
         a.setTemperatura(dto.getTemperatura());
         a.setPesoKg(dto.getPesoKg());
         a.setTallaCm(dto.getTallaCm());
-        return toDTO(atencionRepository.save(a));
+        AtencionDTO saved = toDTO(atencionRepository.save(a));
+        cita.setEstado(EstadoCita.ATENDIDA);
+        citaRepository.save(cita);
+        return saved;
     }
 
     public void eliminar(Long id) {

@@ -9,78 +9,118 @@
     <div th:replace="~{fragments/header :: topbar}"></div>
 
     <main class="page-main">
-        <div class="container-xl">
-            <div class="page-header">
-                <div class="row align-items-center">
-                    <div class="col">
-                        <h2 class="page-title"><i class="fa-solid fa-file-medical"></i> Historia Clínica</h2>
-                    </div>
+
+        <div class="page-header">
+            <div>
+                <h1><i class="bi bi-file-earmark-medical"></i>Historias Clínicas</h1>
+                <p>Registro de historias clínicas de pacientes</p>
+            </div>
+            <a th:href="@{/historia-clinica/nueva}" class="btn-nuevo">
+                <i class="bi bi-plus-lg"></i>Nueva Historia
+            </a>
+        </div>
+
+        <div th:if="${ok}" class="alert-professional alert-success-prof mb-4">
+            <i class="bi bi-check-circle-fill"></i> <span th:text="${ok}"></span>
+        </div>
+        <div th:if="${error}" class="alert-professional alert-danger-prof mb-4">
+            <i class="bi bi-exclamation-triangle-fill"></i> <span th:text="${error}"></span>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats-grid mb-4">
+            <div class="stat-card">
+                <div class="stat-icon stat-icon-total"><i class="bi bi-file-earmark-text"></i></div>
+                <div>
+                    <div class="stat-value" th:text="${#lists.size(historias)}">0</div>
+                    <div class="stat-label">Total Historias</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon stat-icon-activa"><i class="bi bi-check-circle-fill"></i></div>
+                <div>
+                    <div class="stat-value" th:text="${#lists.size(historias.?[activo == 1])}">0</div>
+                    <div class="stat-label">Activas</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon stat-icon-inactiva"><i class="bi bi-x-circle-fill"></i></div>
+                <div>
+                    <div class="stat-value" th:text="${#lists.size(historias.?[activo == 0])}">0</div>
+                    <div class="stat-label">Inactivas</div>
                 </div>
             </div>
         </div>
 
-        <div class="page-wrapper">
-            <div class="container-xl">
-                <div class="row">
-                    <div class="col-12">
-                        <div th:if="${ok}" class="alert alert-success alert-dismissible" th:text="${ok}"></div>
-                        <div class="card">
-                            <div class="card-header d-flex justify-content-between align-items-center">
-                                <span>Historias Clínicas registradas</span>
-                                <a href="/trinidad/historia-clinica/nueva" class="btn btn-primary btn-sm">
-                                    <i class="fa-solid fa-plus"></i> Nueva Historia
-                                </a>
-                            </div>
-                            <div class="table-responsive">
-                                <table class="table card-table table-vcenter">
-                                    <thead>
-                                        <tr>
-                                            <th>N° Historia</th>
-                                            <th>Paciente</th>
-                                            <th>DNI</th>
-                                            <th>Fecha Apertura</th>
-                                            <th>Estado</th>
-                                            <th>Acciones</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr th:if="${historias.isEmpty()}">
-                                            <td colspan="6" class="text-center">No hay historias clínicas registradas</td></tr>
-                                        <tr th:each="h : ${historias}">
-                                            <td th:text="${h.nroHistoria}"></td>
-                                            <td th:text="${h.paciente != null ? h.paciente.nombres + ' ' + h.paciente.apellidoPaterno : '-'}"></td>
-                                            <td th:text="${h.paciente != null ? h.paciente.dni : '-'}"></td>
-                                            <td th:text="${h.fechaApertura}"></td>
-                                            <td>
-                                                <span th:if="${h.activo == 1}" class="badge bg-success">Activa</span>
-                                                <span th:if="${h.activo != 1}" class="badge bg-secondary">Inactiva</span>
-                                            </td>
-                                            <td>
-                                                <a th:href="@{/historia-clinica/{id}(id=${h.idHistoria})}" class="btn-ver">
-                                                    <i class="fa-solid fa-eye"></i>
-                                                </a>
-                                                <a th:href="@{/historia-clinica/editar/{id}(id=${h.idHistoria})}" class="btn-editar">
-                                                    <i class="fa-solid fa-pencil"></i>
-                                                </a>
-                                                <form th:action="@{/historia-clinica/eliminar/{id}(id=${h.idHistoria})}" method="post" style="display:inline;">
-                                                    <button type="submit" class="btn-eliminar"
-                                                            onclick="return confirm('¿Eliminar esta historia clínica?')">
-                                                        <i class="fa-solid fa-trash"></i>
-                                                    </button>
-                                                </form>
-                                            </div></td></tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap;">
+            <div class="search-bar" style="flex:1;min-width:200px;">
+                <i class="bi bi-search"></i>
+                <input type="text" id="searchInput" class="form-input-professional" placeholder="Buscar paciente, N° historia..." oninput="filterTable()">
             </div>
         </div>
+
+        <!-- Tabla -->
+        <div class="table-container">
+            <table class="table-modern">
+                <thead>
+                    <tr>
+                        <th>N° Historia</th>
+                        <th>Paciente</th>
+                        <th>DNI</th>
+                        <th>Fecha Apertura</th>
+                        <th>Estado</th>
+                        <th style="text-align:center;">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:if="${#lists.isEmpty(historias)}">
+                        <td colspan="6" class="table-empty">No hay historias clínicas registradas</td>
+                    </tr>
+                    <tr th:each="h : ${historias}" th:data-search="${h.nroHistoria + ' ' + h.paciente?.nombres + ' ' + h.paciente?.apellidoPaterno + ' ' + h.paciente?.dni}">
+                        <td class="df-value-accent" th:text="${h.nroHistoria}" style="font-weight:700;">HC-001</td>
+                        <td th:text="${h.paciente?.nombres + ' ' + h.paciente?.apellidoPaterno}">-</td>
+                        <td th:text="${h.paciente?.dni ?: '-'}">-</td>
+                        <td th:text="${#temporals.format(h.fechaApertura, 'dd/MM/yyyy')}">-</td>
+                        <td>
+                            <span class="badge-estado"
+                                  th:classappend="${h.activo == 1} ? 'badge-activa' : 'badge-inactiva'"
+                                  th:text="${h.activo == 1} ? 'Activa' : 'Inactiva'"></span>
+                        </td>
+                        <td style="text-align:center;">
+                            <div class="action-group">
+                                <a th:href="@{/historia-clinica/{id}(id=${h.idHistoria})}" class="action-btn action-view" title="Ver detalle"><i class="bi bi-eye"></i></a>
+                                <a th:href="@{/historia-clinica/editar/{id}(id=${h.idHistoria})}" class="action-btn action-edit" title="Editar"><i class="bi bi-pencil"></i></a>
+                                <form th:action="@{/historia-clinica/toggle/{id}(id=${h.idHistoria})}" method="post" style="display:inline;" onsubmit="return confirm('¿Cambiar estado de esta historia clínica?')">
+                                    <button type="submit" class="action-btn" th:classappend="${h.activo == 1} ? 'action-state' : 'action-activate'" th:title="${h.activo == 1} ? 'Desactivar' : 'Activar'">
+                                        <i class="bi" th:classappend="${h.activo == 1} ? 'bi-pause-fill' : 'bi-play-fill'"></i>
+                                    </button>
+                                </form>
+                                <form th:action="@{/historia-clinica/eliminar/{id}(id=${h.idHistoria})}" method="post" style="display:inline;" onsubmit="return confirm('¿Eliminar esta historia clínica?')">
+                                    <button type="submit" class="action-btn action-delete" title="Eliminar"><i class="bi bi-trash3"></i></button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        
+
+        <script>
+        function filterTable() {
+            var q = document.getElementById('searchInput').value.toLowerCase();
+            document.querySelectorAll('.table-modern tbody tr').forEach(function(r) {
+                if (r.classList.contains('table-empty')) return;
+                var data = (r.getAttribute('data-search') || '').toLowerCase();
+                r.classList.toggle('hidden', q.length > 0 && data.indexOf(q) === -1);
+            });
+        }
+        </script>
+
     </main>
+    <footer th:replace="~{fragments/header :: footer}"></footer>
 </div>
 
 </body>
 </html>
-
-

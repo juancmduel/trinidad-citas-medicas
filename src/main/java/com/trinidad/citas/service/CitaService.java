@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -84,6 +85,16 @@ public class CitaService {
     }
 
     @Transactional(readOnly = true)
+    public List<Cita> listarEntidadesPorEstado(EstadoCita estado) {
+        return citaRepository.findByEstado(estado);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Object[]> contarAgrupadoPorFechaEntre(LocalDate desde, LocalDate hasta) {
+        return citaRepository.countByFechaCitaBetween(desde, hasta);
+    }
+
+    @Transactional(readOnly = true)
     public CitaDTO obtenerDTO(Long id) {
         return toDTO(obtenerEntidad(id));
     }
@@ -146,5 +157,36 @@ public class CitaService {
 
     public CitaDTO cancelar(Long idCita) {
         return cambiarEstado(idCita, EstadoCita.CANCELADA);
+    }
+
+    public CitaDTO confirmarPago(Long idCita) {
+        Cita c = obtenerEntidad(idCita);
+        if (c.getEstado() != EstadoCita.PROGRAMADA) {
+            throw new BusinessException("Solo se puede confirmar una cita en estado PROGRAMADA");
+        }
+        c.setEstado(EstadoCita.CONFIRMADA);
+        return toDTO(citaRepository.save(c));
+    }
+
+    public CitaDTO checkin(Long idCita) {
+        Cita c = obtenerEntidad(idCita);
+        if (c.getEstado() != EstadoCita.CONFIRMADA) {
+            throw new BusinessException("Solo se puede registrar check-in en citas CONFIRMADA");
+        }
+        if (c.getFechaCheckin() != null) {
+            throw new BusinessException("El check-in ya fue registrado para esta cita");
+        }
+        c.setFechaCheckin(LocalDateTime.now());
+        c.setEstado(EstadoCita.EN_ATENCION);
+        return toDTO(citaRepository.save(c));
+    }
+
+    public CitaDTO finalizar(Long idCita) {
+        Cita c = obtenerEntidad(idCita);
+        if (c.getEstado() != EstadoCita.EN_ATENCION) {
+            throw new BusinessException("Solo se puede finalizar una cita en estado EN_ATENCION");
+        }
+        c.setEstado(EstadoCita.ATENDIDA);
+        return toDTO(citaRepository.save(c));
     }
 }

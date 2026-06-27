@@ -7,55 +7,81 @@
     <div th:replace="~{fragments/header :: topbar}"></div>
     <main class="page-main">
 
-        <div class="mb-4">
-            <h1 style="font-size:28px;font-weight:700;margin-bottom:6px;">
-                <i class="bi bi-journal-medical me-2" style="color:#06b6d4;"></i>Historia Clínica
-            </h1>
+        <div class="page-header">
+            <div>
+                <h1><i class="bi bi-journal-medical"></i>Historia Clínica</h1>
+                <p>Detalle completo de la historia clínica del paciente</p>
+            </div>
+            <span class="badge-estado-lg"
+                  th:classappend="${historia.activo == 1} ? 'be-activa' : 'be-inactiva'"
+                  th:text="${historia.activo == 1} ? 'Activa' : 'Inactiva'"></span>
         </div>
 
-        <div th:if="${historia != null}" class="card-professional mb-4">
-            <div class="card-header-professional d-flex justify-content-between align-items-center">
-                <h5><i class="bi bi-file-person"></i> Datos del Paciente</h5>
-                <a th:href="@{/historia-clinica/editar/{id}(id=${historia.idHistoria})}" class="btn-editar">
-                    <i class="bi bi-pencil"></i> Editar
-                </a>
+        <div class="row g-4">
+            <div class="col-lg-8">
+                <div class="detail-card">
+                    <div class="detail-card-head">
+                        <div class="dch-icon"><i class="bi bi-file-person-fill"></i></div>
+                        <div><h5 class="mb-0" style="font-weight:700;">Datos del Paciente</h5></div>
+                    </div>
+                    <div class="detail-card-body">
+                        <div class="row g-4">
+                            <div class="col-md-6">
+                                <div class="detail-field">
+                                    <span class="df-label">N° Historia</span>
+                                    <span class="df-value df-value-accent" th:text="${historia.nroHistoria}">-</span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="detail-field">
+                                    <span class="df-label">Paciente</span>
+                                    <span class="df-value" th:text="${historia.paciente?.apellidoPaterno + ' ' + historia.paciente?.apellidoMaterno + ', ' + historia.paciente?.nombres}">-</span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="detail-field">
+                                    <span class="df-label">DNI</span>
+                                    <span class="df-value" th:text="${historia.paciente?.dni ?: '-'}">-</span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="detail-field">
+                                    <span class="df-label">Fecha Apertura</span>
+                                    <span class="df-value" th:text="${#temporals.format(historia.fechaApertura, 'dd/MM/yyyy')}">-</span>
+                                </div>
+                            </div>
+                            <div class="col-12" th:if="${historia.observaciones}">
+                                <div class="detail-field">
+                                    <span class="df-label">Observaciones</span>
+                                    <span class="df-value" th:text="${historia.observaciones}">-</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="p-4">
-                <div class="row g-3">
-                    <div class="col-md-3">
-                        <label style="color:rgba(255,255,255,0.5);font-size:12px;">Nº Historia</label>
-                        <p style="font-weight:700;color:#06b6d4;" th:text="${historia.nroHistoria}"></p>
-                    </div>
-                    <div class="col-md-3">
-                        <label style="color:rgba(255,255,255,0.5);font-size:12px;">Paciente</label>
-                        <p th:text="${historia.paciente.apellidoPaterno + ' ' + historia.paciente.nombres}"></p>
-                    </div>
-                    <div class="col-md-3">
-                        <label style="color:rgba(255,255,255,0.5);font-size:12px;">DNI</label>
-                        <p th:text="${historia.paciente.dni}"></p>
-                    </div>
-                    <div class="col-md-3">
-                        <label style="color:rgba(255,255,255,0.5);font-size:12px;">Fecha Apertura</label>
-                        <p th:text="${#temporals.format(historia.fechaApertura, 'dd/MM/yyyy')}"></p>
-                    </div>
-                    <div class="col-12" th:if="${historia.observaciones}">
-                        <label style="color:rgba(255,255,255,0.5);font-size:12px;">Observaciones</label>
-                        <p th:text="${historia.observaciones}"></p>
-                    </div>
+
+            <div class="col-lg-4">
+                <div class="detail-actions">
+                    <a th:href="@{/historia-clinica/editar/{id}(id=${historia.idHistoria})}" class="action-btn w-100">
+                        <i class="bi bi-pencil"></i>Editar Historia
+                    </a>
+                    <form th:action="@{/historia-clinica/eliminar/{id}(id=${historia.idHistoria})}" method="post" style="display:block;" onsubmit="return confirm('¿Eliminar esta historia clínica?')">
+                        <button type="submit" class="action-btn btn-danger-outline w-100" style="padding:12px;border-radius:10px;font-weight:600;">
+                            <i class="bi bi-trash3"></i>Eliminar
+                        </button>
+                    </form>
+                    <a th:href="@{/historia-clinica}" class="btn-volver w-100 text-center">
+                        <i class="bi bi-arrow-left"></i>Volver al listado
+                    </a>
                 </div>
             </div>
         </div>
 
-        <div class="mt-3">
-            <a href="/trinidad/historia-clinica" class="btn-ver">
-                <i class="bi bi-arrow-left"></i> Volver
-            </a>
-        </div>
+        
 
     </main>
     <footer th:replace="~{fragments/header :: footer}"></footer>
 </div>
 </body>
 </html>
-
-

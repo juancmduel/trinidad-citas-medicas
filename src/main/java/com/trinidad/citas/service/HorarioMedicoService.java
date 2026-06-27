@@ -37,7 +37,7 @@ public class HorarioMedicoService {
 
     @Transactional(readOnly = true)
     public List<HorarioMedicoDTO> listarTodos() {
-        return horarioMedicoRepository.findAll().stream().map(this::toDTO).collect(Collectors.toList());
+        return horarioMedicoRepository.findAllWithMedico().stream().map(this::toDTO).collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
@@ -48,8 +48,13 @@ public class HorarioMedicoService {
 
     @Transactional(readOnly = true)
     public HorarioMedicoDTO obtenerPorId(Long id) {
-        return toDTO(horarioMedicoRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("HorarioMedico", id)));
+        return toDTO(obtenerEntidadPorId(id));
+    }
+
+    @Transactional(readOnly = true)
+    public HorarioMedico obtenerEntidadPorId(Long id) {
+        return horarioMedicoRepository.findByIdWithMedico(id)
+                .orElseThrow(() -> new ResourceNotFoundException("HorarioMedico", id));
     }
 
     public HorarioMedicoDTO crear(HorarioMedicoDTO dto) {

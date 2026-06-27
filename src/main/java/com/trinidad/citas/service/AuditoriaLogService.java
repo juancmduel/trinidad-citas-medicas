@@ -20,4 +20,8 @@ public class AuditoriaLogService {
     public Optional<AuditoriaLog> obtenerPorId(Long id) {
         return auditoriaLogRepository.findById(id);
     }
+
+    public AuditoriaLog guardar(AuditoriaLog log) {
+        return auditoriaLogRepository.save(log);
+    }
 }

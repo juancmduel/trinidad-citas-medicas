@@ -2,37 +2,36 @@
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/header :: head('Medicamento de Receta')}"></head>
 <body class="app-body">
-
 <nav th:replace="~{fragments/header :: navbar}"></nav>
-
 <div class="app-content">
     <div th:replace="~{fragments/header :: topbar}"></div>
-
     <main class="page-main">
-
-        <div class="mb-4">
-            <h1 style="font-size:28px;font-weight:700;margin-bottom:6px;">
-                <i class="bi bi-capsule me-2" style="color:#06b6d4;"></i>
-                <span th:text="${detalle.idDetalle != null} ? 'Editar Medicamento' : 'Nuevo Medicamento'">Medicamento</span>
-            </h1>
-            <p style="color:rgba(255,255,255,0.5);font-size:13px;">Datos del medicamento recetado</p>
-        </div>
-
-        <div class="card-professional">
-            <div class="card-header-professional">
-                <h5><i class="bi bi-pencil-square"></i> Formulario de Medicamento</h5>
+        <div class="page-header">
+            <div>
+                <h1><i class="bi bi-capsule"></i>
+                    <span th:text="${detalle.idDetalle != null} ? 'Editar Medicamento' : 'Nuevo Medicamento'">Medicamento</span>
+                </h1>
+                <p>Datos del medicamento recetado</p>
             </div>
-            <div class="p-4">
-                <form th:action="@{/detalle-recetas/guardar}" method="post">
-
-                    <!-- ID oculto para edición -->
-                    <input type="hidden" th:name="idDetalle" th:value="${detalle.idDetalle}">
-
-                    <!-- Selección de Receta -->
-                    <div class="row g-3 mb-3">
-                        <div class="col-12">
-                            <label class="form-label">Receta <span style="color:#ef4444;">*</span></label>
-                            <select name="recetaId" class="form-select" required>
+            <a th:href="@{/detalle-recetas}" class="btn-volver">
+                <i class="bi bi-arrow-left"></i>Volver
+            </a>
+        </div>
+        <form th:action="@{/detalle-recetas/guardar}" method="post">
+            <div class="row g-4">
+                <div class="col-lg-8">
+                    <div class="form-section-card">
+                        <div class="d-flex align-items-center gap-3 mb-3">
+                            <div class="fs-icon"><i class="bi bi-capsule-pill"></i></div>
+                            <div>
+                                <h5 class="mb-1" style="font-weight:700;">Datos del Medicamento</h5>
+                                <p style="color:var(--text-muted);font-size:13px;margin:0;">Información del medicamento recetado</p>
+                            </div>
+                        </div>
+                        <input type="hidden" th:name="idDetalle" th:value="${detalle.idDetalle}">
+                        <div class="form-field mb-3">
+                            <label>Receta <span class="required">*</span></label>
+                            <select name="recetaId" class="form-select-professional" required>
                                 <option value="">-- Seleccionar Receta --</option>
                                 <option th:each="r : ${recetas}"
                                         th:value="${r.idReceta}"
@@ -41,103 +40,93 @@
                                 </option>
                             </select>
                         </div>
-                    </div>
-
-                    <!-- Nombres del medicamento -->
-                    <div class="row g-3 mb-3">
-                        <div class="col-md-6">
-                            <label class="form-label">Nombre Genérico <span style="color:#ef4444;">*</span></label>
-                            <input type="text" name="nombreGenerico" class="form-control"
-                                   th:value="${detalle.nombreGenerico}"
-                                   placeholder="Ej: Amoxicilina" maxlength="150" required>
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6 form-field">
+                                <label>Nombre Genérico <span class="required">*</span></label>
+                                <input type="text" name="nombreGenerico" class="form-input-professional"
+                                       th:value="${detalle.nombreGenerico}"
+                                       placeholder="Ej: Amoxicilina" maxlength="150" required>
+                            </div>
+                            <div class="col-md-6 form-field">
+                                <label>Nombre Comercial</label>
+                                <input type="text" name="nombreComercial" class="form-input-professional"
+                                       th:value="${detalle.nombreComercial}"
+                                       placeholder="Ej: Amoxan" maxlength="150">
+                            </div>
                         </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Nombre Comercial</label>
-                            <input type="text" name="nombreComercial" class="form-control"
-                                   th:value="${detalle.nombreComercial}"
-                                   placeholder="Ej: Amoxan" maxlength="150">
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6 form-field">
+                                <label>Presentación</label>
+                                <input type="text" name="presentacion" class="form-input-professional"
+                                       th:value="${detalle.presentacion}"
+                                       placeholder="Ej: Cápsulas 500mg" maxlength="80">
+                            </div>
+                            <div class="col-md-6 form-field">
+                                <label>Dosis <span class="required">*</span></label>
+                                <input type="text" name="dosis" class="form-input-professional"
+                                       th:value="${detalle.dosis}"
+                                       placeholder="Ej: 500mg" maxlength="80" required>
+                            </div>
                         </div>
-                    </div>
-
-                    <!-- Presentación y Dosis -->
-                    <div class="row g-3 mb-3">
-                        <div class="col-md-6">
-                            <label class="form-label">Presentación</label>
-                            <input type="text" name="presentacion" class="form-control"
-                                   th:value="${detalle.presentacion}"
-                                   placeholder="Ej: Cápsulas 500mg" maxlength="80">
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6 form-field">
+                                <label>Frecuencia <span class="required">*</span></label>
+                                <input type="text" name="frecuencia" class="form-input-professional"
+                                       th:value="${detalle.frecuencia}"
+                                       placeholder="Ej: Cada 8 horas" maxlength="80" required>
+                            </div>
+                            <div class="col-md-6 form-field">
+                                <label>Duración (días) <span class="required">*</span></label>
+                                <input type="number" name="duracionDias" class="form-input-professional"
+                                       th:value="${detalle.duracionDias}"
+                                       placeholder="7" min="1" required>
+                            </div>
                         </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Dosis <span style="color:#ef4444;">*</span></label>
-                            <input type="text" name="dosis" class="form-control"
-                                   th:value="${detalle.dosis}"
-                                   placeholder="Ej: 500mg" maxlength="80" required>
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6 form-field">
+                                <label>Vía de Administración</label>
+                                <select name="viaAdministracion" class="form-select-professional">
+                                    <option value="">-- Seleccionar --</option>
+                                    <option value="Oral" th:selected="${detalle.viaAdministracion == 'Oral'}">Oral</option>
+                                    <option value="Intravenosa" th:selected="${detalle.viaAdministracion == 'Intravenosa'}">Intravenosa</option>
+                                    <option value="Intramuscular" th:selected="${detalle.viaAdministracion == 'Intramuscular'}">Intramuscular</option>
+                                    <option value="Subcutánea" th:selected="${detalle.viaAdministracion == 'Subcutánea'}">Subcutánea</option>
+                                    <option value="Tópica" th:selected="${detalle.viaAdministracion == 'Tópica'}">Tópica</option>
+                                    <option value="Inhalada" th:selected="${detalle.viaAdministracion == 'Inhalada'}">Inhalada</option>
+                                    <option value="Sublingual" th:selected="${detalle.viaAdministracion == 'Sublingual'}">Sublingual</option>
+                                    <option value="Rectal" th:selected="${detalle.viaAdministracion == 'Rectal'}">Rectal</option>
+                                </select>
+                            </div>
                         </div>
-                    </div>
-
-                    <!-- Frecuencia y Duración -->
-                    <div class="row g-3 mb-3">
-                        <div class="col-md-6">
-                            <label class="form-label">Frecuencia <span style="color:#ef4444;">*</span></label>
-                            <input type="text" name="frecuencia" class="form-control"
-                                   th:value="${detalle.frecuencia}"
-                                   placeholder="Ej: Cada 8 horas" maxlength="80" required>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Duración (días) <span style="color:#ef4444;">*</span></label>
-                            <input type="number" name="duracionDias" class="form-control"
-                                   th:value="${detalle.duracionDias}"
-                                   placeholder="7" min="1" required>
-                        </div>
-                    </div>
-
-                    <!-- Vía de Administración -->
-                    <div class="row g-3 mb-3">
-                        <div class="col-md-6">
-                            <label class="form-label">Vía de Administración</label>
-                            <select name="viaAdministracion" class="form-select">
-                                <option value="">-- Seleccionar --</option>
-                                <option value="Oral" th:selected="${detalle.viaAdministracion == 'Oral'}">Oral</option>
-                                <option value="Intravenosa" th:selected="${detalle.viaAdministracion == 'Intravenosa'}">Intravenosa</option>
-                                <option value="Intramuscular" th:selected="${detalle.viaAdministracion == 'Intramuscular'}">Intramuscular</option>
-                                <option value="Subcutánea" th:selected="${detalle.viaAdministracion == 'Subcutánea'}">Subcutánea</option>
-                                <option value="Tópica" th:selected="${detalle.viaAdministracion == 'Tópica'}">Tópica</option>
-                                <option value="Inhalada" th:selected="${detalle.viaAdministracion == 'Inhalada'}">Inhalada</option>
-                                <option value="Sublingual" th:selected="${detalle.viaAdministracion == 'Sublingual'}">Sublingual</option>
-                                <option value="Rectal" th:selected="${detalle.viaAdministracion == 'Rectal'}">Rectal</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <!-- Indicaciones -->
-                    <div class="row g-3 mb-4">
-                        <div class="col-12">
-                            <label class="form-label">Indicaciones Adicionales</label>
-                            <textarea name="indicaciones" class="form-control" rows="3"
+                        <div class="form-field">
+                            <label>Indicaciones Adicionales</label>
+                            <textarea name="indicaciones" class="form-input-professional" rows="3"
                                       th:text="${detalle.indicaciones}"
                                       placeholder="Indicaciones especiales para el paciente..." maxlength="500"></textarea>
                         </div>
                     </div>
-
-                    <!-- Botones -->
-                    <div class="d-flex gap-2">
-                        <button type="submit" class="btn-nuevo">
-                            <i class="bi bi-save"></i> Guardar Medicamento
+                </div>
+                <div class="col-lg-4">
+                    <div class="form-section-card">
+                        <div class="d-flex align-items-center gap-3 mb-3">
+                            <div class="fs-icon"><i class="bi bi-lightning-fill"></i></div>
+                            <div>
+                                <h5 class="mb-1" style="font-weight:700;">Acciones</h5>
+                                <p style="color:var(--text-muted);font-size:13px;margin:0;">Finaliza o descarta los cambios</p>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn-guardar w-100 mb-2" style="justify-content:center;padding:12px;">
+                            <i class="bi bi-check-circle"></i> Guardar Medicamento
                         </button>
-                        <a href="/trinidad/detalle-recetas" class="btn-ver">
-                            <i class="bi bi-x-lg"></i> Cancelar
+                        <a th:href="@{/detalle-recetas}" class="btn-volver w-100 text-center" style="justify-content:center;padding:12px;">
+                            <i class="bi bi-x-circle"></i>Cancelar
                         </a>
                     </div>
-
-                </form>
+                </div>
             </div>
-        </div>
-
+        </form>
     </main>
-
     <footer th:replace="~{fragments/header :: footer}"></footer>
 </div>
-
 </body>
 </html>
-

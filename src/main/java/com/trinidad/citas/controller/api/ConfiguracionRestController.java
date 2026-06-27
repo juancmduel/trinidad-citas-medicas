@@ -12,7 +12,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/v1/configuracion")
 @RequiredArgsConstructor
-@PreAuthorize("hasRole('ADMIN')")
+@PreAuthorize("hasRole('ADMINISTRADOR')")
 public class ConfiguracionRestController {
 
     /**

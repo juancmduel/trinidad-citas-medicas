@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: head('Intentos de Login')}"></head>
+<body class="app-body">
+<nav th:replace="~{fragments/header :: navbar}"></nav>
+<div class="app-content">
+    <div th:replace="~{fragments/header :: topbar}"></div>
+    <main class="page-main">
+
+        <div class="page-header">
+            <div>
+                <h1><i class="bi bi-shield-check"></i>Intentos de Inicio de Sesión</h1>
+                <p th:if="${username != null}" th:text="'Filtrado por usuario: ' + ${username}">Todos los intentos</p>
+                <p th:if="${username == null}">Registro de todos los intentos de autenticación</p>
+            </div>
+            <a th:if="${username != null}" th:href="@{/auditoria/intentos}" class="btn-volver">
+                <i class="bi bi-arrow-left"></i>Ver todos
+            </a>
+            <a th:if="${username == null}" th:href="@{/auditoria}" class="btn-volver">
+                <i class="bi bi-arrow-left"></i>Volver a Auditoría
+            </a>
+        </div>
+
+        <div class="stats-grid mb-4">
+            <div class="stat-card">
+                <div class="stat-icon stat-icon-total"><i class="bi bi-shield-check"></i></div>
+                <div>
+                    <div class="stat-value" th:text="${#lists.size(intentos)}">0</div>
+                    <div class="stat-label">Total Intentos</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon stat-icon-create"><i class="bi bi-check-circle"></i></div>
+                <div>
+                    <div class="stat-value" th:text="${#lists.size(intentos.?[exitoso == 1])}">0</div>
+                    <div class="stat-label">Exitosos</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon stat-icon-delete"><i class="bi bi-x-circle"></i></div>
+                <div>
+                    <div class="stat-value" th:text="${#lists.size(intentos.?[exitoso == 0])}">0</div>
+                    <div class="stat-label">Fallidos</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <table class="table-modern">
+                <thead>
+                    <tr>
+                        <th>Fecha / Hora</th>
+                        <th>Usuario</th>
+                        <th>Resultado</th>
+                        <th>IP Origen</th>
+                        <th>Mensaje Error</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:if="${#lists.isEmpty(intentos)}">
+                        <td colspan="5" class="table-empty">No hay intentos de login registrados</td>
+                    </tr>
+                    <tr th:each="i : ${intentos}">
+                        <td style="white-space:nowrap;" th:text="${#temporals.format(i.fechaHora, 'dd/MM/yyyy HH:mm:ss')}">-</td>
+                        <td><span class="badge-usuario" th:text="${i.username}">-</span></td>
+                        <td>
+                            <span class="badge-estado" th:classappend="${i.exitoso == 1} ? 'badge-exitoso' : 'badge-fallido'"
+                                  th:text="${i.exitoso == 1} ? 'EXITOSO' : 'FALLIDO'">-</span>
+                        </td>
+                        <td style="font-size:12px;color:var(--text-muted);" th:text="${i.ipOrigen ?: '-'}">-</td>
+                        <td th:text="${i.mensajeError ?: '-'}" style="max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">-</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </main>
+    <footer th:replace="~{fragments/header :: footer}"></footer>
+</div>
+</body>
+</html>

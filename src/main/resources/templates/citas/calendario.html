@@ -1,91 +1,140 @@
 ﻿<!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/header :: head(${titulo})}"></head>
-<body class="bg-light">
+<body class="app-body">
 
 <nav th:replace="~{fragments/header :: navbar}"></nav>
 
-<div class="container py-4">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h2><i class="bi bi-calendar-check"></i> Citas</h2>
-        <a th:href="@{/citas/agendar}" class="btn-nuevo">
-            <i class="bi bi-plus-lg"></i> Agendar cita
-        </a>
-    </div>
+<div class="app-content">
+    <div th:replace="~{fragments/header :: topbar}"></div>
 
-    <div th:if="${ok}" class="alert alert-success alert-dismissible fade show">
-        <span th:text="${ok}"></span>
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    </div>
+    <main class="page-main">
 
-    <div class="card shadow-sm mb-3">
-        <div class="card-body">
-            <form method="get" th:action="@{/citas/calendario}" class="row g-2 align-items-end">
-                <div class="col-md-4">
-                    <label class="form-label">Fecha</label>
-                    <input type="date" name="fecha" th:value="${fecha}" class="form-control">
-                </div>
-                <div class="col-md-2">
-                    <button class="btn btn-outline-primary w-100">
-                        <i class="bi bi-search"></i> Filtrar
-                    </button>
-                </div>
-            </form>
+        <div class="page-header">
+            <div>
+                <h1><i class="bi bi-calendar3"></i>Calendario de Citas</h1>
+                <p>Gestión visual de citas médicas</p>
+            </div>
+            <a th:href="@{/citas/agendar}" class="btn-nuevo">
+                <i class="bi bi-plus-circle-fill"></i> Nueva Cita
+            </a>
         </div>
-    </div>
 
-    <div class="card shadow-sm">
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-hover">
-                    <thead class="table-light">
-                        <tr>
-                            <th>Hora</th>
-                            <th>Paciente</th>
-                            <th>Medico</th>
-                            <th>Especialidad</th>
-                            <th>Estado</th>
-                            <th>Canal</th>
-                            <th class="text-end">Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr th:each="c : ${citas}">
-                            <td><strong th:text="${c.horaInicio}"></strong></td>
-                            <td th:text="${c.nombrePaciente}"></td>
-                            <td th:text="${c.nombreMedico}"></td>
-                            <td th:text="${c.nombreEspecialidad}"></td>
-                            <td>
-                                <span class="badge"
-                                      th:classappend="${c.estado == 'PROGRAMADA'} ? 'bg-warning' :
-                                                      (${c.estado == 'CONFIRMADA'} ? 'bg-info' :
-                                                      (${c.estado == 'ATENDIDA'} ? 'bg-success' :
-                                                      (${c.estado == 'CANCELADA'} ? 'bg-danger' : 'bg-secondary')))"
-                                      th:text="${c.estado}"></span>
-                            </td>
-                            <td><small class="text-muted" th:text="${c.canalReserva}"></small></td>
-                            <td><div class="acciones-tabla">
-                                <form th:action="@{/citas/{id}/cancelar(id=${c.idCita})}" method="post"
-                                      class="d-inline" onsubmit="return confirm('Cancelar esta cita?')"
-                                      th:if="${c.estado == 'PROGRAMADA' or c.estado == 'CONFIRMADA'}">
-                                    <button class="btn-eliminar">
-                                        <i class="bi bi-x-circle"></i> Cancelar
-                                    </button>
-                                </form>
-                            </div></td></tr>
-                        <tr th:if="${#lists.isEmpty(citas)}">
-                            <td colspan="7" class="text-center text-muted py-4">
-                                <i class="bi bi-calendar-x display-6"></i>
-                                <p class="mt-2">No hay citas para esta fecha</p>
-                            </div></td></tr>
-                    </tbody>
-                </table>
+        <div th:if="${ok}" class="alert-professional alert-success-prof mb-4">
+            <i class="bi bi-check-circle-fill"></i><span th:text="${ok}"></span>
+        </div>
+
+        <!-- ========== CALENDARIO VISUAL ========== -->
+        <div class="card-professional mb-4">
+            <div class="card-header-professional d-flex align-items-center justify-content-between flex-wrap gap-2">
+                <h5 class="mb-0">
+                    <i class="bi bi-calendar-week"></i>
+                    <span th:text="${#strings.capitalize(monthName) + ' ' + calendarYear}"></span>
+                </h5>
+                <div class="d-flex gap-1">
+                    <a th:href="@{/citas/calendario(mes=${prevMonth}, anio=${prevYear}, fecha=${fecha})}"
+                       class="btn-ver" title="Mes anterior">
+                        <i class="bi bi-chevron-left"></i>
+                    </a>
+                    <a th:href="@{/citas/calendario(fecha=${#temporals.createToday()})}"
+                       class="btn-nuevo" style="padding:6px 14px;font-size:12px;">
+                        Hoy
+                    </a>
+                    <a th:href="@{/citas/calendario(mes=${nextMonth}, anio=${nextYear}, fecha=${fecha})}"
+                       class="btn-ver" title="Mes siguiente">
+                        <i class="bi bi-chevron-right"></i>
+                    </a>
+                </div>
+            </div>
+            <div class="p-3">
+                <div class="cal-weekdays">
+                    <div>Dom</div><div>Lun</div><div>Mar</div><div>Mie</div><div>Jue</div><div>Vie</div><div>Sab</div>
+                </div>
+                <div class="cal-grid">
+                    <th:block th:each="d : ${diasCalendario}">
+                        <a th:if="${d.dia != null}"
+                           th:href="@{/citas/calendario(fecha=${d.fecha}, mes=${calendarMonth}, anio=${calendarYear})}"
+                           th:classappend="${d.esSeleccionado} ? 'cal-day-selected' : (${d.esHoy} ? 'cal-day-today' : (${d.hayCitas} ? 'cal-day-has' : ''))"
+                           class="cal-day">
+                            <span class="cal-day-num" th:text="${d.dia}"></span>
+                            <span th:if="${d.hayCitas}" class="cal-day-badge" th:text="${d.conteo}"></span>
+                        </a>
+                        <div th:if="${d.dia == null}" class="cal-day-empty"></div>
+                    </th:block>
+                </div>
             </div>
         </div>
-    </div>
+
+        <!-- ========== CITAS DEL DIA ========== -->
+        <div class="card-professional">
+            <div class="card-header-professional d-flex align-items-center justify-content-between flex-wrap gap-2">
+                <h5 class="mb-0">
+                    <i class="bi bi-list-check"></i>
+                    Citas del <span th:text="${#temporals.format(fecha, 'dd/MM/yyyy')}"></span>
+                </h5>
+                <span class="badge-estado badge-estado-primary" th:text="${#lists.size(citas)} + ' cita(s)'"></span>
+            </div>
+            <div class="p-4">
+                <div th:if="${not #lists.isEmpty(citas)}" class="table-container">
+                    <table class="table-modern">
+                        <thead>
+                            <tr>
+                                <th>Hora</th>
+                                <th>Paciente</th>
+                                <th>Médico</th>
+                                <th>Especialidad</th>
+                                <th>Estado</th>
+                                <th class="text-end">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="c : ${citas}">
+                                <td><strong th:text="${c.horaInicio}"></strong></td>
+                                <td>
+                                    <strong th:text="${c.nombrePaciente}"></strong>
+                                    <small th:text="${c.dniPaciente}"></small>
+                                </td>
+                                <td th:text="${c.nombreMedico}"></td>
+                                <td th:text="${c.nombreEspecialidad}"></td>
+                                <td>
+                                    <span class="badge-estado"
+                                          th:classappend="${c.estado == 'PROGRAMADA'} ? 'badge-estado-warning' :
+                                                          (${c.estado == 'CONFIRMADA'} ? 'badge-estado-primary' :
+                                                          (${c.estado == 'EN_ATENCION'} ? 'badge-estado-info' :
+                                                          (${c.estado == 'ATENDIDA'} ? 'badge-estado-success' :
+                                                          (${c.estado == 'CANCELADA'} ? 'badge-estado-danger' : 'badge-estado-warning'))))"
+                                          th:text="${c.estado}"></span>
+                                </td>
+                                <td><div class="acciones-tabla" style="justify-content:flex-end;">
+                                    <a th:href="@{/citas/{id}(id=${c.idCita})}" class="btn-ver" title="Ver detalle">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    <form th:action="@{/citas/{id}/cancelar(id=${c.idCita})}" method="post"
+                                          class="d-inline" onsubmit="return confirm('Cancelar esta cita?')"
+                                          th:if="${c.estado == 'PROGRAMADA' or c.estado == 'CONFIRMADA'}">
+                                        <button class="btn-eliminar" title="Cancelar cita">
+                                            <i class="bi bi-x-circle"></i>
+                                        </button>
+                                    </form>
+                                </div></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div th:if="${#lists.isEmpty(citas)}" class="empty-state">
+                    <i class="bi bi-calendar-x"></i>
+                    <p>No hay citas para esta fecha</p>
+                    <a th:href="@{/citas/agendar}" class="btn-nuevo mt-2">
+                        <i class="bi bi-plus-circle-fill"></i> Agendar cita
+                    </a>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <footer th:replace="~{fragments/header :: footer}"></footer>
 </div>
 
-<footer th:replace="~{fragments/header :: footer}"></footer>
 </body>
 </html>
-

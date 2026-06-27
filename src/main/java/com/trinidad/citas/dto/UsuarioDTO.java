@@ -25,6 +25,7 @@ public class UsuarioDTO {
 
     private Integer activo;
     private Integer bloqueado;
+    private Integer intentosFallidos;
     private LocalDateTime fechaCreacion;
     private LocalDateTime fechaUltLogin;
 

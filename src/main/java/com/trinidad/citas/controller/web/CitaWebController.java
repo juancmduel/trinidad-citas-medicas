@@ -2,6 +2,8 @@ package com.trinidad.citas.controller.web;
 
 import org.springframework.context.annotation.Profile;
 import com.trinidad.citas.dto.CitaDTO;
+import com.trinidad.citas.repository.CitaRepository;
+import com.trinidad.citas.repository.PagoRepository;
 import com.trinidad.citas.service.CitaService;
 import com.trinidad.citas.service.EspecialidadService;
 import com.trinidad.citas.service.MedicoService;
@@ -15,6 +17,10 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.LocalDate;
+import java.time.YearMonth;
+import java.time.format.TextStyle;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Profile({"web", "default"})
 @Controller
@@ -23,9 +29,11 @@ import java.time.LocalDate;
 public class CitaWebController {
 
     private final CitaService citaService;
+    private final CitaRepository citaRepository;
     private final EspecialidadService especialidadService;
     private final MedicoService medicoService;
     private final PacienteService pacienteService;
+    private final PagoRepository pagoRepository;
 
     @GetMapping
     public String lista(Model model) {
@@ -35,11 +43,78 @@ public class CitaWebController {
     }
 
     @GetMapping("/calendario")
-    public String calendario(@RequestParam(required = false) String fecha, Model model) {
+    public String calendario(@RequestParam(required = false) String fecha,
+                             @RequestParam(required = false) Integer mes,
+                             @RequestParam(required = false) Integer anio,
+                             Model model) {
+        // Fecha seleccionada para la tabla
         LocalDate f = (fecha != null && !fecha.isBlank()) ? LocalDate.parse(fecha) : LocalDate.now();
         model.addAttribute("citas", citaService.listarPorFechaConRelaciones(f));
         model.addAttribute("fecha", f);
         model.addAttribute("titulo", "Calendario de Citas");
+
+        // Mes/año del calendario visual
+        YearMonth pagina;
+        if (mes != null && anio != null) {
+            pagina = YearMonth.of(anio, mes);
+        } else {
+            pagina = YearMonth.from(f);
+        }
+
+        // Dias del mes con citas
+        LocalDate inicioMes = pagina.atDay(1);
+        LocalDate finMes = pagina.atEndOfMonth();
+        List<Object[]> counts = citaRepository.countByFechaCitaBetween(inicioMes, finMes);
+        Set<LocalDate> diasConCitas = counts.stream()
+            .map(row -> (LocalDate) row[0])
+            .collect(Collectors.toSet());
+        Map<LocalDate, Long> conteoDias = counts.stream()
+            .collect(Collectors.toMap(row -> (LocalDate) row[0], row -> (Long) row[1]));
+
+        // Construir grid del calendario
+        int primerDiaSemana = inicioMes.getDayOfWeek().getValue() % 7; // 0=domingo
+        int diasEnMes = pagina.lengthOfMonth();
+        List<Map<String, Object>> diasCalendario = new ArrayList<>();
+
+        // Celdas vacias antes del dia 1
+        for (int i = 0; i < primerDiaSemana; i++) {
+            Map<String, Object> d = new HashMap<>();
+            d.put("dia", null);
+            d.put("fecha", null);
+            d.put("hayCitas", false);
+            d.put("conteo", 0);
+            d.put("esHoy", false);
+            d.put("esSeleccionado", false);
+            diasCalendario.add(d);
+        }
+
+        LocalDate hoy = LocalDate.now();
+        for (int dia = 1; dia <= diasEnMes; dia++) {
+            LocalDate fechaDia = pagina.atDay(dia);
+            Map<String, Object> d = new HashMap<>();
+            d.put("dia", dia);
+            d.put("fecha", fechaDia.toString());
+            d.put("hayCitas", diasConCitas.contains(fechaDia));
+            d.put("conteo", conteoDias.getOrDefault(fechaDia, 0L));
+            d.put("esHoy", fechaDia.equals(hoy));
+            d.put("esSeleccionado", fechaDia.equals(f));
+            diasCalendario.add(d);
+        }
+
+        // Navigation
+        YearMonth prev = pagina.minusMonths(1);
+        YearMonth next = pagina.plusMonths(1);
+
+        model.addAttribute("pagina", pagina);
+        model.addAttribute("monthName", pagina.getMonth().getDisplayName(TextStyle.FULL, new Locale("es", "ES")));
+        model.addAttribute("calendarYear", pagina.getYear());
+        model.addAttribute("calendarMonth", pagina.getMonthValue());
+        model.addAttribute("diasCalendario", diasCalendario);
+        model.addAttribute("prevMonth", prev.getMonthValue());
+        model.addAttribute("prevYear", prev.getYear());
+        model.addAttribute("nextMonth", next.getMonthValue());
+        model.addAttribute("nextYear", next.getYear());
+
         return "citas/calendario";
     }
 
@@ -56,6 +131,7 @@ public class CitaWebController {
     @GetMapping("/{id}")
     public String detalle(@PathVariable Long id, Model model) {
         model.addAttribute("cita", citaService.obtener(id));
+        model.addAttribute("pago", pagoRepository.findByCita_IdCita(id).orElse(null));
         return "citas/detalle";
     }
 
@@ -90,5 +166,36 @@ public class CitaWebController {
         citaService.cancelar(id);
         ra.addFlashAttribute("ok", "Cita cancelada");
         return "redirect:/citas";
+    }
+
+    @GetMapping("/{id}/checkin")
+    public String checkinForm(@PathVariable Long id, Model model) {
+        model.addAttribute("cita", citaService.obtener(id));
+        model.addAttribute("pago", pagoRepository.findByCita_IdCita(id).orElse(null));
+        return "citas/checkin";
+    }
+
+    @PostMapping("/{id}/checkin")
+    public String checkin(@PathVariable Long id, RedirectAttributes ra) {
+        try {
+            citaService.checkin(id);
+            ra.addFlashAttribute("ok", "Check-in registrado. Paciente en atencion.");
+            return "redirect:/citas/" + id;
+        } catch (Exception e) {
+            ra.addFlashAttribute("error", e.getMessage());
+            return "redirect:/citas/" + id;
+        }
+    }
+
+    @PostMapping("/{id}/finalizar")
+    public String finalizar(@PathVariable Long id, RedirectAttributes ra) {
+        try {
+            citaService.finalizar(id);
+            ra.addFlashAttribute("ok", "Atencion finalizada.");
+            return "redirect:/citas/" + id;
+        } catch (Exception e) {
+            ra.addFlashAttribute("error", e.getMessage());
+            return "redirect:/citas/" + id;
+        }
     }
 }

@@ -6,70 +6,147 @@
 <div class="app-content">
     <div th:replace="~{fragments/header :: topbar}"></div>
     <main class="page-main">
-        <div class="container-xl">
-            <div class="page-header">
-                <div class="row align-items-center">
-                    <div class="col">
-                        <h2 class="page-title"><i class="fa-solid fa-credit-card"></i> Pagos</h2>
-                    </div>
-                    <div class="col-auto">
-                        <a th:href="@{/pagos/nuevo}" class="btn-nuevo">
-                            <i class="fa-solid fa-plus"></i> Nuevo Pago
-                        </a>
-                    </div>
+
+        <div class="page-header">
+            <div>
+                <h1><i class="bi bi-credit-card"></i>Pagos</h1>
+                <p>Registro de pagos de citas médicas</p>
+            </div>
+            <a th:href="@{/pagos/nuevo}" class="btn-nuevo">
+                <i class="bi bi-plus-lg"></i>Nuevo Pago
+            </a>
+        </div>
+
+        <div th:if="${ok}" class="alert-professional alert-success-prof mb-4">
+            <i class="bi bi-check-circle-fill"></i> <span th:text="${ok}"></span>
+        </div>
+        <div th:if="${error}" class="alert-professional alert-danger-prof mb-4">
+            <i class="bi bi-exclamation-triangle-fill"></i> <span th:text="${error}"></span>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats-grid mb-4">
+            <div class="stat-card">
+                <div class="stat-icon stat-icon-total"><i class="bi bi-cash-stack"></i></div>
+                <div>
+                    <div class="stat-value" th:text="${#lists.size(pagos)}">0</div>
+                    <div class="stat-label">Total Pagos</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon stat-icon-pagado"><i class="bi bi-check-circle-fill"></i></div>
+                <div>
+                    <div class="stat-value" th:text="${#lists.size(pagos.?[estado == 'PAGADO'])}">0</div>
+                    <div class="stat-label">Pagados</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon stat-icon-pendiente"><i class="bi bi-clock"></i></div>
+                <div>
+                    <div class="stat-value" th:text="${#lists.size(pagos.?[estado == 'PENDIENTE'])}">0</div>
+                    <div class="stat-label">Pendientes</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon stat-icon-anulado"><i class="bi bi-x-circle-fill"></i></div>
+                <div>
+                    <div class="stat-value" th:text="${#lists.size(pagos.?[estado == 'ANULADO'])}">0</div>
+                    <div class="stat-label">Anulados</div>
                 </div>
             </div>
         </div>
-        <div class="page-wrapper">
-            <div class="container-xl">
-                <div th:if="${ok}" class="alert alert-success alert-dismissible mb-3" th:text="${ok}"></div>
-                <div class="card">
-                    <div class="table-responsive">
-                        <table class="table card-table table-vcenter">
-                            <thead>
-                                <tr>
-                                    <th>Paciente</th>
-                                    <th>Monto (S/.)</th>
-                                    <th>Método Pago</th>
-                                    <th>N° Comprobante</th>
-                                    <th>Fecha Pago</th>
-                                    <th>Estado</th>
-                                    <th>Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr th:if="${pagos.isEmpty()}">
-                                    <td colspan="7" class="text-center py-4">No hay pagos registrados</td></tr>
-                                <tr th:each="p : ${pagos}">
-                                    <td th:text="${p.cita?.paciente?.apellidoPaterno + ' ' + p.cita?.paciente?.nombres}">-</td>
-                                    <td><strong th:text="${'S/. ' + p.monto}"></strong></td>
-                                    <td th:text="${p.metodoPago}"></td>
-                                    <td th:text="${p.nroComprobante ?: '-'}"></td>
-                                    <td th:text="${p.fechaPago != null ? #temporals.format(p.fechaPago, 'dd/MM/yyyy HH:mm') : '-'}"></td>
-                                    <td>
-                                        <span class="badge"
-                                              th:classappend="${p.estado == 'PAGADO'} ? 'bg-success' : (${p.estado == 'PENDIENTE'} ? 'bg-warning text-dark' : 'bg-secondary')"
-                                              th:text="${p.estado}"></span>
-                                    </td>
-                                    <td>
-                                        <a th:href="@{/pagos/{id}(id=${p.idPago})}" class="btn-ver"><i class="fa-solid fa-eye"></i></a>
-                                        <a th:href="@{/pagos/editar/{id}(id=${p.idPago})}" class="btn-editar"><i class="fa-solid fa-pencil"></i></a>
-                                        <form th:action="@{/pagos/eliminar/{id}(id=${p.idPago})}" method="post" style="display:inline;">
-                                            <button type="submit" class="btn-eliminar"
-                                                    onclick="return confirm('¿Eliminar este pago?')">
-                                                <i class="fa-solid fa-trash"></i>
-                                            </button>
+
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap;">
+            <div class="search-bar" style="flex:1;min-width:200px;">
+                <i class="bi bi-search"></i>
+                <input type="text" id="searchInput" class="form-input-professional" placeholder="Buscar paciente, comprobante..." oninput="filterTable()">
+            </div>
+            <select id="estadoFilter" class="form-select-professional" style="width:auto;min-width:150px;" onchange="filterTable()">
+                <option value="">Todos los estados</option>
+                <option value="PAGADO">Pagado</option>
+                <option value="PENDIENTE">Pendiente</option>
+                <option value="ANULADO">Anulado</option>
+            </select>
+        </div>
+
+        <!-- Tabla -->
+        <div class="table-container">
+            <table class="table-modern">
+                <thead>
+                    <tr>
+                        <th>Paciente</th>
+                        <th>Monto</th>
+                        <th>Método</th>
+                        <th>N° Comprobante</th>
+                        <th>Fecha Pago</th>
+                        <th>Estado</th>
+                        <th style="text-align:center;">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:if="${#lists.isEmpty(pagos)}">
+                        <td colspan="7" class="table-empty">No hay pagos registrados</td>
+                    </tr>
+                    <tr th:each="p : ${pagos}" th:data-search="${p.cita?.paciente?.apellidoPaterno + ' ' + p.cita?.paciente?.nombres + ' ' + p.nroComprobante}" th:data-estado="${p.estado}">
+                        <td th:text="${p.cita?.paciente?.apellidoPaterno + ' ' + p.cita?.paciente?.nombres}">-</td>
+                        <td><span class="monto-accent">S/. <span th:text="${#numbers.formatDecimal(p.monto, 1, 2, 'DEFAULT')}">0.00</span></span></td>
+                        <td><span class="badge-metodo" th:text="${p.metodoPago}">EFECTIVO</span></td>
+                        <td th:text="${p.nroComprobante ?: '-'}">-</td>
+                        <td th:text="${p.fechaPago != null ? #temporals.format(p.fechaPago, 'dd/MM/yyyy HH:mm') : '-'}">-</td>
+                        <td>
+                            <span class="badge-estado"
+                                  th:classappend="${p.estado == 'PAGADO'} ? 'badge-pagado' : (${p.estado == 'PENDIENTE'} ? 'badge-pendiente' : 'badge-anulado')"
+                                  th:text="${p.estado == 'PAGADO'} ? 'Pagado' : (${p.estado == 'PENDIENTE'} ? 'Pendiente' : 'Anulado')"></span>
+                        </td>
+                        <td style="text-align:center;">
+                            <div class="action-group">
+                                <a th:href="@{/pagos/{id}(id=${p.idPago})}" class="action-btn action-view" title="Ver detalle"><i class="bi bi-eye"></i></a>
+                                <a th:href="@{/pagos/editar/{id}(id=${p.idPago})}" class="action-btn action-edit" title="Editar"><i class="bi bi-pencil"></i></a>
+                                <div class="action-dropdown">
+                                    <button class="action-btn action-state" title="Cambiar estado"><i class="bi bi-arrow-repeat"></i></button>
+                                    <div class="dropdown-menu-custom">
+                                        <form th:action="@{/pagos/{id}/estado(id=${p.idPago})}" method="post" style="display:contents;">
+                                            <input type="hidden" name="estado" value="PAGADO">
+                                            <button type="submit" class="dropdown-item">Pagado</button>
                                         </form>
-                                    </div></td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
+                                        <form th:action="@{/pagos/{id}/estado(id=${p.idPago})}" method="post" style="display:contents;">
+                                            <input type="hidden" name="estado" value="PENDIENTE">
+                                            <button type="submit" class="dropdown-item">Pendiente</button>
+                                        </form>
+                                        <form th:action="@{/pagos/{id}/estado(id=${p.idPago})}" method="post" style="display:contents;">
+                                            <input type="hidden" name="estado" value="ANULADO">
+                                            <button type="submit" class="dropdown-item">Anulado</button>
+                                        </form>
+                                    </div>
+                                </div>
+                                <form th:action="@{/pagos/eliminar/{id}(id=${p.idPago})}" method="post" style="display:inline;" onsubmit="return confirm('¿Eliminar este pago?')">
+                                    <button type="submit" class="action-btn action-delete" title="Eliminar"><i class="bi bi-trash3"></i></button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
+
+        
+
+        <script>
+        function filterTable() {
+            var q = document.getElementById('searchInput').value.toLowerCase();
+            var est = document.getElementById('estadoFilter').value;
+            document.querySelectorAll('.table-modern tbody tr').forEach(function(r) {
+                if (r.classList.contains('table-empty')) return;
+                var data = (r.getAttribute('data-search') || '').toLowerCase();
+                var estado = r.getAttribute('data-estado') || '';
+                var match = (!q || data.indexOf(q) !== -1) && (!est || estado === est);
+                r.classList.toggle('hidden', !match);
+            });
+        }
+        </script>
+
     </main>
+    <footer th:replace="~{fragments/header :: footer}"></footer>
 </div>
 </body>
 </html>
-
-

@@ -6,123 +6,141 @@
 <div class="app-content">
     <div th:replace="~{fragments/header :: topbar}"></div>
     <main class="page-main">
-        <div class="container-xl">
-            <div class="page-header">
-                <h2 class="page-title"><i class="fa-solid fa-stethoscope"></i> Nueva Atención Médica</h2>
+        <div class="page-header">
+            <div>
+                <h1><i class="bi bi-clipboard2-pulse"></i>Nueva Atención Médica</h1>
+                <p>Registro de atención médica realizada al paciente</p>
             </div>
+            <a th:href="@{/atenciones}" class="btn-volver">
+                <i class="bi bi-arrow-left"></i>Volver
+            </a>
         </div>
-        <div class="page-wrapper">
-            <div class="container-xl">
-                <div class="row">
-                    <div class="col-md-10 offset-md-1">
-                        <div class="card">
-                            <div class="card-body">
-                                <form th:action="@{/atenciones/guardar}" method="post">
-
-                                    <h6 class="text-muted fw-bold mb-3" style="text-transform:uppercase;letter-spacing:1px;font-size:12px;">Datos de la Cita</h6>
-
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <div class="form-field">
-                                                <label>Cita <span class="required">*</span></label>
-                                                <select name="citaId" class="form-control" required>
-                                                    <option value="">-- Seleccionar cita --</option>
-                                                    <option th:each="c : ${citas}"
-                                                            th:value="${c.idCita}"
-                                                            th:text="${c.paciente.apellidoPaterno + ' ' + c.paciente.nombres + ' | ' + c.fechaCita + ' ' + c.horaInicio}">
-                                                    </option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="form-field">
-                                                <label>Motivo de Consulta</label>
-                                                <input type="text" name="motivoConsulta" class="form-control" placeholder="Motivo de la atención">
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <hr class="my-3">
-                                    <h6 class="text-muted fw-bold mb-3" style="text-transform:uppercase;letter-spacing:1px;font-size:12px;">Signos Vitales</h6>
-
-                                    <div class="row">
-                                        <div class="col-md-3">
-                                            <div class="form-field">
-                                                <label>Presión Arterial</label>
-                                                <input type="text" name="presionArterial" class="form-control" placeholder="120/80">
-                                            </div>
-                                        </div>
-                                        <div class="col-md-3">
-                                            <div class="form-field">
-                                                <label>Temperatura (°C)</label>
-                                                <input type="number" name="temperatura" class="form-control" step="0.1" placeholder="37.0">
-                                            </div>
-                                        </div>
-                                        <div class="col-md-3">
-                                            <div class="form-field">
-                                                <label>Frec. Cardíaca (bpm)</label>
-                                                <input type="number" name="frecuenciaCardiaca" class="form-control" placeholder="80">
-                                            </div>
-                                        </div>
-                                        <div class="col-md-3">
-                                            <div class="form-field">
-                                                <label>Saturación O2 (%)</label>
-                                                <input type="number" name="saturacionO2" class="form-control" min="0" max="100" placeholder="98">
-                                            </div>
-                                        </div>
-                                        <div class="col-md-3">
-                                            <div class="form-field">
-                                                <label>Peso (kg)</label>
-                                                <input type="number" name="pesoKg" class="form-control" step="0.01" placeholder="70.0">
-                                            </div>
-                                        </div>
-                                        <div class="col-md-3">
-                                            <div class="form-field">
-                                                <label>Talla (cm)</label>
-                                                <input type="number" name="tallaCm" class="form-control" step="0.01" placeholder="170.0">
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <hr class="my-3">
-                                    <h6 class="text-muted fw-bold mb-3" style="text-transform:uppercase;letter-spacing:1px;font-size:12px;">Evaluación Clínica</h6>
-
-                                    <div class="form-field">
-                                        <label>Anamnesis</label>
-                                        <textarea name="anamnesis" class="form-control" rows="3" placeholder="Descripción de los síntomas referidos por el paciente..."></textarea>
-                                    </div>
-                                    <div class="form-field">
-                                        <label>Examen Físico</label>
-                                        <textarea name="examenFisico" class="form-control" rows="3" placeholder="Hallazgos del examen físico..."></textarea>
-                                    </div>
-                                    <div class="form-field">
-                                        <label>Diagnóstico <span class="required">*</span></label>
-                                        <textarea name="diagnosticoDesc" class="form-control" rows="2" required placeholder="Diagnóstico clínico..."></textarea>
-                                    </div>
-                                    <div class="form-field">
-                                        <label>Tratamiento <span class="required">*</span></label>
-                                        <textarea name="tratamiento" class="form-control" rows="3" required placeholder="Plan de tratamiento..."></textarea>
-                                    </div>
-                                    <div class="form-field">
-                                        <label>Observaciones</label>
-                                        <textarea name="observaciones" class="form-control" rows="2" placeholder="Notas adicionales..."></textarea>
-                                    </div>
-
-                                    <div class="form-footer d-flex gap-2 justify-content-end mt-3">
-                                        <a th:href="@{/atenciones}" class="btn-volver">Cancelar</a>
-                                        <button type="submit" class="btn-nuevo">
-                                            <i class="fa-solid fa-save"></i> Guardar Atención
-                                        </button>
-                                    </div>
-                                </form>
+        <form th:action="@{/atenciones/guardar}" method="post">
+            <div class="row g-4">
+                <div class="col-lg-8">
+                    <div class="form-section-card">
+                        <div class="d-flex align-items-center gap-3 mb-3">
+                            <div class="fs-icon"><i class="bi bi-person-vcard-fill"></i></div>
+                            <div>
+                                <h5 class="mb-1" style="font-weight:700;">Datos de la Cita</h5>
+                                <p style="color:var(--text-muted);font-size:13px;margin:0;">Selecciona la cita asociada</p>
+                            </div>
+                        </div>
+                        <input type="hidden" name="citaId" th:value="${cita.idCita}" th:if="${cita != null}">
+                        <div class="row g-3">
+                            <div class="col-md-6 form-field">
+                                <label>Cita <span class="required">*</span></label>
+                                <select name="citaId" class="form-select-professional" required
+                                        th:disabled="${cita != null}"
+                                        th:attr="data-selected=${cita != null ? cita.idCita : ''}">
+                                    <option value="">-- Seleccionar cita --</option>
+                                    <option th:each="c : ${citas}"
+                                            th:value="${c.idCita}"
+                                            th:text="${c.paciente.apellidoPaterno + ' ' + c.paciente.nombres + ' | ' + c.fechaCita + ' ' + c.horaInicio}"
+                                            th:selected="${cita != null and c.idCita == cita.idCita}">
+                                    </option>
+                                </select>
+                                <small th:if="${cita != null}" style="color:var(--text-muted);font-size:11px;">
+                                    Cita #<span th:text="${cita.idCita}"></span> - <span th:text="${cita.paciente.nombres + ' ' + cita.paciente.apellidoPaterno}"></span>
+                                </small>
+                            </div>
+                            <div class="col-md-6 form-field">
+                                <label>Motivo de Consulta</label>
+                                <input type="text" name="motivoConsulta" class="form-input-professional" placeholder="Motivo de la Atención">
                             </div>
                         </div>
                     </div>
+                    <div class="form-section-card">
+                        <div class="d-flex align-items-center gap-3 mb-3">
+                            <div class="fs-icon"><i class="bi bi-heart-pulse-fill"></i></div>
+                            <div>
+                                <h5 class="mb-1" style="font-weight:700;">Signos Vitales</h5>
+                                <p style="color:var(--text-muted);font-size:13px;margin:0;">Registro de signos vitales del paciente</p>
+                            </div>
+                        </div>
+                        <div class="row g-3">
+                            <div class="col-md-4 form-field">
+                                <label>Presión Arterial</label>
+                                <input type="text" name="presionArterial" class="form-input-professional" placeholder="120/80">
+                            </div>
+                            <div class="col-md-4 form-field">
+                                <label>Temperatura (°C)</label>
+                                <input type="number" name="temperatura" class="form-input-professional" step="0.1" placeholder="37.0">
+                            </div>
+                            <div class="col-md-4 form-field">
+                                <label>Frec. Cardíaca (bpm)</label>
+                                <input type="number" name="frecuenciaCardiaca" class="form-input-professional" placeholder="80">
+                            </div>
+                            <div class="col-md-4 form-field">
+                                <label>Saturación O2 (%)</label>
+                                <input type="number" name="saturacionO2" class="form-input-professional" min="0" max="100" placeholder="98">
+                            </div>
+                            <div class="col-md-4 form-field">
+                                <label>Peso (kg)</label>
+                                <input type="number" name="pesoKg" class="form-input-professional" step="0.01" placeholder="70.0">
+                            </div>
+                            <div class="col-md-4 form-field">
+                                <label>Talla (cm)</label>
+                                <input type="number" name="tallaCm" class="form-input-professional" step="0.01" placeholder="170.0">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-section-card">
+                        <div class="d-flex align-items-center gap-3 mb-3">
+                            <div class="fs-icon"><i class="bi bi-clipboard2-data-fill"></i></div>
+                            <div>
+                                <h5 class="mb-1" style="font-weight:700;">Evaluación Clínica</h5>
+                                <p style="color:var(--text-muted);font-size:13px;margin:0;">Diagnóstico, tratamiento y observaciones</p>
+                            </div>
+                        </div>
+                        <div class="form-field mb-3">
+                            <label>Anamnesis</label>
+                            <textarea name="anamnesis" class="form-input-professional" rows="3" placeholder="Descripción de los síntomas referidos por el paciente..."></textarea>
+                        </div>
+                        <div class="form-field mb-3">
+                            <label>Examen Físico</label>
+                            <textarea name="examenFisico" class="form-input-professional" rows="3" placeholder="Hallazgos del examen físico..."></textarea>
+                        </div>
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6 form-field">
+                                <label>Código CIE-10</label>
+                                <input type="text" name="diagnosticoCie10Codigo" class="form-input-professional" placeholder="Ej: J00, I10, E11" maxlength="10">
+                            </div>
+                            <div class="col-md-6 form-field">
+                                <label>Diagnóstico <span class="required">*</span></label>
+                                <textarea name="diagnosticoDesc" class="form-input-professional" rows="2" required placeholder="Diagnóstico clínico..."></textarea>
+                            </div>
+                        </div>
+                        <div class="form-field mb-3">
+                            <label>Tratamiento <span class="required">*</span></label>
+                            <textarea name="tratamiento" class="form-input-professional" rows="3" required placeholder="Plan de tratamiento..."></textarea>
+                        </div>
+                        <div class="form-field">
+                            <label>Observaciones</label>
+                            <textarea name="observaciones" class="form-input-professional" rows="2" placeholder="Notas adicionales..."></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="form-section-card">
+                        <div class="d-flex align-items-center gap-3 mb-3">
+                            <div class="fs-icon"><i class="bi bi-lightning-fill"></i></div>
+                            <div>
+                                <h5 class="mb-1" style="font-weight:700;">Acciones</h5>
+                                <p style="color:var(--text-muted);font-size:13px;margin:0;">Finaliza o descarta los cambios</p>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn-guardar w-100 mb-2" style="justify-content:center;padding:12px;">
+                            <i class="bi bi-check-circle"></i> Guardar Atención
+                        </button>
+                        <a th:href="@{/atenciones}" class="btn-volver w-100 text-center" style="justify-content:center;padding:12px;">
+                            <i class="bi bi-x-circle"></i>Cancelar
+                        </a>
+                    </div>
                 </div>
             </div>
-        </div>
+        </form>
     </main>
 </div>
 </body>
 </html>
-

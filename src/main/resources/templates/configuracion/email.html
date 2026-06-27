@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: head('Correo Electrónico')}"></head>
+<body class="app-body">
+<nav th:replace="~{fragments/header :: navbar}"></nav>
+<div class="app-content">
+    <div th:replace="~{fragments/header :: topbar}"></div>
+    <main class="page-main">
+
+        <div class="d-flex align-items-center justify-content-between mb-4">
+            <div>
+                <h1 style="font-size:26px;font-weight:700;margin-bottom:4px;">
+                    <i class="bi bi-envelope me-2" style="color:var(--accent);"></i>Correo Electrónico
+                </h1>
+                <p style="color:var(--text-muted);font-size:13px;margin:0;">Configuración del servidor de correo</p>
+            </div>
+            <a th:href="@{/configuracion}" class="btn-volver">
+                <i class="bi bi-arrow-left me-1"></i>Volver
+            </a>
+        </div>
+
+        <div class="form-section-card">
+            <div class="d-flex align-items-center gap-3 mb-3">
+                <div class="fs-icon"><i class="bi bi-server"></i></div>
+                <div>
+                    <h5 class="mb-1" style="font-weight:700;">Servidor SMTP</h5>
+                    <p style="color:var(--text-muted);font-size:13px;margin:0;">Configuración del servidor de correo saliente</p>
+                </div>
+            </div>
+            <div class="row g-3">
+                <div class="col-md-6 form-field">
+                    <label>Servidor SMTP</label>
+                    <input type="text" class="form-control" value="smtp.gmail.com" disabled>
+                </div>
+                <div class="col-md-3 form-field">
+                    <label>Puerto</label>
+                    <input type="number" class="form-control" value="587" disabled>
+                </div>
+                <div class="col-md-3 form-field">
+                    <label>Seguridad</label>
+                    <input type="text" class="form-control" value="TLS" disabled>
+                </div>
+                <div class="col-md-6 form-field">
+                    <label>Correo Remitente</label>
+                    <input type="email" class="form-control" value="notificaciones@trinidadmedicas.com" disabled>
+                </div>
+                <div class="col-md-6 form-field">
+                    <label>Nombre Remitente</label>
+                    <input type="text" class="form-control" value="Trinidad Citas Medicas" disabled>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-section-card">
+            <div class="d-flex align-items-center gap-3 mb-3">
+                <div class="fs-icon"><i class="bi bi-bell-fill"></i></div>
+                <div>
+                    <h5 class="mb-1" style="font-weight:700;">Notificaciones</h5>
+                    <p style="color:var(--text-muted);font-size:13px;margin:0;">Configuración de notificaciones automáticas</p>
+                </div>
+            </div>
+            <div class="row g-3">
+                <div class="col-md-6 form-field">
+                    <label>Notificar Confirmación de Cita</label>
+                    <select class="form-select" disabled>
+                        <option value="1" selected>Activado</option>
+                        <option value="0">Desactivado</option>
+                    </select>
+                </div>
+                <div class="col-md-6 form-field">
+                    <label>Notificar Recordatorio (24h antes)</label>
+                    <select class="form-select" disabled>
+                        <option value="1" selected>Activado</option>
+                        <option value="0">Desactivado</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+    </main>
+    <footer th:replace="~{fragments/header :: footer}"></footer>
+</div>
+</body>
+</html>

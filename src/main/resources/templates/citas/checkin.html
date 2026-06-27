@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/header :: head('Check-in de Paciente')}"></head>
+<body class="app-body">
+<nav th:replace="~{fragments/header :: navbar}"></nav>
+<div class="app-content">
+    <div th:replace="~{fragments/header :: topbar}"></div>
+    <main class="page-main">
+        <div class="page-header">
+            <div>
+                <h1><i class="bi bi-box-arrow-in-right"></i>Check-in de Paciente</h1>
+                <p>Cita #<span th:text="${cita.idCita}"></span></p>
+            </div>
+            <a th:href="@{/citas/{id}(id=${cita.idCita})}" class="btn-volver">
+                <i class="bi bi-arrow-left"></i>Volver
+            </a>
+        </div>
+
+        <div class="form-section-card">
+            <div class="d-flex align-items-center gap-3 mb-4">
+                <span class="fs-icon"><i class="bi bi-person-check"></i></span>
+                <span style="font-weight:700;font-size:1rem;color:var(--text-primary);">Registrar Llegada del Paciente</span>
+            </div>
+
+            <div class="row mb-4">
+                <div class="col-sm-6">
+                    <div class="detail-field">
+                        <span class="df-label">Paciente</span>
+                        <span class="df-value" th:text="${cita.paciente.nombres + ' ' + cita.paciente.apellidoPaterno + ' ' + cita.paciente.apellidoMaterno}"></span>
+                    </div>
+                </div>
+                <div class="col-sm-3">
+                    <div class="detail-field">
+                        <span class="df-label">DNI</span>
+                        <span class="df-value" th:text="${cita.paciente.dni}"></span>
+                    </div>
+                </div>
+                <div class="col-sm-3">
+                    <div class="detail-field">
+                        <span class="df-label">Medico</span>
+                        <span class="df-value" th:text="${'Dr. ' + cita.medico.nombres + ' ' + cita.medico.apellidoPaterno}"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="row mb-4">
+                <div class="col-sm-4">
+                    <div class="detail-field">
+                        <span class="df-label">Fecha</span>
+                        <span class="df-value" th:text="${#temporals.format(cita.fechaCita, 'dd/MM/yyyy')}"></span>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="detail-field">
+                        <span class="df-label">Horario</span>
+                        <span class="df-value" th:text="${cita.horaInicio} + ' - ' + ${cita.horaFin}"></span>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="detail-field">
+                        <span class="df-label">Especialidad</span>
+                        <span class="df-value" th:text="${cita.especialidad.nombre}"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="alert-professional alert-success-prof" th:if="${pago != null and pago.estado == 'PAGADO'}">
+                <i class="bi bi-check-circle-fill"></i>
+                <div>
+                    <strong style="color:var(--success);">Pago Verificado</strong>
+                    <span class="d-block" style="color:var(--text-muted);font-size:13px;">
+                        S/. <span th:text="${pago.monto}"></span> - <span th:text="${pago.metodoPago}"></span>
+                    </span>
+                </div>
+            </div>
+            <div class="alert-professional" style="background:rgba(245,158,11,0.1);border-color:var(--warning);color:var(--warning);" th:if="${pago == null}">
+                <i class="bi bi-exclamation-triangle"></i>
+                <span>Esta cita no tiene pago registrado. Debe registrar el pago antes del check-in.</span>
+            </div>
+            <div class="alert-professional" style="background:rgba(245,158,11,0.1);border-color:var(--warning);color:var(--warning);" th:if="${pago != null and pago.estado != 'PAGADO'}">
+                <i class="bi bi-exclamation-triangle"></i>
+                <span>El pago esta en estado <strong th:text="${pago.estado}"></strong>. Debe estar PAGADO para continuar.</span>
+            </div>
+
+            <form th:action="@{/citas/{id}/checkin(id=${cita.idCita})}" method="post">
+                <div class="form-footer">
+                    <a th:href="@{/citas/{id}(id=${cita.idCita})}" class="btn-volver">Cancelar</a>
+                    <button type="submit" class="btn-nuevo"
+                            th:disabled="${pago == null or pago.estado != 'PAGADO'}">
+                        <i class="bi bi-check-lg"></i>Confirmar Check-in
+                    </button>
+                </div>
+            </form>
+        </div>
+    </main>
+    <footer th:replace="~{fragments/header :: footer}"></footer>
+</div>
+</body>
+</html>

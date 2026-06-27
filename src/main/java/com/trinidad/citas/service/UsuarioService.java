@@ -33,6 +33,7 @@ public class UsuarioService {
         dto.setEmail(u.getEmail());
         dto.setActivo(u.getActivo());
         dto.setBloqueado(u.getBloqueado());
+        dto.setIntentosFallidos(u.getIntentosFallidos());
         dto.setFechaCreacion(u.getFechaCreacion());
         dto.setFechaUltLogin(u.getFechaUltLogin());
         dto.setRolesIds(u.getRoles().stream().map(Rol::getIdRol).collect(Collectors.toSet()));
@@ -51,9 +52,14 @@ public class UsuarioService {
     }
 
     @Transactional(readOnly = true)
+    public Usuario obtenerEntidadPorId(Long id) {
+        return usuarioRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Usuario", id));
+    }
+
+    @Transactional(readOnly = true)
     public UsuarioDTO obtenerPorId(Long id) {
-        return toDTO(usuarioRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Usuario", id)));
+        return toDTO(obtenerEntidadPorId(id));
     }
 
     @Transactional(readOnly = true)
@@ -97,5 +103,28 @@ public class UsuarioService {
             u.setRoles(roles);
         }
         return toDTO(usuarioRepository.save(u));
+    }
+
+    public void eliminar(Long id) {
+        usuarioRepository.deleteById(id);
+    }
+
+    public void bloquear(Long id) {
+        Usuario u = obtenerEntidadPorId(id);
+        u.setBloqueado(1);
+        usuarioRepository.save(u);
+    }
+
+    public void desbloquear(Long id) {
+        Usuario u = obtenerEntidadPorId(id);
+        u.setBloqueado(0);
+        u.setIntentosFallidos(0);
+        usuarioRepository.save(u);
+    }
+
+    public void resetearIntentosFallidos(Long id) {
+        Usuario u = obtenerEntidadPorId(id);
+        u.setIntentosFallidos(0);
+        usuarioRepository.save(u);
     }
 }

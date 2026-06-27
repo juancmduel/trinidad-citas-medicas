@@ -2,105 +2,151 @@
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/header :: head('Especialidad')}"></head>
 <body class="app-body">
+
 <nav th:replace="~{fragments/header :: navbar}"></nav>
+
 <div class="app-content">
     <div th:replace="~{fragments/header :: topbar}"></div>
+
     <main class="page-main">
+
         <div class="page-header">
             <div>
-                <h1 class="page-title" th:text="${especialidad.idEspecialidad != null} ? 'Editar Especialidad' : 'Nueva Especialidad'">Especialidad</h1>
-                <p class="page-subtitle">Gestione las especialidades médicas disponibles</p>
+                <h1><i class="bi bi-heart-pulse"></i>
+                    <span th:text="${especialidad.idEspecialidad != null} ? 'Editar Especialidad' : 'Nueva Especialidad'">Especialidad</span>
+                </h1>
+                <p>Gestione las especialidades médicas disponibles</p>
             </div>
-            <a th:href="@{/especialidades}" class="btn-volver"><i class="bi bi-arrow-left"></i>Volver</a>
+            <a th:href="@{/especialidades}" class="btn-volver">
+                <i class="bi bi-arrow-left"></i>Volver
+            </a>
         </div>
 
-        <div class="form-container">
-            <div class="form-header">
-                <i class="bi bi-heart-pulse"></i>
-                <h3>Información de la Especialidad</h3>
+        <form th:action="@{/especialidades/guardar}" th:object="${especialidad}" method="post" class="esp-form">
+            <div th:if="${#fields.hasErrors()}" class="alert-professional alert-danger-prof mb-4">
+                <i class="bi bi-exclamation-triangle-fill"></i>
+                <span>Corrige los errores en el formulario antes de guardar.</span>
             </div>
 
-            <form th:action="@{/especialidades/guardar}" method="post" novalidate>
-                <input type="hidden" th:name="idEspecialidad" th:value="${especialidad.idEspecialidad}">
+            <div class="row g-4">
+                <div class="col-lg-8">
 
-                <!-- Sección 1: Datos Básicos -->
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="nombre" class="required">Nombre de la Especialidad</label>
-                        <input type="text" id="nombre" name="nombre" class="form-control"
-                               th:value="${especialidad.nombre}"
-                               placeholder="Cardiología, Dermatología, Pediatría..." maxlength="80" required>
-                        <div class="form-text">Nombre único de la especialidad médica</div>
-                    </div>
-                </div>
-
-                <!-- Sección 2: Configuración de Consulta -->
-                <div class="form-section">
-                    <div class="form-header">
-                        <i class="bi bi-gear"></i>
-                        <h3>Configuración de Consulta</h3>
-                    </div>
-
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="precioConsulta" class="required">Precio de Consulta (S/.)</label>
-                            <input type="number" id="precioConsulta" name="precioConsulta" class="form-control"
-                                   th:value="${especialidad.precioConsulta}"
-                                   placeholder="150.00" step="0.01" min="0" required>
-                            <div class="form-text">Tarifa estándar por consulta en esta especialidad</div>
+                    <!-- Datos Básicos -->
+                    <div class="form-section-card">
+                        <div class="d-flex align-items-center gap-3 mb-3">
+                            <div class="fs-icon"><i class="bi bi-info-circle-fill"></i></div>
+                            <div>
+                                <h5 class="mb-1" style="font-weight:700;">Datos Básicos</h5>
+                                <p style="color:var(--text-muted);font-size:13px;margin:0;">Información principal de la especialidad</p>
+                            </div>
                         </div>
-                        <div class="form-group">
-                            <label for="duracionMinutos">Duración de Consulta (minutos)</label>
-                            <input type="number" id="duracionMinutos" name="duracionMinutos" class="form-control"
-                                   th:value="${especialidad.duracionMinutos ?: 20}"
-                                   placeholder="30" min="5" max="240">
-                            <div class="form-text">Tiempo recomendado por cita (5-240 minutos)</div>
+                        <div class="form-field mb-3">
+                            <label for="nombre" class="required">Nombre de la Especialidad</label>
+                            <input type="text" id="nombre" th:field="*{nombre}" class="form-input-professional"
+                                   placeholder="Cardiología, Dermatología, Pediatría..." maxlength="80" required>
+                            <div style="font-size:11px;color:var(--text-muted);margin-top:4px;">Nombre único de la especialidad médica</div>
+                        </div>
+                        <div class="form-field">
+                            <label for="descripcion">Descripción Detallada</label>
+                             <textarea id="descripcion" th:field="*{descripcion}" class="form-input-professional"
+                                      placeholder="Describa qué servicios ofrece esta especialidad, áreas de enfoque, etc."
+                                      rows="4" maxlength="300"></textarea>
+                            <div style="font-size:11px;color:var(--text-muted);margin-top:4px;">Información pública que verán los pacientes (máximo 300 caracteres)</div>
                         </div>
                     </div>
-                </div>
 
-                <!-- Sección 3: Descripción -->
-                <div class="form-section">
-                    <div class="form-group">
-                        <label for="descripcion">Descripción Detallada</label>
-                        <textarea id="descripcion" name="descripcion" class="form-control" 
-                                  placeholder="Describa qué servicios ofrece esta especialidad, áreas de enfoque, etc."
-                                  rows="4" maxlength="300"
-                                  th:text="${especialidad.descripcion}"></textarea>
-                        <div class="form-text">Información pública que verán los pacientes (máximo 300 caracteres)</div>
-                    </div>
-                </div>
-
-                <!-- Sección 4: Estado -->
-                <div class="form-section">
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="activo">Estado</label>
-                            <select id="activo" name="activo" class="form-select">
-                                <option value="1" th:selected="${especialidad.activo == 1}">✓ Activa</option>
-                                <option value="0" th:selected="${especialidad.activo == 0}">✗ Inactiva</option>
-                            </select>
-                            <div class="form-text">Solo especialidades activas aparecerán disponibles para nuevas citas</div>
+                    <!-- Configuración de Consulta -->
+                    <div class="form-section-card">
+                        <div class="d-flex align-items-center gap-3 mb-3">
+                            <div class="fs-icon"><i class="bi bi-gear-fill"></i></div>
+                            <div>
+                                <h5 class="mb-1" style="font-weight:700;">Configuración de Consulta</h5>
+                                <p style="color:var(--text-muted);font-size:13px;margin:0;">Tarifa y duración estándar de las citas</p>
+                            </div>
+                        </div>
+                        <div class="row g-3">
+                            <div class="col-md-6 form-field">
+                                <label for="precioConsulta" class="required">Precio de Consulta (S/.)</label>
+                                <div class="price-input-wrapper">
+                                    <span class="price-currency">S/.</span>
+                                     <input type="number" id="precioConsulta" th:field="*{precioConsulta}" class="form-input-professional"
+                                           placeholder="150.00" step="0.01" min="0" required>
+                                </div>
+                                <div style="font-size:11px;color:var(--text-muted);margin-top:4px;">Tarifa estándar por consulta en esta especialidad</div>
+                            </div>
+                            <div class="col-md-6 form-field">
+                                <label for="duracionMinutos">Duración de Consulta (minutos)</label>
+                                <div class="duration-input-wrapper">
+                                     <input type="number" id="duracionMinutos" th:field="*{duracionMinutos}" class="form-input-professional"
+                                           placeholder="30" min="5" max="240">
+                                    <span class="duration-suffix">min</span>
+                                </div>
+                                <div style="font-size:11px;color:var(--text-muted);margin-top:4px;">Tiempo recomendado por cita (5-240 minutos)</div>
+                            </div>
                         </div>
                     </div>
+
                 </div>
 
-                <!-- Botones de Acción -->
-                <div class="form-actions">
-                    <button type="submit" class="btn-guardar">
-                        <i class="bi bi-check-circle"></i>
-                        <span th:text="${especialidad.idEspecialidad != null} ? 'Guardar Cambios' : 'Crear Especialidad'"></span>
-                    </button>
-                    <a th:href="@{/especialidades}" class="btn-volver">
-                        <i class="bi bi-x-circle"></i>
-                        Cancelar
-                    </a>
+                <div class="col-lg-4">
+
+                    <!-- Estado -->
+                    <div class="form-section-card">
+                        <div class="d-flex align-items-center gap-3 mb-3">
+                            <div class="fs-icon"><i class="bi bi-toggle-on"></i></div>
+                            <div>
+                                <h5 class="mb-1" style="font-weight:700;">Estado</h5>
+                                <p style="color:var(--text-muted);font-size:13px;margin:0;">Control de disponibilidad</p>
+                            </div>
+                        </div>
+                        <div class="status-toggle-group">
+                            <label class="status-option" th:classappend="${especialidad.activo == 1 || especialidad.activo == null} ? 'selected-active' : ''">
+                                <input type="radio" name="activo" value="1"
+                                       th:checked="${especialidad.activo == 1 || especialidad.activo == null}">
+                                <i class="bi bi-check-circle-fill"></i>
+                                <span>Activa</span>
+                            </label>
+                            <label class="status-option" th:classappend="${especialidad.activo == 0} ? 'selected-inactive' : ''">
+                                <input type="radio" name="activo" value="0"
+                                       th:checked="${especialidad.activo == 0}">
+                                <i class="bi bi-x-circle-fill"></i>
+                                <span>Inactiva</span>
+                            </label>
+                        </div>
+                        <div style="font-size:11px;color:var(--text-muted);margin-top:8px;">
+                            Solo especialidades activas aparecerán disponibles para nuevas citas
+                        </div>
+                    </div>
+
+                    <!-- Acciones -->
+                    <div class="form-section-card">
+                        <div class="d-flex align-items-center gap-3 mb-3">
+                            <div class="fs-icon"><i class="bi bi-lightning-fill"></i></div>
+                            <div>
+                                <h5 class="mb-1" style="font-weight:700;">Acciones</h5>
+                                <p style="color:var(--text-muted);font-size:13px;margin:0;">Finaliza o descarta los cambios</p>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn-guardar w-100 mb-2" style="justify-content:center;padding:12px;">
+                            <i class="bi bi-check-circle me-2"></i>
+                            <span th:text="${especialidad.idEspecialidad != null} ? 'Guardar Cambios' : 'Crear Especialidad'"></span>
+                        </button>
+                        <a th:href="@{/especialidades}" class="btn-volver w-100 text-center" style="justify-content:center;padding:12px;">
+                            <i class="bi bi-x-circle me-2"></i>Cancelar
+                        </a>
+                    </div>
+
                 </div>
-            </form>
-        </div>
+            </div>
+
+        </form>
+
+        
+
     </main>
+
     <footer th:replace="~{fragments/header :: footer}"></footer>
 </div>
+
 </body>
 </html>
-

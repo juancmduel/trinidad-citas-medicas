@@ -41,4 +41,27 @@ public class DiagnosticoCie10Service {
         d.setActivo(dto.getActivo() != null ? dto.getActivo() : 1);
         return toDTO(diagnosticoCie10Repository.save(d));
     }
+
+    @Transactional(readOnly = true)
+    public DiagnosticoCie10 obtenerEntidadPorCodigo(String codigo) {
+        return diagnosticoCie10Repository.findById(codigo)
+                .orElseThrow(() -> new ResourceNotFoundException("DiagnosticoCie10", 0L));
+    }
+
+    @Transactional(readOnly = true)
+    public List<DiagnosticoCie10> listarEntidades() {
+        return diagnosticoCie10Repository.findAll();
+    }
+
+    public DiagnosticoCie10DTO actualizar(String codigo, DiagnosticoCie10DTO dto) {
+        DiagnosticoCie10 d = obtenerEntidadPorCodigo(codigo);
+        d.setDescripcion(dto.getDescripcion());
+        d.setCapitulo(dto.getCapitulo());
+        if (dto.getActivo() != null) d.setActivo(dto.getActivo());
+        return toDTO(diagnosticoCie10Repository.save(d));
+    }
+
+    public void eliminar(String codigo) {
+        diagnosticoCie10Repository.deleteById(codigo);
+    }
 }

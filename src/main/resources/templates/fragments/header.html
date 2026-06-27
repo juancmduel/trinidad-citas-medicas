@@ -4,13 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title th:text="${titulo} + ' | Trinidad'">Trinidad</title>
-    <link rel="stylesheet" href="/webjars/bootstrap/5.3.3/css/bootstrap.min.css">
+    <script>
+        (function() {
+            var t = localStorage.getItem('trinidad-theme');
+            if (t === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+        })();
+    </script>
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.3/css/bootstrap.min.css}">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" th:href="@{/css/system.css}">
     <link rel="stylesheet" th:href="@{/css/trinidad.css}">
-    <link rel="stylesheet" th:href="@{/css/forms.css}">
 </head>
 <body class="app-body">
 
@@ -80,21 +85,22 @@
             <i class="bi bi-clock"></i><span>Horarios Médicos</span>
         </a>
 
-        <p class="menu-label mt-2" sec:authorize="hasRole('ADMIN')">ADMINISTRACIÓN</p>
-        <a class="sidebar-item" th:href="@{/usuarios}" sec:authorize="hasRole('ADMIN')">
+        <p class="menu-label mt-2" sec:authorize="hasRole('ADMINISTRADOR')">ADMINISTRACIÓN</p>
+        <a class="sidebar-item" th:href="@{/usuarios}" sec:authorize="hasRole('ADMINISTRADOR')">
             <i class="bi bi-person-gear"></i><span>Usuarios</span>
         </a>
-        <a class="sidebar-item" th:href="@{/roles}" sec:authorize="hasRole('ADMIN')">
+        <a class="sidebar-item" th:href="@{/roles}" sec:authorize="hasRole('ADMINISTRADOR')">
             <i class="bi bi-shield-lock"></i><span>Roles & Permisos</span>
         </a>
-        <a class="sidebar-item" th:href="@{/auditoria}" sec:authorize="hasRole('ADMIN')">
+        <a class="sidebar-item" th:href="@{/auditoria}" sec:authorize="hasRole('ADMINISTRADOR')">
             <i class="bi bi-clock-history"></i><span>Auditoría</span>
         </a>
-        <a class="sidebar-item" th:href="@{/reportes}" sec:authorize="hasRole('ADMIN')">
-            <i class="bi bi-bar-chart"></i><span>Reportes</span>
-        </a>
-        <a class="sidebar-item" th:href="@{/configuracion}" sec:authorize="hasRole('ADMIN')">
+        <a class="sidebar-item" th:href="@{/configuracion}" sec:authorize="hasRole('ADMINISTRADOR')">
             <i class="bi bi-gear"></i><span>Configuración</span>
+        </a>
+        <p class="menu-label mt-2" sec:authorize="hasAnyRole('ADMINISTRADOR', 'GERENTE')">INFORMES</p>
+        <a class="sidebar-item" th:href="@{/reportes}" sec:authorize="hasAnyRole('ADMINISTRADOR', 'GERENTE')">
+            <i class="bi bi-bar-chart"></i><span>Reportes</span>
         </a>
     </div>
 
@@ -133,9 +139,14 @@
         <i class="bi bi-hospital me-2"></i>TRINIDAD MEDICAL
     </div>
     <div class="topbar-right" sec:authorize="isAuthenticated()">
+        <!-- Theme toggle -->
+        <button class="btn-theme" onclick="toggleTheme()" title="Cambiar tema">
+            <i id="themeIcon" class="bi bi-moon-fill"></i>
+        </button>
+
         <span class="topbar-user">
             <i class="bi bi-circle-fill text-success me-1" style="font-size:0.45rem;"></i>
-            Bienvenido, <strong class="ms-1" style="color:#06b6d4;" sec:authentication="name">Usuario</strong>
+            Bienvenido, <strong class="ms-1" style="color:var(--accent);" sec:authentication="name">Usuario</strong>
         </span>
         <form th:action="@{/logout}" method="post" class="mb-0">
             <button type="submit" class="btn-topbar-logout">
@@ -145,11 +156,44 @@
     </div>
 </div>
 
+<script>
+// Tema oscuro/claro
+(function() {
+    var theme = localStorage.getItem('trinidad-theme');
+    if (theme === 'dark') {
+        document.documentElement.setAttribute('data-theme', 'dark');
+    } else {
+        document.documentElement.removeAttribute('data-theme');
+    }
+    var icon = document.getElementById('themeIcon');
+    if (icon) {
+        icon.className = theme === 'dark' ? 'bi bi-sun-fill' : 'bi bi-moon-fill';
+    }
+})();
+
+function toggleTheme() {
+    var html = document.documentElement;
+    var isDark = html.getAttribute('data-theme') === 'dark';
+    var icon = document.getElementById('themeIcon');
+    html.classList.add('theme-transitioning');
+    if (isDark) {
+        html.removeAttribute('data-theme');
+        localStorage.setItem('trinidad-theme', 'light');
+        if (icon) icon.className = 'bi bi-moon-fill';
+    } else {
+        html.setAttribute('data-theme', 'dark');
+        localStorage.setItem('trinidad-theme', 'dark');
+        if (icon) icon.className = 'bi bi-sun-fill';
+    }
+    setTimeout(function() { html.classList.remove('theme-transitioning'); }, 500);
+}
+</script>
+
 <div id="sidebarOverlay" onclick="this.classList.remove('show');document.getElementById('sidebar').classList.remove('open')"></div>
 
 <footer th:fragment="footer" class="app-footer">
     <span>&copy; 2026 Trinidad &amp; Especialidades Medicas &mdash; Tarapoto, San Martin</span>
-    <script src="/webjars/bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
+    <script th:src="@{/webjars/bootstrap/5.3.3/js/bootstrap.bundle.min.js}"></script>
 </footer>
 
 </body>

@@ -53,10 +53,22 @@ public class DetalleRecetaService {
                 .orElseThrow(() -> new ResourceNotFoundException("DetalleReceta", id)));
     }
 
+    @Transactional(readOnly = true)
+    public Receta obtenerRecetaEntidad(Long id) {
+        return recetaRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Receta", id));
+    }
+
+    @Transactional(readOnly = true)
+    public DetalleReceta obtenerEntidadPorId(Long id) {
+        return detalleRecetaRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("DetalleReceta", id));
+    }
+
     public DetalleRecetaDTO crear(DetalleRecetaDTO dto) {
         Receta receta = recetaRepository.findById(dto.getIdReceta())
                 .orElseThrow(() -> new ResourceNotFoundException("Receta", dto.getIdReceta()));
-        
+
         DetalleReceta detalle = new DetalleReceta();
         detalle.setReceta(receta);
         detalle.setNombreGenerico(dto.getNombreGenerico());
@@ -67,7 +79,6 @@ public class DetalleRecetaService {
         detalle.setDuracionDias(dto.getDuracionDias());
         detalle.setViaAdministracion(dto.getViaAdministracion());
         detalle.setIndicaciones(dto.getIndicaciones());
-        
         return toDTO(detalleRecetaRepository.save(detalle));
     }
 

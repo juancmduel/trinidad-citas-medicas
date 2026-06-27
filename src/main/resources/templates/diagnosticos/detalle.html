@@ -6,54 +6,63 @@
 <div class="app-content">
     <div th:replace="~{fragments/header :: topbar}"></div>
     <main class="page-main">
-
-        <div class="mb-4">
-            <h1 style="font-size:28px;font-weight:700;margin-bottom:6px;">
-                <i class="bi bi-hospital me-2" style="color:#06b6d4;"></i>Detalle del Diagnóstico
-            </h1>
+        <div class="page-header">
+            <div>
+                <h1><i class="bi bi-hospital"></i>Detalle del Diagnóstico</h1>
+                <p>Información completa del diagnóstico CIE-10</p>
+            </div>
+            <div class="d-flex gap-2">
+                <a th:href="@{/diagnosticos/editar/{id}(id=${diagnostico.codigo})}" class="btn-editar">
+                    <i class="bi bi-pencil"></i> Editar
+                </a>
+                <form th:action="@{/diagnosticos/eliminar/{id}(id=${diagnostico.codigo})}" method="post" style="display:inline;">
+                    <button type="submit" class="btn-eliminar" onclick="return confirm('¿Eliminar este Diagnóstico?')">
+                        <i class="bi bi-trash"></i> Eliminar
+                    </button>
+                </form>
+            </div>
         </div>
-
-        <div th:if="${diagnostico != null}" class="card-professional mb-4">
-            <div class="card-header-professional d-flex justify-content-between align-items-center">
-                <h5><i class="bi bi-info-circle"></i> Información del Diagnóstico</h5>
-                <div class="d-flex gap-2">
-                    <a th:href="@{/diagnosticos/editar/{id}(id=${diagnostico.codigo})}" class="btn-editar">
-                        <i class="bi bi-pencil"></i> Editar
+        <div th:if="${diagnostico != null}" class="row g-4">
+            <div class="col-lg-8">
+                <div class="detail-card">
+                    <div class="detail-card-head">
+                        <div class="dch-icon"><i class="bi bi-info-circle-fill"></i></div>
+                        <div><h5 class="mb-0" style="font-weight:700;">Información del Diagnóstico</h5></div>
+                    </div>
+                    <div class="detail-card-body">
+                        <div class="row g-4">
+                            <div class="col-md-4">
+                                <div class="detail-field">
+                                    <span class="df-label">Código CIE-10</span>
+                                    <span class="df-value df-value-accent" th:text="${diagnostico.codigo}">-</span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="detail-field">
+                                    <span class="df-label">Capítulo</span>
+                                    <span class="df-value" th:text="${diagnostico.capitulo ?: 'No especificado'}">-</span>
+                                </div>
+                            </div>
+                            <div class="col-12" th:if="${diagnostico.descripcion}">
+                                <div class="detail-field">
+                                    <span class="df-label">Descripción</span>
+                                    <span class="df-value" th:text="${diagnostico.descripcion}">-</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="detail-actions">
+                    <a th:href="@{/diagnosticos}" class="btn-volver w-100 text-center">
+                        <i class="bi bi-arrow-left"></i>Volver al listado
                     </a>
-                    <form th:action="@{/diagnosticos/eliminar/{id}(id=${diagnostico.codigo})}" method="post" style="display:inline;">
-                        <button type="submit" class="btn-eliminar"
-                                onclick="return confirm('¿Eliminar este diagnóstico?')">
-                            <i class="bi bi-trash"></i> Eliminar
-                        </button>
-                    </form>
-                </div>
-            </div>
-            <div class="p-4">
-                <div class="row g-3">
-                    <div class="col-md-4">
-                        <label style="color:rgba(255,255,255,0.5);font-size:12px;">Código CIE-10</label>
-                        <p style="font-weight:700;color:#06b6d4;" th:text="${diagnostico.codigo}"></p>
-                    </div>
-                    <div class="col-md-4">
-                        <label style="color:rgba(255,255,255,0.5);font-size:12px;">Capítulo</label>
-                        <p style="font-weight:700;" th:text="${diagnostico.capitulo ?: 'No especificado'}"></p>
-                    </div>
-                    <div class="col-12" th:if="${diagnostico.descripcion}">
-                        <label style="color:rgba(255,255,255,0.5);font-size:12px;">Descripción</label>
-                        <p th:text="${diagnostico.descripcion}"></p>
-                    </div>
                 </div>
             </div>
         </div>
-
-        <a href="/trinidad/diagnosticos" class="btn-ver">
-            <i class="bi bi-arrow-left"></i> Volver
-        </a>
-
     </main>
     <footer th:replace="~{fragments/header :: footer}"></footer>
 </div>
 </body>
 </html>
-
-

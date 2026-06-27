@@ -1,0 +1,235 @@
+/* ================================================================
+   LOGIN PAGE - Trinidad Citas Medicas
+   Standalone styles for auth/login.html
+   ================================================================ */
+
+:root {
+    --accent: #06b6d4;
+    --danger: #ef4444;
+    --success: #10b981;
+    --warning: #f59e0b;
+    --text-muted: rgba(255,255,255,0.45);
+    --border-accent: rgba(6,182,212,0.35);
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    background: linear-gradient(135deg, #0a1628 0%, #0d2444 40%, #0a2035 70%, #061220 100%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    overflow: hidden;
+    position: relative;
+}
+
+/* Fondo animado canvas */
+#bg-canvas {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: 0;
+    pointer-events: none;
+}
+
+/* Tarjeta login glassmorphism */
+.login-container {
+    position: relative;
+    z-index: 10;
+    background: rgba(255,255,255,0.07);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    border: 1px solid rgba(255,255,255,0.13);
+    border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.05);
+    padding: 48px 42px;
+    width: 100%;
+    max-width: 420px;
+}
+
+.login-header {
+    text-align: center;
+    margin-bottom: 42px;
+    padding-bottom: 22px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+.login-logo {
+    width: 60px; height: 60px;
+    background: linear-gradient(135deg, #3b82f6, var(--accent, #06b6d4));
+    border-radius: 16px;
+    margin: 0 auto 16px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 28px;
+    color: white;
+    box-shadow: 0 8px 20px rgba(59,130,246,0.4);
+}
+
+.login-header h2 {
+    color: #ffffff;
+    font-weight: 700;
+    margin: 8px 0 4px;
+    font-size: 1.6rem;
+}
+
+.login-header p {
+    color: rgba(255,255,255,0.5);
+    font-size: 0.88rem;
+    margin: 0;
+}
+
+.form-group {
+    margin-bottom: 24px;
+}
+
+.form-group:last-of-type {
+    margin-bottom: 40px;
+}
+
+.form-label {
+    color: #ffffff;
+    font-weight: 700;
+    font-size: 0.95rem;
+    letter-spacing: 0.3px;
+    margin-bottom: 10px;
+    display: block;
+}
+
+.form-control {
+    background: rgba(255,255,255,0.12);
+    border: 1.5px solid rgba(255,255,255,0.25);
+    border-radius: 12px;
+    padding: 14px 16px;
+    font-size: 1rem;
+    color: #ffffff;
+    transition: border-color 0.3s, background 0.3s, box-shadow 0.3s;
+}
+
+.form-control::placeholder { 
+    color: rgba(255,255,255,0.45); 
+    font-weight: 500;
+}
+
+.form-control:focus {
+    background: rgba(255,255,255,0.18);
+    border-color: var(--accent, #06b6d4);
+    box-shadow: 0 0 0 4px var(--border-accent, rgba(6,182,212,0.25)), inset 0 0 0 2px var(--border-accent, rgba(6,182,212,0.1));
+    color: #ffffff;
+    outline: none;
+}
+
+.form-control:hover:not(:focus) {
+    border-color: rgba(255,255,255,0.35);
+    background: rgba(255,255,255,0.15);
+}
+
+.input-group-text {
+    background: rgba(255,255,255,0.12);
+    border: 1.5px solid rgba(255,255,255,0.25);
+    border-right: none;
+    border-radius: 12px 0 0 12px;
+    color: var(--accent, #06b6d4);
+    font-weight: 600;
+    padding: 14px 18px;
+    font-size: 1.05rem;
+}
+
+.input-group .form-control {
+    border-left: none;
+    border-radius: 0 12px 12px 0;
+}
+
+.input-group:focus-within .input-group-text {
+    border-color: var(--accent, #06b6d4);
+    background: rgba(6,182,212,0.15);
+    color: var(--accent, #00d4ff);
+}
+
+.btn-login {
+    background: linear-gradient(135deg, var(--accent, #06b6d4) 0%, #0ea5e9 100%);
+    border: 2px solid var(--border-accent, rgba(6,182,212,0.4));
+    border-radius: 12px;
+    padding: 14px;
+    font-weight: 700;
+    font-size: 1.05rem;
+    width: 100%;
+    color: #ffffff;
+    transition: transform 0.2s, box-shadow 0.2s, background 0.3s;
+    box-shadow: 0 8px 24px var(--border-accent, rgba(6,182,212,0.45));
+    letter-spacing: 0.5px;
+}
+
+.btn-login:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 32px var(--border-accent, rgba(6,182,212,0.6));
+    color: #ffffff;
+    background: linear-gradient(135deg, #00d4ff 0%, var(--accent, #06b6d4) 100%);
+}
+
+.btn-login:active {
+    transform: translateY(-1px);
+}
+
+.login-footer {
+    text-align: center;
+    margin-top: 28px;
+    font-size: 0.88rem;
+    color: rgba(255,255,255,0.45);
+}
+
+.login-footer a {
+    color: #60a5fa;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.login-footer a:hover {
+    color: #93c5fd;
+    text-decoration: underline;
+}
+
+.alert {
+    border-radius: 12px;
+    font-size: 0.95rem;
+    border-left: 4px solid;
+    padding: 14px 16px;
+}
+
+.alert-danger {
+    background: rgba(239,68,68,0.2);
+    border-color: var(--danger, #ef4444);
+    border: 1.5px solid rgba(239,68,68,0.5);
+    color: var(--danger, #fecaca);
+}
+
+.alert-success {
+    background: rgba(34,197,94,0.2);
+    border-color: var(--success, #10b981);
+    border: 1.5px solid rgba(34,197,94,0.5);
+    color: var(--success, #86efac);
+}
+
+.hint-box {
+    display: none !important;
+    visibility: hidden;
+    height: 0;
+    padding: 0;
+    margin: 0;
+    border: none;
+}
+
+.hint-box strong {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--accent, #06b6d4);
+    font-weight: 700;
+}
+
+.hint-box code {
+    background: rgba(6,182,212,0.25);
+    color: var(--accent, #00ffff);
+    padding: 3px 7px;
+    border-radius: 5px;
+    font-weight: 600;
+}
