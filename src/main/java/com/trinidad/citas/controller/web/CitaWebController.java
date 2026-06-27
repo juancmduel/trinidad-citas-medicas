@@ -16,11 +16,16 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.security.Principal;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.time.format.TextStyle;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import com.trinidad.citas.repository.MedicoRepository;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 
 @Profile({"web", "default"})
 @Controller
@@ -30,14 +35,27 @@ public class CitaWebController {
 
     private final CitaService citaService;
     private final CitaRepository citaRepository;
+    private final MedicoRepository medicoRepository;
     private final EspecialidadService especialidadService;
     private final MedicoService medicoService;
     private final PacienteService pacienteService;
     private final PagoRepository pagoRepository;
 
     @GetMapping
-    public String lista(Model model) {
-        model.addAttribute("citas", citaService.listarTodasConRelaciones());
+    public String lista(Model model, Principal principal, Authentication authentication) {
+        boolean esMedico = authentication.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .anyMatch(a -> a.equals("ROLE_MEDICO"));
+
+        if (esMedico) {
+            var medico = medicoRepository.findByUsuario_Username(principal.getName())
+                    .orElseThrow(() -> new RuntimeException("Medico no encontrado para: " + principal.getName()));
+            model.addAttribute("citas", citaService.listarPorMedicoConRelaciones(medico.getIdMedico()));
+            model.addAttribute("soloLectura", true);
+        } else {
+            model.addAttribute("citas", citaService.listarTodasConRelaciones());
+            model.addAttribute("soloLectura", false);
+        }
         model.addAttribute("titulo", "Citas Médicas");
         return "citas/lista";
     }

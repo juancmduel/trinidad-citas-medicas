@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/header :: head(${titulo})}"></head>
+<body class="app-body">
+
+<nav th:replace="~{fragments/header :: navbar}"></nav>
+
+<div class="app-content">
+    <div th:replace="~{fragments/header :: topbar}"></div>
+
+    <main class="page-main">
+
+        <div class="page-header">
+            <div>
+                <h1><i class="bi bi-clock"></i>Mis Horarios</h1>
+                <p th:text="'Horarios de atención de ' + ${medico.nombreCompleto}">Horarios del médico</p>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <table class="table-modern">
+                <thead>
+                    <tr>
+                        <th>D&iacute;a</th>
+                        <th>Hora Inicio</th>
+                        <th>Hora Fin</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:if="${#lists.isEmpty(horarios)}">
+                        <td colspan="4" class="table-empty">
+                            <i class="bi bi-inbox"></i>
+                            <p>No tienes horarios configurados</p>
+                        </td>
+                    </tr>
+                    <tr th:each="h : ${horarios}">
+                        <td th:text="${h.diaSemanaDescripcion}">-</td>
+                        <td th:text="${h.horaInicio}">-</td>
+                        <td th:text="${h.horaFin}">-</td>
+                        <td>
+                            <span class="badge-estado" th:classappend="${h.activo == 1} ? 'badge-activo' : 'badge-inactivo'"
+                                  th:text="${h.activo == 1} ? 'Activo' : 'Inactivo'"></span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </main>
+
+    <footer th:replace="~{fragments/header :: footer}"></footer>
+</div>
+
+</body>
+</html>

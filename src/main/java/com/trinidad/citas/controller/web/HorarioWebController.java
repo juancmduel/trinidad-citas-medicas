@@ -2,13 +2,18 @@ package com.trinidad.citas.controller.web;
 
 import org.springframework.context.annotation.Profile;
 import com.trinidad.citas.dto.HorarioMedicoDTO;
+import com.trinidad.citas.repository.MedicoRepository;
 import com.trinidad.citas.service.HorarioMedicoService;
 import com.trinidad.citas.service.MedicoService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import java.security.Principal;
 
 @Profile({"web", "default"})
 @Controller
@@ -18,10 +23,23 @@ public class HorarioWebController {
 
     private final HorarioMedicoService horarioMedicoService;
     private final MedicoService medicoService;
+    private final MedicoRepository medicoRepository;
 
     @GetMapping
-    public String lista(Model model) {
-        model.addAttribute("horarios", horarioMedicoService.listarTodos());
+    public String lista(Model model, Principal principal, Authentication authentication) {
+        boolean esMedico = authentication.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .anyMatch(a -> a.equals("ROLE_MEDICO"));
+
+        if (esMedico) {
+            var medico = medicoRepository.findByUsuario_Username(principal.getName())
+                    .orElseThrow(() -> new RuntimeException("Medico no encontrado para: " + principal.getName()));
+            model.addAttribute("horarios", horarioMedicoService.listarPorMedico(medico.getIdMedico()));
+            model.addAttribute("soloLectura", true);
+        } else {
+            model.addAttribute("horarios", horarioMedicoService.listarTodos());
+            model.addAttribute("soloLectura", false);
+        }
         return "horarios/lista";
     }
 

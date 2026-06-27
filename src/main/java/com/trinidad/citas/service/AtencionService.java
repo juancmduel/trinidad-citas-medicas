@@ -45,6 +45,12 @@ public class AtencionService {
         dto.setTemperatura(a.getTemperatura());
         dto.setPesoKg(a.getPesoKg());
         dto.setTallaCm(a.getTallaCm());
+        if (a.getMedico() != null) {
+            dto.setNombreMedicoCompleto(a.getMedico().getNombreCompleto());
+        }
+        if (a.getCita() != null && a.getCita().getPaciente() != null) {
+            dto.setNombrePacienteCompleto(a.getCita().getPaciente().getNombreCompleto());
+        }
         return dto;
     }
 
@@ -68,6 +74,12 @@ public class AtencionService {
     public Atencion obtenerEntidadConRelaciones(Long id) {
         return atencionRepository.findByIdWithRelations(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Atencion", id));
+    }
+
+    @Transactional(readOnly = true)
+    public List<AtencionDTO> listarPorHistoria(Long idHistoria) {
+        return atencionRepository.findByHistoria_IdHistoriaOrderByFechaAtencionDesc(idHistoria)
+                .stream().map(this::toDTO).toList();
     }
 
     @Transactional(readOnly = true)

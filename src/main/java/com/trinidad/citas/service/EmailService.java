@@ -80,6 +80,56 @@ public class EmailService {
         enviarHtml(pacienteEmail, "🔔 Recordatorio: Cita Mañana – Trinidad Salud", html, qrContenido);
     }
 
+    public void enviarRecuperacionPassword(String destino, String nombre, String link) {
+        String html = "<!DOCTYPE html><html lang='es'><head><meta charset='UTF-8'></head>"
+            + "<body style='margin:0;padding:0;background:#f1f5f9;font-family:\"Segoe UI\",Arial,sans-serif;'>"
+            + "<table width='100%' cellpadding='0' cellspacing='0' style='background:#f1f5f9;padding:32px 0;'>"
+            + "<tr><td align='center'>"
+            + "<table width='600' cellpadding='0' cellspacing='0' style='max-width:600px;width:100%;'>"
+            + "<tr><td style='background:linear-gradient(135deg,#0e7490,#0891b2);padding:36px 40px;"
+            + "border-radius:12px 12px 0 0;text-align:center;'>"
+            + "<p style='margin:0 0 6px;color:#bae6fd;font-size:12px;letter-spacing:2px;"
+            + "text-transform:uppercase;font-weight:600;'>Sistema de Citas Medicas</p>"
+            + "<h1 style='margin:0 0 4px;color:#fff;font-size:26px;font-weight:700;'>Trinidad Salud</h1>"
+            + "<div style='display:inline-block;background:rgba(255,255,255,0.15);"
+            + "border:2px solid rgba(255,255,255,0.4);border-radius:50px;padding:8px 22px;margin-top:16px;'>"
+            + "<span style='color:#fff;font-size:15px;font-weight:600;'>Recuperacion de Contrasena</span>"
+            + "</div></td></tr>"
+            + "<tr><td style='background:#fff;padding:32px 40px;'>"
+            + "<p style='margin:0 0 8px;font-size:18px;font-weight:700;color:#0f172a;'>"
+            + "Hola <span style='color:#0e7490;'>" + nombre + "</span>,</p>"
+            + "<p style='margin:0 0 24px;font-size:15px;color:#475569;line-height:1.7;'>"
+            + "Hemos recibido una solicitud para restablecer tu contrasena. "
+            + "Haz clic en el siguiente boton para crear una nueva contrasena:</p>"
+            + "<table width='100%' cellpadding='0' cellspacing='0'>"
+            + "<tr><td align='center' style='padding:0 0 24px;'>"
+            + "<a href='" + link + "' style='display:inline-block;background:#0e7490;color:#fff;"
+            + "text-decoration:none;padding:14px 36px;border-radius:8px;font-size:16px;font-weight:700;'>"
+            + "Restablecer Contrasena</a></td></tr></table>"
+            + "<p style='margin:0 0 16px;font-size:13px;color:#64748b;line-height:1.6;'>"
+            + "Este enlace expirara en <strong>1 hora</strong>. Si no solicitaste este cambio, "
+            + "ignora este mensaje.</p>"
+            + "</td></tr>"
+            + "<tr><td style='background:#0f172a;padding:24px 40px;border-radius:0 0 12px 12px;text-align:center;'>"
+            + "<p style='margin:0 0 4px;color:#fff;font-size:15px;font-weight:700;'>Trinidad Salud</p>"
+            + "<p style='margin:0;color:#475569;font-size:11px;'>"
+            + "© 2026 Trinidad Salud — Todos los derechos reservados.</p>"
+            + "</td></tr></table></td></tr></table></body></html>";
+
+        try {
+            MimeMessage mensaje = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(mensaje, true, "UTF-8");
+            helper.setFrom("\"Trinidad Salud 🏥\" <" + fromEmail + ">");
+            helper.setTo(destino);
+            helper.setSubject("Recuperacion de Contrasena – Trinidad Salud");
+            helper.setText(html, true);
+            mailSender.send(mensaje);
+            log.info("[EMAIL] Recuperacion enviada a {}", destino);
+        } catch (Exception e) {
+            log.error("[EMAIL] Error al enviar recuperacion a {}: {}", destino, e.getMessage());
+        }
+    }
+
     private String plantillaConfirmacion(String nombre, String medico, String especialidad,
                                           String nroCita, String fecha, String hora, String estado) {
         return baseHtml("✅ Cita Confirmada",

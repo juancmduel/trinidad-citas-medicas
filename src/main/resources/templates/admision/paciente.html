@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: head(${titulo})}"></head>
+<body class="app-body">
+<nav th:replace="~{fragments/header :: navbar}"></nav>
+<div class="app-content">
+    <div th:replace="~{fragments/header :: topbar}"></div>
+    <main class="page-main">
+        <div class="page-header">
+            <div>
+                <h1><i class="bi bi-person-badge"></i> Admisi&oacute;n</h1>
+                <p th:text="'Paciente: ' + ${paciente.nombreCompleto} + '  |  DNI: ' + ${paciente.dni}"></p>
+            </div>
+            <a th:href="@{/admision}" class="btn-volver">
+                <i class="bi bi-arrow-left"></i> Nueva B&uacute;squeda
+            </a>
+        </div>
+
+        <div th:if="${ok}" class="alert-professional alert-success-prof mb-4">
+            <i class="bi bi-check-circle-fill"></i>
+            <span th:text="${ok}"></span>
+        </div>
+        <div th:if="${error}" class="alert-professional alert-danger-prof mb-4">
+            <i class="bi bi-exclamation-triangle-fill"></i>
+            <span th:text="${error}"></span>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-lg-4">
+                <div class="detail-card">
+                    <div class="detail-card-head">
+                        <div class="dch-icon"><i class="bi bi-person-vcard"></i></div>
+                        <div>
+                            <h5 class="mb-0" style="font-weight:700;">Datos del Paciente</h5>
+                        </div>
+                    </div>
+                    <div class="detail-card-body">
+                        <div class="info-row">
+                            <span class="info-label">DNI</span>
+                            <span class="info-value" th:text="${paciente.dni}"></span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Nombre</span>
+                            <span class="info-value" th:text="${paciente.nombreCompleto}"></span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Tel&eacute;fono</span>
+                            <span class="info-value" th:text="${paciente.telefono} ?: '-'"></span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Email</span>
+                            <span class="info-value" th:text="${paciente.email} ?: '-'"></span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Distrito</span>
+                            <span class="info-value" th:text="${paciente.distrito} ?: '-'"></span>
+                        </div>
+                        <div class="info-row" style="border-bottom:none;">
+                            <span class="info-label">Seguro</span>
+                            <span class="info-value" th:text="${paciente.seguroSalud} ?: '-'"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-8">
+                <div class="detail-card">
+                    <div class="detail-card-head">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="bi bi-calendar-day" style="color:var(--accent);"></i>
+                            <h5 class="mb-0" style="font-weight:700;">Citas de Hoy</h5>
+                        </div>
+                        <span class="text-muted" th:text="${#temporals.format(#temporals.createToday(), 'dd/MM/yyyy')}"></span>
+                    </div>
+                    <div class="detail-card-body">
+                        <div th:if="${#lists.isEmpty(citas)}" class="text-center py-4">
+                            <i class="bi bi-inbox" style="font-size:2.5rem;color:var(--text-muted);display:block;margin-bottom:12px;"></i>
+                            <p style="color:var(--text-muted);margin:0;">El paciente no tiene citas programadas para hoy</p>
+                        </div>
+                        <div th:unless="${#lists.isEmpty(citas)}" class="table-container">
+                            <table class="table-modern">
+                                <thead>
+                                    <tr>
+                                        <th>Hora</th>
+                                        <th>Especialidad</th>
+                                        <th>M&eacute;dico</th>
+                                        <th>Estado</th>
+                                        <th style="text-align:center;">Acci&oacute;n</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="c : ${citas}">
+                                        <td><strong th:text="${c.horaInicio}"></strong></td>
+                                        <td th:text="${c.especialidad.nombre}"></td>
+                                        <td th:text="'Dr. ' + ${c.medico.apellidoPaterno} + ', ' + ${c.medico.nombres}"></td>
+                                        <td>
+                                            <span class="badge-estado"
+                                                  th:classappend="${c.estado == T(com.trinidad.citas.model.EstadoCita).PROGRAMADA} ? 'badge-proceso' : (${c.estado == T(com.trinidad.citas.model.EstadoCita).CONFIRMADA} ? 'badge-completado' : (${c.estado == T(com.trinidad.citas.model.EstadoCita).EN_TRIAGE} ? 'badge-atencion' : 'badge-critico'))"
+                                                  th:text="${c.estado}"></span>
+                                        </td>
+                                        <td style="text-align:center;">
+                                            <th:block th:if="${estadosAccionables.contains(c.estado)}">
+                                                <div class="action-group">
+                                                    <button type="button" class="action-btn action-edit"
+                                                            data-bs-toggle="modal" data-bs-target="#admModal"
+                                                            th:attr="data-cita-id=${c.idCita},
+                                                                     data-cita-hora=${c.horaInicio},
+                                                                     data-cita-esp=${c.especialidad.nombre},
+                                                                     data-cita-med=${'Dr. ' + c.medico.apellidoPaterno},
+                                                                     data-precio=${c.especialidad.precioConsulta}"
+                                                            title="Iniciar Admisi&oacute;n">
+                                                        <i class="bi bi-check-circle"></i>
+                                                    </button>
+                                                </div>
+                                            </th:block>
+                                            <th:block th:unless="${estadosAccionables.contains(c.estado)}">
+                                                <span class="badge-estado"
+                                                      th:classappend="${c.estado == T(com.trinidad.citas.model.EstadoCita).ATENDIDA} ? 'badge-completado' : 'badge-critico'"
+                                                      th:text="${c.estado}"></span>
+                                            </th:block>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<div class="modal fade" id="admModal" tabindex="-1" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius:var(--radius);border:none;box-shadow:var(--shadow-hover);">
+            <div class="modal-header" style="border:none;padding:1.5rem 1.5rem 0;">
+                <div>
+                    <h5 class="modal-title" style="font-weight:700;"><i class="bi bi-check-circle" style="color:var(--accent);"></i> Procesar Admisi&oacute;n</h5>
+                    <p style="color:var(--text-muted);font-size:13px;margin:4px 0 0;" id="modalCitaInfo"></p>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="post" id="admForm">
+                <div class="modal-body" style="padding:1.5rem;">
+                    <div class="d-flex justify-content-between align-items-center p-3 mb-3"
+                         style="background:var(--accent);border-radius:var(--radius-sm);color:white;">
+                        <span style="font-weight:500;">Monto de la consulta</span>
+                        <span style="font-size:1.4rem;font-weight:800;">
+                            S/. <span id="modalMonto">0.00</span>
+                        </span>
+                    </div>
+
+                    <div class="form-field mb-3">
+                        <label>M&eacute;todo de Pago <span class="required">*</span></label>
+                        <select name="metodoPago" class="form-select-professional" required>
+                            <option value="">— Seleccionar —</option>
+                            <option value="EFECTIVO">Efectivo</option>
+                            <option value="TARJETA">Tarjeta</option>
+                            <option value="TRANSFERENCIA">Transferencia</option>
+                            <option value="YAPE">Yape / Plin</option>
+                        </select>
+                    </div>
+
+                    <div class="form-field mb-3">
+                        <label>Tipo Comprobante</label>
+                        <select name="tipoComprobante" class="form-select-professional">
+                            <option value="">— Sin comprobante —</option>
+                            <option value="BOLETA">Boleta</option>
+                            <option value="FACTURA">Factura</option>
+                            <option value="RECIBO">Recibo</option>
+                        </select>
+                    </div>
+
+                    <div class="alert-professional alert-info-prof" style="font-size:13px;padding:12px 16px;margin:0;">
+                        <i class="bi bi-lightbulb"></i>
+                        Al confirmar se registrar&aacute; el <strong>pago</strong>, se marcar&aacute; el <strong>check-in</strong> y te redirigiremos al formulario de <strong>triaje</strong>.
+                    </div>
+                </div>
+                <div class="modal-footer" style="border:none;padding:0 1.5rem 1.5rem;gap:8px;">
+                    <a href="#" class="btn-volver" data-bs-dismiss="modal" style="padding:10px 20px;">
+                        <i class="bi bi-x-circle"></i> Cancelar
+                    </a>
+                    <button type="submit" class="btn-guardar" style="padding:10px 24px;">
+                        <i class="bi bi-check-lg"></i> Confirmar &amp; Ir a Triaje
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var modal = document.getElementById('admModal');
+    if (modal) {
+        modal.addEventListener('show.bs.modal', function(event) {
+            var btn = event.relatedTarget;
+            var hora = btn.getAttribute('data-cita-hora');
+            var esp = btn.getAttribute('data-cita-esp');
+            var med = btn.getAttribute('data-cita-med');
+            document.getElementById('admForm').action = '/trinidad/admision/' + btn.getAttribute('data-cita-id') + '/procesar';
+            document.getElementById('modalCitaInfo').textContent = hora + ' — ' + esp + ' — ' + med;
+            document.getElementById('modalMonto').textContent = parseFloat(btn.getAttribute('data-precio') || 0).toFixed(2);
+        });
+    }
+});
+</script>
+
+<footer th:replace="~{fragments/header :: footer}"></footer>
+</body>
+</html>

@@ -63,10 +63,17 @@
             <button type="submit" class="btn btn-login">
                 <i class="bi bi-box-arrow-in-right"></i> Iniciar Sesión
             </button>
+            <div style="text-align:center; margin-top:14px;">
+                <a th:href="@{/olvide-password}" style="color:#64748b;font-size:13px;text-decoration:none;">
+                    <i class="bi bi-question-circle"></i> ¿Olvidaste tu contraseña?
+                </a>
+            </div>
         </form>
 
         <!-- Footer -->
         <div class="login-footer">
+            <a th:href="@{/registro}"><i class="bi bi-person-plus"></i> ¿No tienes cuenta? Regístrate</a>
+            <br>
             <a th:href="@{/}"><i class="bi bi-arrow-left"></i> Volver al inicio</a>
         </div>
 

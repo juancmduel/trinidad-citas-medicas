@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: head(${titulo})}"></head>
+<body class="app-body">
+<nav th:replace="~{fragments/header :: navbar}"></nav>
+<div class="app-content">
+    <div th:replace="~{fragments/header :: topbar}"></div>
+    <main class="page-main">
+        <div class="page-header">
+            <div>
+                <h1><i class="bi bi-clock"></i>Pacientes en Triaje</h1>
+                <p>Pacientes que esperan evaluación de enfermería</p>
+            </div>
+            <div class="page-actions">
+                <a th:href="@{/triaje}" class="btn btn-modern btn-secondary">
+                    <i class="bi bi-list"></i>Ver todos
+                </a>
+            </div>
+        </div>
+        <div class="table-container">
+            <table class="table-modern">
+                <thead>
+                    <tr>
+                        <th>Turno</th>
+                        <th>Paciente</th>
+                        <th>DNI</th>
+                        <th>Médico</th>
+                        <th>Especialidad</th>
+                        <th>Hora</th>
+                        <th>Consultorio</th>
+                        <th style="text-align:center;">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="c : ${citas}">
+                        <td><strong th:text="${c.numeroTurno}"></strong></td>
+                        <td th:text="${c.paciente.nombreCompleto}"></td>
+                        <td th:text="${c.paciente.dni}"></td>
+                        <td th:text="${c.medico.nombreCompleto}"></td>
+                        <td th:text="${c.especialidad.nombre}"></td>
+                        <td th:text="${c.horaInicio}"></td>
+                        <td th:text="${c.medico.consultorio}"></td>
+                        <td style="text-align:center;">
+                            <div class="action-group">
+                                <a th:href="@{/triaje/cita/{id}/registrar(id=${c.idCita})}" class="action-btn action-edit" title="Realizar Triaje">
+                                    <i class="bi bi-heart-pulse"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(citas)}">
+                        <td colspan="8" class="table-empty">No hay pacientes pendientes de triaje</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+    <footer th:replace="~{fragments/header :: footer}"></footer>
+</div>
+</body>
+</html>

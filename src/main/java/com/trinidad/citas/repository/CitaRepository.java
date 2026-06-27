@@ -22,6 +22,8 @@ public interface CitaRepository extends JpaRepository<Cita, Long> {
 
     List<Cita> findByFechaCitaOrderByHoraInicioAsc(LocalDate fecha);
 
+    List<Cita> findByPaciente_IdPacienteAndFechaCitaOrderByHoraInicioAsc(Long idPaciente, LocalDate fecha);
+
     @Query("SELECT c FROM Cita c JOIN FETCH c.paciente JOIN FETCH c.medico JOIN FETCH c.especialidad WHERE c.fechaCita = :fecha ORDER BY c.horaInicio")
     List<Cita> findByFechaConRelaciones(@Param("fecha") LocalDate fecha);
 
@@ -29,6 +31,8 @@ public interface CitaRepository extends JpaRepository<Cita, Long> {
     List<Cita> findAllConRelaciones();
 
     Optional<Cita> findByMedico_IdMedicoAndFechaCitaAndHoraInicio(Long idMedico, LocalDate fecha, String horaInicio);
+
+    List<Cita> findByMedico_IdMedicoAndEstadoOrderByFechaCitaAscHoraInicioAsc(Long idMedico, EstadoCita estado);
 
     List<Cita> findByEstado(EstadoCita estado);
 
@@ -51,6 +55,9 @@ public interface CitaRepository extends JpaRepository<Cita, Long> {
            "WHERE c.fechaCita BETWEEN :inicio AND :fin " +
            "GROUP BY c.fechaCita ORDER BY c.fechaCita")
     List<Object[]> countByFechaCitaBetween(@Param("inicio") LocalDate inicio, @Param("fin") LocalDate fin);
+
+    @Query("SELECT c FROM Cita c JOIN FETCH c.paciente JOIN FETCH c.medico JOIN FETCH c.especialidad WHERE c.medico.idMedico = :idMedico ORDER BY c.fechaCita DESC, c.horaInicio")
+    List<Cita> findByMedico_IdMedicoConRelaciones(@Param("idMedico") Long idMedico);
 
     @Query("SELECT c FROM Cita c JOIN FETCH c.paciente JOIN FETCH c.medico JOIN FETCH c.especialidad " +
            "WHERE c.fechaCita BETWEEN :inicio AND :fin ORDER BY c.fechaCita, c.horaInicio")

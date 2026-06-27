@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro - Trinidad</title>
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.3/css/bootstrap.min.css}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+    <link rel="stylesheet" th:href="@{/css/login.css}">
+</head>
+<body>
+    <canvas id="bg-canvas"></canvas>
+    <div class="login-container" style="max-width:600px;">
+        <div class="login-header">
+            <div class="login-logo"><i class="bi bi-person-plus"></i></div>
+            <h2>Crear Cuenta</h2>
+            <p>Regístrate como paciente en Trinidad</p>
+        </div>
+
+        <div th:if="${ok}" class="alert alert-success" style="margin-bottom:20px;">
+            <i class="bi bi-check-circle-fill"></i> <span th:text="${ok}"></span>
+        </div>
+        <div th:if="${error}" class="alert alert-danger" style="margin-bottom:20px;">
+            <i class="bi bi-exclamation-circle-fill"></i> <span th:text="${error}"></span>
+        </div>
+
+        <form th:action="@{/registro}" method="post" th:object="${registro}">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label">Usuario *</label>
+                    <input type="text" th:field="*{username}" class="form-control" placeholder="Elije un usuario" required>
+                    <small class="text-danger" th:if="${#fields.hasErrors('username')}" th:errors="*{username}"></small>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Contraseña *</label>
+                    <input type="password" th:field="*{password}" class="form-control" placeholder="Min. 8 caracteres" required>
+                    <small class="text-danger" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></small>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">DNI *</label>
+                    <input type="text" th:field="*{dni}" class="form-control" placeholder="8 digitos" maxlength="8" required>
+                    <small class="text-danger" th:if="${#fields.hasErrors('dni')}" th:errors="*{dni}"></small>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Email *</label>
+                    <input type="email" th:field="*{email}" class="form-control" placeholder="correo@ejemplo.com" required>
+                    <small class="text-danger" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></small>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Nombres *</label>
+                    <input type="text" th:field="*{nombres}" class="form-control" placeholder="Nombres" required>
+                    <small class="text-danger" th:if="${#fields.hasErrors('nombres')}" th:errors="*{nombres}"></small>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Ap. Paterno *</label>
+                    <input type="text" th:field="*{apellidoPaterno}" class="form-control" placeholder="Apellido paterno" required>
+                    <small class="text-danger" th:if="${#fields.hasErrors('apellidoPaterno')}" th:errors="*{apellidoPaterno}"></small>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Ap. Materno</label>
+                    <input type="text" th:field="*{apellidoMaterno}" class="form-control" placeholder="Apellido materno">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Fecha de Nacimiento *</label>
+                    <input type="date" th:field="*{fechaNacimiento}" class="form-control" required>
+                    <small class="text-danger" th:if="${#fields.hasErrors('fechaNacimiento')}" th:errors="*{fechaNacimiento}"></small>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Sexo *</label>
+                    <select th:field="*{sexo}" class="form-control" required>
+                        <option value="">--</option>
+                        <option value="M">Masculino</option>
+                        <option value="F">Femenino</option>
+                    </select>
+                    <small class="text-danger" th:if="${#fields.hasErrors('sexo')}" th:errors="*{sexo}"></small>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Teléfono</label>
+                    <input type="text" th:field="*{telefono}" class="form-control" placeholder="999888777">
+                </div>
+                <div class="col-12">
+                    <label class="form-label">Dirección</label>
+                    <input type="text" th:field="*{direccion}" class="form-control" placeholder="Dirección">
+                </div>
+                <div class="col-12">
+                    <label class="form-label">Distrito</label>
+                    <input type="text" th:field="*{distrito}" class="form-control" placeholder="Distrito">
+                </div>
+            </div>
+
+            <div class="d-grid gap-2 mt-4">
+                <button type="submit" class="btn btn-login">
+                    <i class="bi bi-person-plus-fill"></i> Crear Cuenta
+                </button>
+            </div>
+        </form>
+
+        <div class="login-footer mt-3">
+            <a th:href="@{/login}"><i class="bi bi-arrow-left"></i> Ya tengo cuenta, iniciar sesión</a>
+            <br>
+            <a th:href="@{/}"><i class="bi bi-house"></i> Volver al inicio</a>
+        </div>
+    </div>
+
+    <script th:src="@{/webjars/bootstrap/5.3.3/js/bootstrap.bundle.min.js}"></script>
+    <script th:src="@{/js/login-bg.js}"></script>
+</body>
+</html>

@@ -2,11 +2,16 @@ package com.trinidad.citas.controller.web;
 
 import org.springframework.context.annotation.Profile;
 import com.trinidad.citas.dto.AtencionDTO;
+import com.trinidad.citas.dto.OrdenExamenDTO;
+import com.trinidad.citas.dto.RecetaDTO;
 import com.trinidad.citas.model.Atencion;
 import com.trinidad.citas.model.EstadoCita;
 import com.trinidad.citas.service.HistoriaClinicaService;
 import com.trinidad.citas.service.AtencionService;
 import com.trinidad.citas.service.CitaService;
+import com.trinidad.citas.service.OrdenExamenService;
+import com.trinidad.citas.service.RecetaService;
+import com.trinidad.citas.service.TriajeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -14,6 +19,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Profile({"web", "default"})
 @Controller
@@ -24,18 +31,33 @@ public class AtencionWebController {
     private final AtencionService atencionService;
     private final CitaService citaService;
     private final HistoriaClinicaService historiaClinicaService;
+    private final OrdenExamenService ordenExamenService;
+    private final RecetaService recetaService;
+    private final TriajeService triajeService;
 
     @GetMapping
     public String lista(Model model) {
         model.addAttribute("atenciones", atencionService.listarEntidadesConRelaciones());
-        model.addAttribute("titulo", "Atenciones Médicas");
+        model.addAttribute("titulo", "Atenciones M&eacute;dicas");
         return "atenciones/lista";
     }
 
     @GetMapping("/{id}")
     public String detalle(@PathVariable Long id, Model model) {
-        model.addAttribute("atencion", atencionService.obtenerEntidadConRelaciones(id));
-        model.addAttribute("titulo", "Detalle Atención");
+        var atencion = atencionService.obtenerEntidadConRelaciones(id);
+        model.addAttribute("atencion", atencion);
+
+        com.trinidad.citas.dto.TriajeDTO triaje = null;
+        if (atencion.getCita() != null) {
+            try {
+                triaje = triajeService.obtenerPorCita(atencion.getCita().getIdCita());
+            } catch (Exception e) {
+                // sin triaje
+            }
+        }
+        model.addAttribute("triaje", triaje);
+
+        model.addAttribute("titulo", "Detalle Atenci&oacute;n");
         return "atenciones/detalle";
     }
 
@@ -43,14 +65,14 @@ public class AtencionWebController {
     public String nueva(@PathVariable Long citaId, Model model) {
         model.addAttribute("cita", citaService.obtenerEntidad(citaId));
         model.addAttribute("citas", citaService.listarEntidadesPorEstado(EstadoCita.EN_ATENCION));
-        model.addAttribute("titulo", "Nueva Atención");
+        model.addAttribute("titulo", "Nueva Atenci&oacute;n");
         return "atenciones/form";
     }
 
     @GetMapping("/nuevo")
     public String nuevoGeneral(Model model) {
         model.addAttribute("citas", citaService.listarEntidadesPorEstado(EstadoCita.EN_ATENCION));
-        model.addAttribute("titulo", "Nueva Atención Médica");
+        model.addAttribute("titulo", "Nueva Atenci&oacute;n M&eacute;dica");
         return "atenciones/form";
     }
 
@@ -59,6 +81,11 @@ public class AtencionWebController {
                           @RequestParam Long citaId,
                           @RequestParam(required = false) Long historiaId,
                           @RequestParam(required = false) Long medicoId,
+                          @RequestParam(required = false) List<String> ordenesTipo,
+                          @RequestParam(required = false) List<String> ordenesNombre,
+                          @RequestParam(required = false) List<String> ordenesIndicaciones,
+                          @RequestParam(required = false) List<String> recetasNro,
+                          @RequestParam(required = false) List<String> recetasObservaciones,
                           RedirectAttributes redirectAttributes) {
         try {
             var cita = citaService.obtenerEntidad(citaId);
@@ -68,6 +95,7 @@ public class AtencionWebController {
                     .orElse(null);
             }
             Long medId = medicoId != null ? medicoId : cita.getMedico().getIdMedico();
+
             AtencionDTO dto = new AtencionDTO();
             dto.setIdCita(citaId);
             dto.setIdHistoria(hcId);
@@ -79,13 +107,37 @@ public class AtencionWebController {
             dto.setDiagnosticoDesc(atencion.getDiagnosticoDesc());
             dto.setTratamiento(atencion.getTratamiento());
             dto.setObservaciones(atencion.getObservaciones());
-            dto.setPresionArterial(atencion.getPresionArterial());
-            dto.setFrecuenciaCardiaca(atencion.getFrecuenciaCardiaca());
-            dto.setTemperatura(atencion.getTemperatura());
-            dto.setPesoKg(atencion.getPesoKg());
-            dto.setTallaCm(atencion.getTallaCm());
-            atencionService.crear(dto);
-            redirectAttributes.addFlashAttribute("ok", "Atencion medica guardada correctamente.");
+            dto.setDiagnosticoCie10Codigo(atencion.getDiagnosticoCie10() != null ? atencion.getDiagnosticoCie10().getCodigo() : null);
+
+            AtencionDTO saved = atencionService.crear(dto);
+
+            if (ordenesTipo != null) {
+                for (int i = 0; i < ordenesTipo.size(); i++) {
+                    String tipo = ordenesTipo.get(i);
+                    String nombre = ordenesNombre != null && i < ordenesNombre.size() ? ordenesNombre.get(i) : null;
+                    if (tipo == null || tipo.isBlank()) continue;
+                    OrdenExamenDTO oDto = new OrdenExamenDTO();
+                    oDto.setIdAtencion(saved.getIdAtencion());
+                    oDto.setTipoExamen(tipo);
+                    oDto.setNombreExamen(nombre != null ? nombre : tipo);
+                    oDto.setIndicaciones(ordenesIndicaciones != null && i < ordenesIndicaciones.size() ? ordenesIndicaciones.get(i) : null);
+                    ordenExamenService.crear(oDto);
+                }
+            }
+
+            if (recetasNro != null) {
+                for (int i = 0; i < recetasNro.size(); i++) {
+                    String nro = recetasNro.get(i);
+                    if (nro == null || nro.isBlank()) continue;
+                    RecetaDTO rDto = new RecetaDTO();
+                    rDto.setIdAtencion(saved.getIdAtencion());
+                    rDto.setNroReceta(nro);
+                    rDto.setObservaciones(recetasObservaciones != null && i < recetasObservaciones.size() ? recetasObservaciones.get(i) : null);
+                    recetaService.crear(rDto);
+                }
+            }
+
+            redirectAttributes.addFlashAttribute("ok", "Atenci&oacute;n m&eacute;dica guardada correctamente.");
             return "redirect:/atenciones";
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());

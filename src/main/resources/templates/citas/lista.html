@@ -28,7 +28,7 @@
             <table class="table-modern">
                 <thead>
                     <tr>
-                        <th>ID</th>
+                        <th th:if="${soloLectura != true}">ID</th>
                         <th>Paciente</th>
                         <th>Médico</th>
                         <th>Especialidad</th>
@@ -40,7 +40,7 @@
                 </thead>
                 <tbody>
                     <tr th:each="c : ${citas}">
-                        <td>
+                        <td th:if="${soloLectura != true}">
                             <span class="badge-estado badge-activo" th:text="${c.idCita}"></span>
                         </td>
                         <td>
@@ -65,7 +65,7 @@
                             </a>
                         </div></td></tr>
                     <tr th:if="${#lists.isEmpty(citas)}">
-                        <td colspan="8" class="table-empty">
+                        <td th:attr="colspan=${soloLectura == true} ? 7 : 8" class="table-empty">
                             <i class="bi bi-inbox"></i>
                             <p>No hay citas registradas</p>
                         </td>

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: head(${titulo})}"></head>
+<body class="app-body">
+<nav th:replace="~{fragments/header :: navbar}"></nav>
+<div class="app-content">
+    <div th:replace="~{fragments/header :: topbar}"></div>
+    <main class="page-main">
+        <div class="page-header">
+            <div>
+                <h1><i class="bi bi-heart-pulse"></i>Detalle de Triaje</h1>
+                <p>Paciente: <strong th:text="${triaje.nombrePaciente}"></strong> | 
+                   Médico: <strong th:text="${triaje.nombreMedico}"></strong></p>
+            </div>
+            <div class="page-actions">
+                <a th:href="@{/triaje}" class="btn btn-modern btn-secondary">
+                    <i class="bi bi-arrow-left"></i>Volver
+                </a>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-md-6">
+                <div class="card-modern">
+                    <div class="card-header-modern">
+                        <h5><i class="bi bi-activity"></i>Signos Vitales</h5>
+                    </div>
+                    <div class="card-body-modern">
+                        <table class="table-detail">
+                            <tr><th>Presión Arterial</th><td th:text="${triaje.presionArterial != null ? triaje.presionArterial : '-'}"></td></tr>
+                            <tr><th>Frecuencia Cardíaca</th><td th:text="${triaje.frecuenciaCardiaca != null ? triaje.frecuenciaCardiaca + ' lpm' : '-'}"></td></tr>
+                            <tr><th>Temperatura</th><td th:text="${triaje.temperatura != null ? triaje.temperatura + ' °C' : '-'}"></td></tr>
+                            <tr><th>Peso</th><td th:text="${triaje.pesoKg != null ? triaje.pesoKg + ' kg' : '-'}"></td></tr>
+                            <tr><th>Talla</th><td th:text="${triaje.tallaCm != null ? triaje.tallaCm + ' cm' : '-'}"></td></tr>
+                            <tr><th>Saturación O2</th><td th:text="${triaje.saturacionO2 != null ? triaje.saturacionO2 + ' %' : '-'}"></td></tr>
+                            <tr><th>Glucosa</th><td th:text="${triaje.glucosa != null ? triaje.glucosa + ' mg/dL' : '-'}"></td></tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card-modern">
+                    <div class="card-header-modern">
+                        <h5><i class="bi bi-chat-dots"></i>Evaluación</h5>
+                    </div>
+                    <div class="card-body-modern">
+                        <table class="table-detail">
+                            <tr><th>Síntomas</th><td th:text="${triaje.sintomas != null ? triaje.sintomas : '-'}"></td></tr>
+                            <tr><th>Alergias</th><td th:text="${triaje.alergiasReportadas != null ? triaje.alergiasReportadas : '-'}"></td></tr>
+                            <tr><th>Medicación</th><td th:text="${triaje.medicacionActual != null ? triaje.medicacionActual : '-'}"></td></tr>
+                            <tr>
+                                <th>Urgencia</th>
+                                <td>
+                                    <span class="badge-estado"
+                                          th:classappend="${triaje.nivelUrgencia == 'ALTA'} ? 'badge-critico' : (${triaje.nivelUrgencia == 'MEDIA'} ? 'badge-proceso' : 'badge-completado')"
+                                          th:text="${triaje.nivelUrgencia != null ? triaje.nivelUrgencia : 'NO ESPECIFICADO'}"></span>
+                                </td>
+                            </tr>
+                            <tr><th>Observaciones</th><td th:text="${triaje.observaciones != null ? triaje.observaciones : '-'}"></td></tr>
+                            <tr><th>Fecha</th><td th:text="${#temporals.format(triaje.fechaTriaje, 'dd/MM/yyyy HH:mm')}"></td></tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    <footer th:replace="~{fragments/header :: footer}"></footer>
+</div>
+</body>
+</html>

@@ -74,6 +74,11 @@ public class CitaService {
     }
 
     @Transactional(readOnly = true)
+    public List<CitaDTO> listarPorMedicoConRelaciones(Long idMedico) {
+        return citaRepository.findByMedico_IdMedicoConRelaciones(idMedico).stream().map(this::toDTO).toList();
+    }
+
+    @Transactional(readOnly = true)
     public List<CitaDTO> listarPorMedicoYFecha(Long idMedico, LocalDate fecha) {
         return citaRepository.findByMedico_IdMedicoAndFechaCitaOrderByHoraInicioAsc(idMedico, fecha)
             .stream().map(this::toDTO).toList();
@@ -177,7 +182,7 @@ public class CitaService {
             throw new BusinessException("El check-in ya fue registrado para esta cita");
         }
         c.setFechaCheckin(LocalDateTime.now());
-        c.setEstado(EstadoCita.EN_ATENCION);
+        c.setEstado(EstadoCita.EN_TRIAGE);
         return toDTO(citaRepository.save(c));
     }
 

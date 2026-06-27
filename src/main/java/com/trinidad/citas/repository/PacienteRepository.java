@@ -15,6 +15,8 @@ public interface PacienteRepository extends JpaRepository<Paciente, Long> {
 
     Optional<Paciente> findByDni(String dni);
 
+    Optional<Paciente> findByUsuario_IdUsuario(Long idUsuario);
+
     boolean existsByDni(String dni);
 
     @Query("SELECT p FROM Paciente p WHERE " +

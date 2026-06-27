@@ -12,6 +12,12 @@ import java.util.Optional;
 public interface AtencionRepository extends JpaRepository<Atencion, Long> {
     Optional<Atencion> findByCita_IdCita(Long idCita);
     List<Atencion> findByHistoria_IdHistoriaOrderByFechaAtencionDesc(Long idHistoria);
+
+    @Query("SELECT a FROM Atencion a " +
+           "LEFT JOIN FETCH a.medico " +
+           "LEFT JOIN FETCH a.diagnosticoCie10 " +
+           "WHERE a.historia.idHistoria = ?1 ORDER BY a.fechaAtencion DESC")
+    List<Atencion> findByHistoriaIdWithRelations(Long idHistoria);
     
     @Query("SELECT DISTINCT a FROM Atencion a " +
            "LEFT JOIN FETCH a.cita c " +

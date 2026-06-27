@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: head(${titulo})}"></head>
+<body class="app-body">
+<nav th:replace="~{fragments/header :: navbar}"></nav>
+<div class="app-content">
+    <div th:replace="~{fragments/header :: topbar}"></div>
+    <main class="page-main">
+        <div class="page-header">
+            <div>
+                <h1><i class="bi bi-people"></i>Reporte de Pacientes</h1>
+                <p>Listado completo de pacientes registrados</p>
+            </div>
+            <div class="page-actions d-flex gap-2">
+                <a th:href="@{/reportes/pacientes/pdf}" class="btn btn-modern btn-danger">
+                    <i class="bi bi-file-pdf"></i> PDF
+                </a>
+                <a th:href="@{/reportes/pacientes/xlsx}" class="btn btn-modern btn-success">
+                    <i class="bi bi-file-excel"></i> Excel
+                </a>
+            </div>
+        </div>
+
+        <div class="card-modern">
+            <div class="card-header-modern">
+                <h5><i class="bi bi-table"></i> Pacientes</h5>
+                <span class="text-muted">Total: <strong th:text="${totalPacientes}"></strong></span>
+            </div>
+            <div class="card-body-modern">
+                <div class="table-container">
+                    <table class="table-modern">
+                        <thead>
+                            <tr>
+                                <th>DNI</th>
+                                <th>Nombre Completo</th>
+                                <th>Sexo</th>
+                                <th>F. Nacimiento</th>
+                                <th>Teléfono</th>
+                                <th>Email</th>
+                                <th>Distrito</th>
+                                <th>Seguro</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="p : ${pacientes}">
+                                <td th:text="${p.dni}"></td>
+                                <td th:text="${p.nombreCompleto}"></td>
+                                <td th:text="${p.sexo}"></td>
+                                <td th:text="${#temporals.format(p.fechaNacimiento, 'dd/MM/yyyy')}"></td>
+                                <td th:text="${p.telefono} ?: '-'"></td>
+                                <td th:text="${p.email} ?: '-'"></td>
+                                <td th:text="${p.distrito} ?: '-'"></td>
+                                <td th:text="${p.seguroSalud} ?: '-'"></td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(pacientes)}">
+                                <td colspan="8" class="table-empty">No hay pacientes registrados</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+    <footer th:replace="~{fragments/header :: footer}"></footer>
+</div>
+</body>
+</html>

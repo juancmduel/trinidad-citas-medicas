@@ -39,6 +39,7 @@ public class DataInitializer implements CommandLineRunner {
                 crearRol("GERENTE", "Gerencia / dashboards"),
                 crearRol("MEDICO", "Medico especialista"),
                 crearRol("RECEPCIONISTA", "Personal de admision"),
+                crearRol("ENFERMERA", "Personal de enfermeria / triaje"),
                 crearRol("PACIENTE", "Paciente del centro medico")
             );
             roles = rolRepository.saveAll(roles);
@@ -47,7 +48,7 @@ public class DataInitializer implements CommandLineRunner {
 
         if (usuarioRepository.count() > 0) {
             log.info("Users exist, updating passwords to ensure they match...");
-            for (String username : List.of("admin", "gerente", "recepcion", "dr.garcia", "dra.lopez", "paciente1")) {
+            for (String username : List.of("admin", "gerente", "recepcion", "enfermera", "dr.garcia", "dra.lopez", "paciente1")) {
                 usuarioRepository.findByUsername(username).ifPresent(u -> {
                     u.setPasswordHash(passwordHash);
                     u.setActivo(1);
@@ -67,6 +68,7 @@ public class DataInitializer implements CommandLineRunner {
             crearUsuario("admin",     passwordHash, "admin@trinidadtarapoto.com",     "ADMINISTRADOR", roles),
             crearUsuario("gerente",   passwordHash, "gerente@trinidadtarapoto.com",   "GERENTE", roles),
             crearUsuario("recepcion", passwordHash, "recepcion@trinidadtarapoto.com", "RECEPCIONISTA", roles),
+            crearUsuario("enfermera", passwordHash, "enfermera@trinidadtarapoto.com", "ENFERMERA", roles),
             crearUsuario("dr.garcia", passwordHash, "dr.garcia@trinidadtarapoto.com", "MEDICO", roles),
             crearUsuario("dra.lopez", passwordHash, "dra.lopez@trinidadtarapoto.com", "MEDICO", roles),
             crearUsuario("paciente1", passwordHash, "paciente1@example.com",          "PACIENTE", roles)

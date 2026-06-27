@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/header-paciente :: head(${titulo})}"></head>
+<body class="app-body">
+<nav th:replace="~{fragments/header-paciente :: navbar}"></nav>
+<div class="app-content">
+    <div th:replace="~{fragments/header-paciente :: topbar}"></div>
+    <main class="page-main">
+
+        <div class="page-header">
+            <div>
+                <h1><i class="bi bi-person-gear"></i>Mi Perfil</h1>
+                <p>Gestiona tu informaci&oacute;n personal y de contacto</p>
+            </div>
+        </div>
+
+        <div th:if="${ok}" class="alert-professional alert-success-prof mb-4">
+            <i class="bi bi-check-circle-fill"></i> <span th:text="${ok}"></span>
+        </div>
+        <div th:if="${error}" class="alert-professional alert-danger-prof mb-4">
+            <i class="bi bi-exclamation-triangle-fill"></i> <span th:text="${error}"></span>
+        </div>
+
+        <div class="card-modern mb-4">
+            <div class="card-body-modern">
+                <div class="d-flex align-items-center gap-4">
+                    <div style="width:72px;height:72px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                        <i class="bi bi-person-fill" style="font-size:2rem;color:#fff;"></i>
+                    </div>
+                    <div>
+                        <h4 class="mb-1" th:text="${paciente.nombreCompleto}">Nombre</h4>
+                        <p class="mb-0 text-muted">
+                            <i class="bi bi-person-badge me-1"></i>DNI: <strong th:text="${paciente.dni}">00000000</strong>
+                            <span class="mx-2">|</span>
+                            <i class="bi bi-person-fill" style="color:var(--text-muted);"></i>
+                            <span th:text="${paciente.sexo == 'M' ? 'Masculino' : 'Femenino'}">Sexo</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <form th:action="@{/portal/mi-perfil}" method="post">
+
+            <div class="card-modern mb-4">
+                <div class="card-header-modern">
+                    <h5 class="mb-0"><i class="bi bi-person-vcard text-primary me-2"></i>Informaci&oacute;n Personal</h5>
+                </div>
+                <div class="card-body-modern">
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon stat-icon-total"><i class="bi bi-person"></i></div>
+                            <div>
+                                <div class="stat-value" th:text="${paciente.nombres} + ' ' + ${paciente.apellidoPaterno} + ' ' + ${paciente.apellidoMaterno ?: ''}">-</div>
+                                <div class="stat-label">Nombre Completo</div>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon stat-icon-info"><i class="bi bi-person-badge"></i></div>
+                            <div>
+                                <div class="stat-value" th:text="${paciente.dni}">-</div>
+                                <div class="stat-label">DNI</div>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon stat-icon-activo"><i class="bi bi-calendar"></i></div>
+                            <div>
+                                <div class="stat-value" th:text="${#temporals.format(paciente.fechaNacimiento, 'dd/MM/yyyy')}">-</div>
+                                <div class="stat-label">Fecha Nacimiento</div>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon" style="background:#6f42c1;"><i class="bi bi-gender-female"></i></div>
+                            <div>
+                                <div class="stat-value" th:text="${paciente.sexo == 'M' ? 'Masculino' : 'Femenino'}">-</div>
+                                <div class="stat-label">Sexo</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-modern mb-4">
+                <div class="card-header-modern">
+                    <h5 class="mb-0"><i class="bi bi-envelope text-success me-2"></i>Contacto</h5>
+                </div>
+                <div class="card-body-modern">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="input-group-modern">
+                                <span class="input-icon"><i class="bi bi-envelope"></i></span>
+                                <div class="input-group-modern-body">
+                                    <label class="form-label-modern">Correo Electr&oacute;nico</label>
+                                    <input type="email" name="email" class="form-control-modern" th:value="${paciente.email}" placeholder="ejemplo@correo.com">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="input-group-modern">
+                                <span class="input-icon"><i class="bi bi-telephone"></i></span>
+                                <div class="input-group-modern-body">
+                                    <label class="form-label-modern">Tel&eacute;fono</label>
+                                    <input type="text" name="telefono" class="form-control-modern" th:value="${paciente.telefono}" placeholder="999 888 777">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="input-group-modern">
+                                <span class="input-icon"><i class="bi bi-geo-alt"></i></span>
+                                <div class="input-group-modern-body">
+                                    <label class="form-label-modern">Direcci&oacute;n</label>
+                                    <input type="text" name="direccion" class="form-control-modern" th:value="${paciente.direccion}" placeholder="Av. / Jr. / Calle">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="input-group-modern">
+                                <span class="input-icon"><i class="bi bi-building"></i></span>
+                                <div class="input-group-modern-body">
+                                    <label class="form-label-modern">Distrito</label>
+                                    <input type="text" name="distrito" class="form-control-modern" th:value="${paciente.distrito}" placeholder="Ej: Tarapoto">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-modern mb-4">
+                <div class="card-header-modern">
+                    <h5 class="mb-0"><i class="bi bi-heart-pulse text-danger me-2"></i>Informaci&oacute;n M&eacute;dica</h5>
+                </div>
+                <div class="card-body-modern">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <div class="input-group-modern">
+                                <span class="input-icon"><i class="bi bi-droplet"></i></span>
+                                <div class="input-group-modern-body">
+                                    <label class="form-label-modern">Tipo de Sangre</label>
+                                    <input type="text" name="tipoSangre" class="form-control-modern" th:value="${paciente.tipoSangre}" placeholder="Ej: O+" maxlength="5">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="input-group-modern">
+                                <span class="input-icon"><i class="bi bi-briefcase"></i></span>
+                                <div class="input-group-modern-body">
+                                    <label class="form-label-modern">Ocupaci&oacute;n</label>
+                                    <input type="text" name="ocupacion" class="form-control-modern" th:value="${paciente.ocupacion}" placeholder="Ej: Ingeniero">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="input-group-modern">
+                                <span class="input-icon"><i class="bi bi-shield-check"></i></span>
+                                <div class="input-group-modern-body">
+                                    <label class="form-label-modern">Seguro de Salud</label>
+                                    <select name="seguroSalud" class="form-control-modern">
+                                        <option value="" th:selected="${paciente.seguroSalud == null}">-- Seleccione --</option>
+                                        <option value="SIS" th:selected="${paciente.seguroSalud == 'SIS'}">SIS</option>
+                                        <option value="ESSALUD" th:selected="${paciente.seguroSalud == 'ESSALUD'}">ESSALUD</option>
+                                        <option value="PRIVADO" th:selected="${paciente.seguroSalud == 'PRIVADO'}">Privado</option>
+                                        <option value="NINGUNO" th:selected="${paciente.seguroSalud == 'NINGUNO'}">Ninguno</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="input-group-modern">
+                                <span class="input-icon"><i class="bi bi-exclamation-triangle"></i></span>
+                                <div class="input-group-modern-body">
+                                    <label class="form-label-modern">Alergias</label>
+                                    <textarea name="alergias" class="form-control-modern" rows="2" placeholder="Alergias conocidas (opcional)" maxlength="500" th:text="${paciente.alergias}"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-modern mb-4">
+                <div class="card-header-modern">
+                    <h5 class="mb-0"><i class="bi bi-telephone-forward text-warning me-2"></i>Contacto de Emergencia</h5>
+                </div>
+                <div class="card-body-modern">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="input-group-modern">
+                                <span class="input-icon"><i class="bi bi-person"></i></span>
+                                <div class="input-group-modern-body">
+                                    <label class="form-label-modern">Nombre Completo</label>
+                                    <input type="text" name="contactoEmergenciaNombre" class="form-control-modern" th:value="${paciente.contactoEmergenciaNombre}" placeholder="Nombre del familiar o amigo">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="input-group-modern">
+                                <span class="input-icon"><i class="bi bi-telephone"></i></span>
+                                <div class="input-group-modern-body">
+                                    <label class="form-label-modern">Tel&eacute;fono</label>
+                                    <input type="text" name="contactoEmergenciaTelefono" class="form-control-modern" th:value="${paciente.contactoEmergenciaTelefono}" placeholder="999 888 777">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-flex gap-3 justify-content-end">
+                <a th:href="@{/portal/dashboard}" class="btn btn-modern btn-secondary">
+                    <i class="bi bi-arrow-left"></i> Volver
+                </a>
+                <button type="submit" class="btn btn-modern btn-primary">
+                    <i class="bi bi-save"></i> Guardar Cambios
+                </button>
+            </div>
+
+        </form>
+
+    </main>
+    <footer th:replace="~{fragments/header-paciente :: footer}"></footer>
+</div>
+</body>
+</html>

@@ -1,9 +1,11 @@
 package com.trinidad.citas.controller.web;
 
-import com.trinidad.citas.dto.HistoriaClinicaDTO;
+import com.trinidad.citas.dto.*;
 import com.trinidad.citas.model.HistoriaClinica;
+import com.trinidad.citas.model.EstadoCita;
+import com.trinidad.citas.repository.CitaRepository;
 import com.trinidad.citas.repository.PacienteRepository;
-import com.trinidad.citas.service.HistoriaClinicaService;
+import com.trinidad.citas.service.*;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Profile;
@@ -13,6 +15,8 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.*;
+
 @Profile({"web", "default"})
 @Controller
 @RequestMapping("/historia-clinica")
@@ -20,6 +24,13 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 public class HistoriaClinicaWebController {
 
     private final HistoriaClinicaService historiaClinicaService;
+    private final AntecedenteService antecedenteService;
+    private final MedicacionActualService medicacionActualService;
+    private final AtencionService atencionService;
+    private final TriajeService triajeService;
+    private final OrdenExamenService ordenExamenService;
+    private final RecetaService recetaService;
+    private final CitaRepository citaRepository;
     private final PacienteRepository pacienteRepository;
 
     @GetMapping
@@ -30,8 +41,81 @@ public class HistoriaClinicaWebController {
 
     @GetMapping("/{id}")
     public String detalle(@PathVariable Long id, Model model) {
-        model.addAttribute("historia", historiaClinicaService.obtenerEntidad(id));
+        var historia = historiaClinicaService.obtenerEntidad(id);
+        var atenciones = atencionService.listarPorHistoria(id);
+
+        Map<Long, TriajeDTO> triajesPorCita = new HashMap<>();
+        Map<Long, List<OrdenExamenDTO>> ordenesPorAtencion = new HashMap<>();
+        Map<Long, List<RecetaDTO>> recetasPorAtencion = new HashMap<>();
+
+        for (AtencionDTO a : atenciones) {
+            try {
+                ordenesPorAtencion.put(a.getIdAtencion(), ordenExamenService.listarPorAtencion(a.getIdAtencion()));
+            } catch (Exception e) {
+                ordenesPorAtencion.put(a.getIdAtencion(), List.of());
+            }
+            try {
+                recetasPorAtencion.put(a.getIdAtencion(), recetaService.listarPorAtencion(a.getIdAtencion()));
+            } catch (Exception e) {
+                recetasPorAtencion.put(a.getIdAtencion(), List.of());
+            }
+        }
+
+        List<Map<String, Object>> timeline = new ArrayList<>();
+        Long idPaciente = historia.getPaciente().getIdPaciente();
+        var citas = citaRepository.findByPaciente_IdPacienteOrderByFechaCitaDescHoraInicioDesc(idPaciente);
+        for (var c : citas) {
+            timeline.add(evento("CITA", c.getFechaCita().atStartOfDay(), "Cita " + c.getEstado(),
+                    c.getFechaCita() + " " + c.getHoraInicio() + " - " + c.getEspecialidad().getNombre(),
+                    "bi-calendar-event", "var(--accent)"));
+            try {
+                var t = triajeService.obtenerPorCita(c.getIdCita());
+                if (t != null) {
+                    triajesPorCita.put(c.getIdCita(), t);
+                    timeline.add(evento("TRIAJE", t.getFechaTriaje(), "Triaje",
+                            "PA: " + t.getPresionArterial() + " | FC: " + t.getFrecuenciaCardiaca() + " | Temp: " + t.getTemperatura(),
+                            "bi-activity", "var(--warning)"));
+                }
+            } catch (Exception ignored) {}
+        }
+        for (AtencionDTO a : atenciones) {
+            timeline.add(evento("ATENCION", a.getFechaAtencion(), "Atención Médica",
+                    a.getDiagnosticoDesc() != null ? a.getDiagnosticoDesc() : "Sin diagnóstico",
+                    "bi-clipboard2-pulse", "var(--success)"));
+            var ords = ordenesPorAtencion.getOrDefault(a.getIdAtencion(), List.of());
+            for (OrdenExamenDTO o : ords) {
+                timeline.add(evento("ORDEN", o.getFechaSolicitud(), "Orden: " + o.getTipoExamen(),
+                        o.getNombreExamen(), "bi-clipboard-check", "var(--accent-green)"));
+            }
+            var recs = recetasPorAtencion.getOrDefault(a.getIdAtencion(), List.of());
+            for (RecetaDTO r : recs) {
+                timeline.add(evento("RECETA", r.getFechaEmision(), "Receta #" + r.getNroReceta(),
+                        r.getObservaciones() != null ? r.getObservaciones() : "",
+                        "bi-file-earmark-text", "#8b5cf6"));
+            }
+        }
+        timeline.sort((e1, e2) -> ((Comparable) e2.get("fecha")).compareTo(e1.get("fecha")));
+
+        model.addAttribute("historia", historia);
+        model.addAttribute("antecedentes", antecedenteService.listarPorHistoria(id));
+        model.addAttribute("medicacionActiva", medicacionActualService.listarActivasPorHistoria(id));
+        model.addAttribute("atenciones", atenciones);
+        model.addAttribute("triajesPorCita", triajesPorCita);
+        model.addAttribute("ordenesPorAtencion", ordenesPorAtencion);
+        model.addAttribute("recetasPorAtencion", recetasPorAtencion);
+        model.addAttribute("timeline", timeline);
         return "historia-clinica/detalle";
+    }
+
+    private Map<String, Object> evento(String tipo, Object fecha, String titulo, String desc, String icono, String color) {
+        Map<String, Object> e = new LinkedHashMap<>();
+        e.put("tipo", tipo);
+        e.put("fecha", fecha);
+        e.put("titulo", titulo);
+        e.put("descripcion", desc);
+        e.put("icono", icono);
+        e.put("color", color);
+        return e;
     }
 
     @GetMapping("/nueva")

@@ -1,6 +1,6 @@
 ﻿<!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/header :: head('Pago')}"></head>
+<head th:replace="~{fragments/header :: head(${titulo})}"></head>
 <body class="app-body">
 <nav th:replace="~{fragments/header :: navbar}"></nav>
 <div class="app-content">
@@ -12,14 +12,14 @@
                 <h1><i class="bi bi-credit-card"></i>
                     <span th:text="${pago.idPago != null} ? 'Editar Pago' : 'Registrar Pago'">Pago</span>
                 </h1>
-                <p>Registra o actualiza un pago de cita médica</p>
+                <p>Registra o actualiza un pago de cita m&eacute;dica</p>
             </div>
             <a th:href="@{/pagos}" class="btn-volver">
                 <i class="bi bi-arrow-left"></i>Volver
             </a>
         </div>
 
-        <form th:action="@{/pagos/guardar}" method="post" class="pago-form" th:object="${pago}">
+        <form th:action="@{/pagos/guardar}" method="post" class="pago-form" th:object="${pago}" id="pagoForm">
             <div th:if="${#fields.hasErrors()}" class="alert-professional alert-danger-prof mb-4">
                 <i class="bi bi-exclamation-triangle-fill"></i>
                 <span>Corrige los errores en el formulario antes de guardar.</span>
@@ -41,24 +41,26 @@
                         </div>
                         <div class="form-field">
                             <label>Cita <span class="required">*</span></label>
-                            <select name="citaId" class="form-select-professional" required>
+                            <select name="citaId" class="form-select-professional" id="citaSelect" required>
                                 <option value="">— Seleccionar cita —</option>
                                 <option th:each="c : ${citas}"
                                         th:value="${c.idCita}"
-                                        th:text="${c.paciente?.apellidoPaterno + ' ' + c.paciente?.nombres + ' | ' + #temporals.format(c.fechaCita, 'dd/MM/yyyy') + ' ' + c.horaInicio}"
+                                        th:attr="data-precio=${c.especialidad?.precioConsulta}"
+                                        th:text="${c.paciente?.apellidoPaterno + ' ' + c.paciente?.nombres + ' | ' + #temporals.format(c.fechaCita, 'dd/MM/yyyy') + ' ' + c.horaInicio + ' - S/ ' + #numbers.formatDecimal(c.especialidad?.precioConsulta, 1, 2)}"
                                         th:selected="${pago.cita != null and pago.cita.idCita == c.idCita}">
                                 </option>
                             </select>
+                            <small class="form-text text-muted" id="citaHelper">Al seleccionar una cita se auto-asignar&aacute; el monto seg&uacute;n la especialidad</small>
                         </div>
                     </div>
 
-                    <!-- Monto y Método -->
+                    <!-- Monto y M&eacute;todo -->
                     <div class="form-section-card">
                         <div class="d-flex align-items-center gap-3 mb-3">
                             <div class="fs-icon"><i class="bi bi-cash-coin"></i></div>
                             <div>
-                                <h5 class="mb-1" style="font-weight:700;">Monto y Método de Pago</h5>
-                                <p style="color:var(--text-muted);font-size:13px;margin:0;">Detalles económicos del pago</p>
+                                <h5 class="mb-1" style="font-weight:700;">Monto y M&eacute;todo de Pago</h5>
+                                <p style="color:var(--text-muted);font-size:13px;margin:0;">Detalles econ&oacute;micos del pago</p>
                             </div>
                         </div>
                         <div class="row g-3">
@@ -67,11 +69,14 @@
                                 <div class="price-input-wrapper">
                                     <span class="price-currency">S/.</span>
                                     <input type="number" name="monto" class="form-input-professional"
-                                           th:value="${pago.monto}" step="0.01" min="0" required>
+                                           id="montoInput"
+                                           th:value="${pago.monto}" step="0.01" min="0" required
+                                           placeholder="0.00">
                                 </div>
+                                <small class="form-text text-muted">El monto se completa autom&aacute;ticamente al seleccionar la cita</small>
                             </div>
                             <div class="col-md-6 form-field">
-                                <label>Método de Pago <span class="required">*</span></label>
+                                <label>M&eacute;todo de Pago <span class="required">*</span></label>
                                 <select name="metodoPago" class="form-select-professional" required>
                                     <option value="">— Seleccionar —</option>
                                     <option value="EFECTIVO" th:selected="${pago.metodoPago == 'EFECTIVO'}">Efectivo</option>
@@ -89,13 +94,13 @@
                             <div class="fs-icon"><i class="bi bi-receipt"></i></div>
                             <div>
                                 <h5 class="mb-1" style="font-weight:700;">Comprobante</h5>
-                                <p style="color:var(--text-muted);font-size:13px;margin:0;">Tipo y número de comprobante fiscal</p>
+                                <p style="color:var(--text-muted);font-size:13px;margin:0;">Tipo y n&uacute;mero de comprobante fiscal</p>
                             </div>
                         </div>
                         <div class="row g-3">
                             <div class="col-md-6 form-field">
                                 <label>Tipo Comprobante</label>
-                                <select name="tipoComprobante" class="form-select-professional">
+                                <select name="tipoComprobante" class="form-select-professional" id="tipoCompSelect">
                                     <option value="">— Sin comprobante —</option>
                                     <option value="BOLETA" th:selected="${pago.tipoComprobante == 'BOLETA'}">Boleta</option>
                                     <option value="FACTURA" th:selected="${pago.tipoComprobante == 'FACTURA'}">Factura</option>
@@ -103,9 +108,11 @@
                                 </select>
                             </div>
                             <div class="col-md-6 form-field">
-                                <label>N° Comprobante</label>
+                                <label>N&deg; Comprobante</label>
                                 <input type="text" name="nroComprobante" class="form-input-professional"
-                                       th:value="${pago.nroComprobante}" placeholder="Ej: B001-000123">
+                                       id="nroCompInput"
+                                       th:value="${pago.nroComprobante}" placeholder="Se genera autom&aacute;ticamente" readonly>
+                                <small class="form-text text-muted">Se genera autom&aacute;ticamente al seleccionar el tipo</small>
                             </div>
                         </div>
                     </div>
@@ -120,7 +127,7 @@
                             <div class="fs-icon"><i class="bi bi-flag-fill"></i></div>
                             <div>
                                 <h5 class="mb-1" style="font-weight:700;">Estado</h5>
-                                <p style="color:var(--text-muted);font-size:13px;margin:0;">Situación del pago</p>
+                                <p style="color:var(--text-muted);font-size:13px;margin:0;">Situaci&oacute;n del pago</p>
                             </div>
                         </div>
                         <div class="status-grid">
@@ -165,7 +172,52 @@
 
         </form>
 
-        
+        <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var citaSelect = document.getElementById('citaSelect');
+            var montoInput = document.getElementById('montoInput');
+            var tipoCompSelect = document.getElementById('tipoCompSelect');
+            var nroCompInput = document.getElementById('nroCompInput');
+
+            if (citaSelect && montoInput) {
+                citaSelect.addEventListener('change', function() {
+                    var opt = citaSelect.options[citaSelect.selectedIndex];
+                    if (opt && opt.value) {
+                        var precio = opt.getAttribute('data-precio');
+                        if (precio) {
+                            montoInput.value = parseFloat(precio).toFixed(2);
+                            montoInput.style.borderColor = '#16a34a';
+                        }
+                    }
+                });
+            }
+
+            if (tipoCompSelect && nroCompInput) {
+                var editMode = nroCompInput.value && nroCompInput.value.length > 0;
+                tipoCompSelect.addEventListener('change', function() {
+                    var tipo = tipoCompSelect.value;
+                    if (tipo && !editMode) {
+                        nroCompInput.value = 'Generando...';
+                        fetch('/trinidad/pagos/generar-comprobante?tipo=' + encodeURIComponent(tipo))
+                            .then(function(r) {
+                                if (!r.ok) {
+                                    return r.json().then(function(e) { throw new Error(e.error || 'Error'); });
+                                }
+                                return r.json();
+                            })
+                            .then(function(d) {
+                                nroCompInput.value = d.numero || '';
+                            })
+                            .catch(function() {
+                                nroCompInput.value = '';
+                            });
+                    } else if (!tipo) {
+                        nroCompInput.value = '';
+                    }
+                });
+            }
+        });
+        </script>
 
     </main>
     <footer th:replace="~{fragments/header :: footer}"></footer>

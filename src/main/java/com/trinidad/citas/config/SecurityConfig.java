@@ -60,6 +60,7 @@ public class SecurityConfig {
                 // ════════════════════════════════════════════════════════════
                 .requestMatchers(
                     "/", "/index", "/login", "/registro",
+                    "/olvide-password", "/reset-password/**",
                     "/css/**", "/js/**", "/img/**", "/webjars/**",
                     "/h2-console/**", "/error",
                     "/api/auth/**", "/api/v1/auth/**"
@@ -86,25 +87,37 @@ public class SecurityConfig {
                 // ════════════════════════════════════════════════════════════
                 //  DASHBOARD — ADMIN + GERENTE + MEDICO + RECEPCIONISTA
                 // ════════════════════════════════════════════════════════════
-                .requestMatchers("/dashboard/**").hasAnyRole("ADMINISTRADOR", "GERENTE", "MEDICO", "RECEPCIONISTA")
+                .requestMatchers("/dashboard/**").hasAnyRole("ADMINISTRADOR", "GERENTE", "RECEPCIONISTA")
 
                 // ════════════════════════════════════════════════════════════
                 //  MÓDULOS BASE — ADMIN + GERENTE + MEDICO + RECEPCIONISTA
                 // ════════════════════════════════════════════════════════════
-                .requestMatchers(
-                    "/pacientes/**", "/medicos/**", "/especialidades/**",
-                    "/horarios/**"
-                ).hasAnyRole("ADMINISTRADOR", "GERENTE", "MEDICO", "RECEPCIONISTA")
+                .requestMatchers("/pacientes/**", "/horarios/**")
+                    .hasAnyRole("ADMINISTRADOR", "GERENTE", "RECEPCIONISTA", "ENFERMERA")
+                .requestMatchers("/medicos/**", "/especialidades/**")
+                    .hasAnyRole("ADMINISTRADOR", "GERENTE", "RECEPCIONISTA")
 
                 // ════════════════════════════════════════════════════════════
-                //  CITAS — todos los roles internos + paciente
+                //  ADMISIÓN + TRIAJE — ADMIN + GERENTE + ENFERMERA
                 // ════════════════════════════════════════════════════════════
-                .requestMatchers("/citas/**").hasAnyRole("ADMINISTRADOR", "GERENTE", "MEDICO", "RECEPCIONISTA", "PACIENTE")
+                .requestMatchers("/admision/**").hasAnyRole("ADMINISTRADOR", "GERENTE", "ENFERMERA")
+                .requestMatchers("/triaje/api/**").hasAnyRole("ADMINISTRADOR", "GERENTE", "ENFERMERA", "MEDICO")
+                .requestMatchers("/triaje/**").hasAnyRole("ADMINISTRADOR", "GERENTE", "ENFERMERA")
 
                 // ════════════════════════════════════════════════════════════
-                //  PAGOS — ADMIN + GERENTE + RECEPCIONISTA
+                //  PORTAL PACIENTE — solo PACIENTE
                 // ════════════════════════════════════════════════════════════
-                .requestMatchers("/pagos/**").hasAnyRole("ADMINISTRADOR", "GERENTE", "RECEPCIONISTA")
+                .requestMatchers("/portal/**").hasRole("PACIENTE")
+
+                // ════════════════════════════════════════════════════════════
+                //  CITAS — todos los roles internos + paciente + enfermera
+                // ════════════════════════════════════════════════════════════
+                .requestMatchers("/citas/**").hasAnyRole("ADMINISTRADOR", "GERENTE", "MEDICO", "RECEPCIONISTA", "ENFERMERA", "PACIENTE")
+
+                // ════════════════════════════════════════════════════════════
+                //  PAGOS — ADMIN + GERENTE + RECEPCIONISTA + ENFERMERA
+                // ════════════════════════════════════════════════════════════
+                .requestMatchers("/pagos/**").hasAnyRole("ADMINISTRADOR", "GERENTE", "RECEPCIONISTA", "ENFERMERA")
 
                 // ════════════════════════════════════════════════════════════
                 //  MÓDULOS MÉDICOS — ADMIN + GERENTE + MEDICO
@@ -114,6 +127,8 @@ public class SecurityConfig {
                     "/diagnosticos/**", "/historia-clinica/**",
                     "/ordenes-examen/**"
                 ).hasAnyRole("ADMINISTRADOR", "GERENTE", "MEDICO")
+
+                .requestMatchers("/medico/**").hasRole("MEDICO")
 
                 // ════════════════════════════════════════════════════════════
                 //  CUALQUIER OTRA RUTA — autenticado

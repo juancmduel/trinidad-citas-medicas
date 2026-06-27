@@ -94,6 +94,10 @@ public class PacienteService {
         dto.setDistrito(p.getDistrito());
         dto.setTipoSangre(p.getTipoSangre());
         dto.setAlergias(p.getAlergias());
+        dto.setOcupacion(p.getOcupacion());
+        dto.setSeguroSalud(p.getSeguroSalud());
+        dto.setContactoEmergenciaNombre(p.getContactoEmergenciaNombre());
+        dto.setContactoEmergenciaTelefono(p.getContactoEmergenciaTelefono());
         return dto;
     }
 
@@ -110,5 +114,9 @@ public class PacienteService {
         p.setDistrito(dto.getDistrito());
         p.setTipoSangre(dto.getTipoSangre());
         p.setAlergias(dto.getAlergias());
+        p.setOcupacion(dto.getOcupacion());
+        p.setSeguroSalud(dto.getSeguroSalud());
+        p.setContactoEmergenciaNombre(dto.getContactoEmergenciaNombre());
+        p.setContactoEmergenciaTelefono(dto.getContactoEmergenciaTelefono());
     }
 }

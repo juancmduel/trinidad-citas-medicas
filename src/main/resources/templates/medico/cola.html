@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: head(${titulo})}"></head>
+<body class="app-body">
+<nav th:replace="~{fragments/header :: navbar}"></nav>
+<div class="app-content">
+    <div th:replace="~{fragments/header :: topbar}"></div>
+    <main class="page-main">
+
+        <div class="page-header">
+            <div>
+                <h1>
+                    <i class="bi bi-people" style="color:var(--accent);"></i> Mi Cola de Pacientes
+                    <span id="medColaCount" class="med-cola-badge" style="display:none;">0</span>
+                </h1>
+                <p>Pacientes en atenci&oacute;n — <strong th:text="${medico.nombreCompleto}"></strong>
+                   <span id="medColaLastUpdate" class="adm-last-update"></span></p>
+            </div>
+            <div class="d-flex gap-2">
+                <a th:href="@{/medico/cola}" class="btn-guardar" style="padding:7px 16px;font-size:12px;">
+                    <i class="bi bi-arrow-clockwise"></i> Refrescar
+                </a>
+                <a th:href="@{/atenciones}" class="btn-volver">
+                    <i class="bi bi-list"></i> Atenciones
+                </a>
+            </div>
+        </div>
+
+        <div th:if="${ok}" class="alert-professional alert-success-prof mb-4">
+            <i class="bi bi-check-circle-fill"></i><span th:text="${ok}"></span>
+        </div>
+        <div th:if="${error}" class="alert-professional alert-danger-prof mb-4">
+            <i class="bi bi-exclamation-triangle-fill"></i><span th:text="${error}"></span>
+        </div>
+
+        <!-- KPIs -->
+        <div class="med-stats-row" th:if="${citas != null}">
+            <div class="med-stat-card med-stat-total">
+                <i class="bi bi-people-fill"></i>
+                <div>
+                    <span class="med-stat-value" id="medStatTotal" th:text="${totalCola}">0</span>
+                    <span class="med-stat-label">En Cola</span>
+                </div>
+            </div>
+            <div class="med-stat-card med-stat-alta">
+                <i class="bi bi-exclamation-triangle-fill"></i>
+                <div>
+                    <span class="med-stat-value" id="medStatAlta" th:text="${countAlta}">0</span>
+                    <span class="med-stat-label">Urgencia Alta</span>
+                </div>
+            </div>
+            <div class="med-stat-card med-stat-media">
+                <i class="bi bi-clock-fill"></i>
+                <div>
+                    <span class="med-stat-value" id="medStatMedia" th:text="${countMedia}">0</span>
+                    <span class="med-stat-label">Urgencia Media</span>
+                </div>
+            </div>
+            <div class="med-stat-card med-stat-baja">
+                <i class="bi bi-check-circle-fill"></i>
+                <div>
+                    <span class="med-stat-value" id="medStatBaja" th:text="${countBaja}">0</span>
+                    <span class="med-stat-label">Urgencia Baja</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Search + Filter -->
+        <div class="med-toolbar">
+            <div class="med-search">
+                <i class="bi bi-search"></i>
+                <input type="text" id="medSearchInput" class="med-search-input"
+                       placeholder="Buscar paciente..." oninput="filtrarMedCards()">
+            </div>
+            <div class="med-filters" id="medFilterGroup">
+                <button class="med-filter-btn active" data-filter="all" onclick="filtrarMedCards()">Todos</button>
+                <button class="med-filter-btn" data-filter="ALTA" onclick="filtrarMedCards()" style="color:#ef4444;">Alta</button>
+                <button class="med-filter-btn" data-filter="MEDIA" onclick="filtrarMedCards()" style="color:#f59e0b;">Media</button>
+                <button class="med-filter-btn" data-filter="BAJA" onclick="filtrarMedCards()" style="color:#10b981;">Baja</button>
+                <button class="med-filter-btn" data-filter="sin" onclick="filtrarMedCards()">Sin triaje</button>
+            </div>
+        </div>
+
+        <!-- Empty state -->
+        <div th:if="${#lists.isEmpty(citas)}" class="med-empty">
+            <i class="bi bi-emoji-smile"></i>
+            <h5>No hay pacientes en espera</h5>
+            <p>Tus pacientes aparecer&aacute;n aqu&iacute; cuando la enfermera complete el triaje.</p>
+        </div>
+
+        <!-- Patient cards -->
+        <div th:unless="${#lists.isEmpty(citas)}" class="med-card-grid" id="medCardGrid">
+            <div th:each="c : ${citas}" class="med-card"
+                 th:attr="data-cita-id=${c.idCita},
+                          data-urgencia=${triajesPorCita.get(c.idCita)?.nivelUrgencia ?: 'SIN'},
+                          data-search=${#strings.toLowerCase(c.paciente.nombreCompleto + ' ' + c.paciente.dni)}">
+
+                <!-- Top: Hora + Estado badge -->
+                <div class="med-card-top">
+                    <div class="med-card-hora" th:text="${c.horaInicio}">09:00</div>
+                    <div th:if="${triajesPorCita.get(c.idCita)?.nivelUrgencia == 'ALTA'}"
+                         class="med-urg-badge med-urg-alta">ALTA</div>
+                    <div th:if="${triajesPorCita.get(c.idCita)?.nivelUrgencia == 'MEDIA'}"
+                         class="med-urg-badge med-urg-media">MEDIA</div>
+                    <div th:if="${triajesPorCita.get(c.idCita)?.nivelUrgencia == 'BAJA'}"
+                         class="med-urg-badge med-urg-baja">BAJA</div>
+                    <div th:if="${triajesPorCita.get(c.idCita) == null}"
+                         class="med-urg-badge med-urg-sin">SIN TRI</div>
+                </div>
+
+                <!-- Body: paciente info -->
+                <div class="med-card-body">
+                    <div class="med-card-patient">
+                        <div class="med-card-avatar">
+                            <i class="bi bi-person-fill"></i>
+                        </div>
+                        <div class="med-card-patient-info">
+                            <span class="med-card-name" th:text="${c.paciente.nombreCompleto}">Paciente</span>
+                            <span class="med-card-dni">
+                                <i class="bi bi-card-text"></i> <span th:text="${c.paciente.dni}">12345678</span>
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Triaje data -->
+                    <div class="med-card-triaje" th:if="${triajesPorCita.get(c.idCita) != null}">
+                        <div class="med-triaje-item" th:if="${triajesPorCita.get(c.idCita).presionArterial}">
+                            <span class="med-triaje-label">PA</span>
+                            <span class="med-triaje-value" th:text="${triajesPorCita.get(c.idCita).presionArterial}"></span>
+                        </div>
+                        <div class="med-triaje-item" th:if="${triajesPorCita.get(c.idCita).frecuenciaCardiaca}">
+                            <span class="med-triaje-label">FC</span>
+                            <span class="med-triaje-value" th:text="${triajesPorCita.get(c.idCita).frecuenciaCardiaca}"></span>
+                        </div>
+                        <div class="med-triaje-item" th:if="${triajesPorCita.get(c.idCita).temperatura}">
+                            <span class="med-triaje-label">T</span>
+                            <span class="med-triaje-value" th:text="${triajesPorCita.get(c.idCita).temperatura}"></span>
+                        </div>
+                        <div class="med-triaje-item" th:if="${triajesPorCita.get(c.idCita).saturacionO2}">
+                            <span class="med-triaje-label">SpO2</span>
+                            <span class="med-triaje-value" th:text="${triajesPorCita.get(c.idCita).saturacionO2}"></span>
+                        </div>
+                    </div>
+                    <div class="med-card-sintomas" th:if="${triajesPorCita.get(c.idCita)?.sintomas}">
+                        <i class="bi bi-chat-quote"></i>
+                        <span th:text="${triajesPorCita.get(c.idCita).sintomas}"></span>
+                    </div>
+                </div>
+
+                <!-- Action -->
+                <div class="med-card-actions">
+                    <a th:href="@{/atenciones/cita/{id}/nuevo(id=${c.idCita})}" class="med-action med-action-primary">
+                        <i class="bi bi-play-circle"></i> Iniciar Atenci&oacute;n
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Toast container -->
+        <div id="medToastContainer" class="med-toast-container"></div>
+
+    </main>
+</div>
+
+<script>
+document.querySelectorAll('#medFilterGroup .med-filter-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+        document.querySelectorAll('#medFilterGroup .med-filter-btn').forEach(function(b) { b.classList.remove('active'); });
+        this.classList.add('active');
+        filtrarMedCards();
+    });
+});
+
+function filtrarMedCards() {
+    var q = (document.getElementById('medSearchInput')?.value || '').toLowerCase();
+    var filter = document.querySelector('#medFilterGroup .med-filter-btn.active')?.getAttribute('data-filter') || 'all';
+    var cards = document.querySelectorAll('.med-card');
+    cards.forEach(function(c) {
+        var s = c.getAttribute('data-search') || '';
+        var u = c.getAttribute('data-urgencia') || 'SIN';
+        var matchSearch = s.includes(q);
+        var matchFilter = (filter === 'all') || (filter === 'sin' && u === 'SIN') || (u === filter);
+        c.style.display = (matchSearch && matchFilter) ? '' : 'none';
+    });
+}
+</script>
+
+<script th:src="@{/js/medico-cola.js}"></script>
+<footer th:replace="~{fragments/header :: footer}"></footer>
+</body>
+</html>

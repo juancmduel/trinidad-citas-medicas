@@ -77,6 +77,22 @@ public class Paciente {
     @Column(name = "ALERGIAS", length = 500)
     private String alergias;
 
+    @Size(max = 100)
+    @Column(name = "OCUPACION", length = 100)
+    private String ocupacion;
+
+    @Size(max = 50)
+    @Column(name = "SEGURO_SALUD", length = 50)
+    private String seguroSalud;
+
+    @Size(max = 100)
+    @Column(name = "CONTACTO_EMERGENCIA_NOMBRE", length = 100)
+    private String contactoEmergenciaNombre;
+
+    @Size(max = 15)
+    @Column(name = "CONTACTO_EMERGENCIA_TELEFONO", length = 15)
+    private String contactoEmergenciaTelefono;
+
     @Column(name = "ACTIVO", nullable = false)
     @Builder.Default
     private Integer activo = 1;

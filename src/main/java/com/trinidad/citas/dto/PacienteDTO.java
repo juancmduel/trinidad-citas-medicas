@@ -50,4 +50,16 @@ public class PacienteDTO {
 
     @Size(max = 500)
     private String alergias;
+
+    @Size(max = 100)
+    private String ocupacion;
+
+    @Size(max = 50)
+    private String seguroSalud;
+
+    @Size(max = 100)
+    private String contactoEmergenciaNombre;
+
+    @Size(max = 15)
+    private String contactoEmergenciaTelefono;
 }

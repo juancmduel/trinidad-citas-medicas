@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${titulo} + ' | Trinidad'">Admision | Trinidad</title>
+    <script>
+        (function() {
+            var t = localStorage.getItem('trinidad-theme');
+            if (t === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+        })();
+    </script>
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.3/css/bootstrap.min.css}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/system.css}">
+    <link rel="stylesheet" th:href="@{/css/trinidad.css}">
+</head>
+<body class="app-body">
+<nav th:replace="~{fragments/header :: navbar}"></nav>
+<div class="app-content">
+    <div th:replace="~{fragments/header :: topbar}"></div>
+    <main class="page-main">
+
+        <!-- HEADER -->
+        <div class="page-header">
+            <div>
+                <h1><i class="bi bi-door-open"></i> Admisi&oacute;n del D&iacute;a</h1>
+                <p>Panel visual de pacientes — <strong id="admFechaTexto"></strong>
+                   <span id="admLastUpdate" class="adm-last-update"></span></p>
+            </div>
+            <div class="d-flex gap-2">
+                <a th:href="@{/admision/buscar}" class="btn-volver" title="B&uacute;squeda manual">
+                    <i class="bi bi-search"></i> Buscar DNI
+                </a>
+                <a th:href="@{/admision}" class="btn-guardar" style="padding:7px 16px;font-size:12px;">
+                    <i class="bi bi-arrow-clockwise"></i> Refrescar
+                </a>
+            </div>
+        </div>
+
+        <!-- ALERTS -->
+        <div th:if="${ok}" class="alert-professional alert-success-prof mb-4">
+            <i class="bi bi-check-circle-fill"></i>
+            <span th:text="${ok}"></span>
+        </div>
+        <div th:if="${error}" class="alert-professional alert-danger-prof mb-4">
+            <i class="bi bi-exclamation-triangle-fill"></i>
+            <span th:text="${error}"></span>
+        </div>
+
+        <!-- KPI ROW -->
+        <div class="adm-stats-row" th:if="${pacientes != null}">
+            <div class="adm-stat-card adm-stat-total">
+                <i class="bi bi-calendar-day"></i>
+                <div>
+                    <span class="adm-stat-value" id="admStatTotal" th:text="${totalHoy}">0</span>
+                    <span class="adm-stat-label">Total Hoy</span>
+                </div>
+            </div>
+            <div class="adm-stat-card adm-stat-pendiente">
+                <i class="bi bi-clock"></i>
+                <div>
+                    <span class="adm-stat-value" id="admStatPendiente" th:text="${countPendiente}">0</span>
+                    <span class="adm-stat-label">Pendientes</span>
+                </div>
+            </div>
+            <div class="adm-stat-card adm-stat-triaje">
+                <i class="bi bi-heart-pulse"></i>
+                <div>
+                    <span class="adm-stat-value" id="admStatTriaje" th:text="${countTriaje}">0</span>
+                    <span class="adm-stat-label">En Triaje</span>
+                </div>
+            </div>
+            <div class="adm-stat-card adm-stat-atencion">
+                <i class="bi bi-bandaid"></i>
+                <div>
+                    <span class="adm-stat-value" id="admStatAtencion" th:text="${countAtencion}">0</span>
+                    <span class="adm-stat-label">En Consulta</span>
+                </div>
+            </div>
+            <div class="adm-stat-card adm-stat-atendido">
+                <i class="bi bi-check-circle"></i>
+                <div>
+                    <span class="adm-stat-value" id="admStatAtendido" th:text="${countAtendido}">0</span>
+                    <span class="adm-stat-label">Atendidos</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- SEARCH + FILTER -->
+        <div class="adm-toolbar">
+            <div class="adm-search">
+                <i class="bi bi-search"></i>
+                <input type="text" id="admSearchInput" class="adm-search-input"
+                       placeholder="Buscar por nombre o DNI..." oninput="filtrarTarjetas()">
+            </div>
+            <div class="adm-filters" id="admFilterGroup">
+                <button class="adm-filter-btn active" data-filter="all" onclick="filtrarPorEstado('all', this)">Todos</button>
+                <button class="adm-filter-btn" data-filter="pendiente" onclick="filtrarPorEstado('pendiente', this)">Pendientes</button>
+                <button class="adm-filter-btn" data-filter="triaje" onclick="filtrarPorEstado('triaje', this)">En Triaje</button>
+                <button class="adm-filter-btn" data-filter="atencion" onclick="filtrarPorEstado('atencion', this)">En Consulta</button>
+                <button class="adm-filter-btn" data-filter="atendido" onclick="filtrarPorEstado('atendido', this)">Atendidos</button>
+            </div>
+        </div>
+
+        <!-- CARD GRID -->
+        <div th:if="${#lists.isEmpty(pacientes)}" class="adm-empty">
+            <i class="bi bi-inbox"></i>
+            <h5>No hay pacientes registrados para hoy</h5>
+            <p>Agenda citas o busca manualmente por DNI para comenzar.</p>
+            <a th:href="@{/citas/agendar}" class="btn-guardar">
+                <i class="bi bi-calendar-plus"></i> Agendar Cita
+            </a>
+        </div>
+
+        <div th:unless="${#lists.isEmpty(pacientes)}" class="adm-card-grid" id="admCardGrid">
+            <div th:each="p : ${pacientes}" class="adm-card"
+                 th:data-estado="${p.estado}">
+
+                <!-- Turno + Hora + Status -->
+                <div class="adm-card-top">
+                    <div class="adm-card-turno" th:if="${p.numeroTurno}" th:text="'#' + ${p.numeroTurno}">#001</div>
+                    <div class="adm-card-turno adm-card-turno-empty" th:unless="${p.numeroTurno}">---</div>
+                    <div class="adm-card-hora" th:text="${p.horaInicio}">08:00</div>
+                    <th:block th:switch="${p.estado}">
+                        <div th:case="'PROGRAMADA'" class="adm-card-badge adm-badge-pendiente">Pendiente</div>
+                        <div th:case="'CONFIRMADA'" class="adm-card-badge adm-badge-pendiente">Pagado</div>
+                        <div th:case="'EN_TRIAGE'" class="adm-card-badge adm-badge-triaje">En Triaje</div>
+                        <div th:case="'EN_ATENCION'" class="adm-card-badge adm-badge-atencion">En Consulta</div>
+                        <div th:case="'ATENDIDA'" class="adm-card-badge adm-badge-atendido">Atendido</div>
+                        <div th:case="*" class="adm-card-badge adm-badge-atendido" th:text="${p.estado}"></div>
+                    </th:block>
+                </div>
+
+                <!-- Patient Info -->
+                <div class="adm-card-body">
+                    <div class="adm-card-patient">
+                        <div class="adm-card-avatar">
+                            <i class="bi bi-person-fill"></i>
+                        </div>
+                        <div class="adm-card-patient-info">
+                            <span class="adm-card-name" th:text="${p.nombrePaciente}">Paciente</span>
+                            <span class="adm-card-dni">
+                                <i class="bi bi-card-text"></i> <span th:text="${p.dniPaciente}">12345678</span>
+                                <span th:if="${p.telefonoPaciente}" th:text="' | ' + ${p.telefonoPaciente}"></span>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="adm-card-meta">
+                        <div class="adm-card-meta-item">
+                            <i class="bi bi-person-badge"></i>
+                            <span th:text="${p.nombreMedico}">Dr. Garcia</span>
+                        </div>
+                        <div class="adm-card-meta-item">
+                            <i class="bi bi-heart-pulse"></i>
+                            <span th:text="${p.nombreEspecialidad}">Cardiologia</span>
+                        </div>
+                        <div class="adm-card-meta-item" th:if="${p.consultorio}">
+                            <i class="bi bi-geo-alt"></i>
+                            <span th:text="${p.consultorio}">Consultorio 203</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Triaje data -->
+                <div class="adm-card-triaje" th:if="${p.idTriaje != null}">
+                    <div class="adm-triaje-item" th:if="${p.presionArterial}" th:title="'PA: ' + ${p.presionArterial}">
+                        <span class="adm-triaje-label">PA</span>
+                        <span class="adm-triaje-value" th:text="${p.presionArterial}">120/80</span>
+                    </div>
+                    <div class="adm-triaje-item" th:if="${p.frecuenciaCardiaca}" th:title="'FC: ' + ${p.frecuenciaCardiaca} + ' lpm'">
+                        <span class="adm-triaje-label">FC</span>
+                        <span class="adm-triaje-value" th:text="${p.frecuenciaCardiaca}">72</span>
+                    </div>
+                    <div class="adm-triaje-item" th:if="${p.temperatura}" th:title="'Temp: ' + ${p.temperatura} + ' C'">
+                        <span class="adm-triaje-label">T</span>
+                        <span class="adm-triaje-value" th:text="${p.temperatura}">36.5</span>
+                    </div>
+                    <div class="adm-triaje-item" th:if="${p.saturacionO2}" th:title="'SpO2: ' + ${p.saturacionO2} + ' %'">
+                        <span class="adm-triaje-label">SpO2</span>
+                        <span class="adm-triaje-value" th:text="${p.saturacionO2}">98</span>
+                    </div>
+                    <div class="adm-triaje-item" th:if="${p.nivelUrgencia}">
+                        <span class="adm-triaje-badge"
+                              th:classappend="${p.nivelUrgencia == 'ALTA'} ? 'adm-urgencia-alta' : (${p.nivelUrgencia == 'MEDIA'} ? 'adm-urgencia-media' : 'adm-urgencia-baja')"
+                              th:text="${p.nivelUrgencia}">BAJA</span>
+                    </div>
+                </div>
+
+                <!-- Price -->
+                <div class="adm-card-price" th:if="${p.precioConsulta}">
+                    <span class="adm-price-label">Consulta:</span>
+                    <span class="adm-price-value" th:text="'S/ ' + ${#numbers.formatDecimal(p.precioConsulta, 1, 2)}">S/ 80.00</span>
+                    <span class="adm-pago-status" th:if="${p.estadoPago == 'PAGADO'}">
+                        <i class="bi bi-check-circle-fill" style="color:var(--success);"></i> Pagado
+                    </span>
+                    <span class="adm-pago-status" th:if="${p.estadoPago != 'PAGADO' and p.estadoPago != null}">
+                        <i class="bi bi-clock-fill" style="color:var(--warning);"></i> <span th:text="${p.estadoPago}"></span>
+                    </span>
+                </div>
+
+                <!-- Actions -->
+                <div class="adm-card-actions" th:id="'actions-' + ${p.idCita}">
+                    <th:block th:if="${p.estado == 'PROGRAMADA' or (p.estado == 'CONFIRMADA' and p.estadoPago != 'PAGADO')}">
+                        <button type="button" class="adm-action adm-action-primary" th:onclick="'showPagoInline(' + ${p.idCita} + ')'">
+                            <i class="bi bi-check-circle"></i> Asistencia + Cobro
+                        </button>
+                    </th:block>
+                    <th:block th:if="${p.estado == 'CONFIRMADA' and p.estadoPago == 'PAGADO'}">
+                        <a th:href="@{/triaje/cita/{id}/registrar(id=${p.idCita})}" class="adm-action adm-action-triaje">
+                            <i class="bi bi-heart-pulse"></i> Ir a Triaje
+                        </a>
+                    </th:block>
+                    <th:block th:if="${p.estado == 'EN_TRIAGE'}">
+                        <a th:href="@{/triaje/cita/{id}/registrar(id=${p.idCita})}" class="adm-action adm-action-triaje">
+                            <i class="bi bi-heart-pulse"></i> Completar Triaje
+                        </a>
+                    </th:block>
+                    <th:block th:if="${p.estado == 'EN_ATENCION'}">
+                        <a th:href="@{/atenciones/cita/{id}/nuevo(id=${p.idCita})}" class="adm-action adm-action-view">
+                            <i class="bi bi-play-circle"></i> Iniciar Atenci&oacute;n
+                        </a>
+                    </th:block>
+                    <th:block th:if="${p.estado == 'ATENDIDA'}">
+                        <a th:href="@{/atenciones}" class="adm-action adm-action-view">
+                            <i class="bi bi-eye"></i> Ver Atenci&oacute;n
+                        </a>
+                    </th:block>
+                </div>
+
+                <!-- Inline Payment -->
+                <div class="adm-pago-inline" th:id="'pagoInline-' + ${p.idCita}" style="display:none;">
+                    <form method="post" th:action="@{/admision/{id}/procesar(id=${p.idCita})}">
+                        <div class="adm-pago-header">
+                            <span class="adm-pago-label">Total consulta:</span>
+                            <span class="adm-pago-monto" th:text="'S/ ' + ${#numbers.formatDecimal(p.precioConsulta, 1, 2)}">S/ 0.00</span>
+                        </div>
+                        <div class="adm-pago-body">
+                            <div class="adm-pago-field">
+                                <select name="metodoPago" class="adm-pago-select" required>
+                                    <option value="">M&eacute;todo de pago</option>
+                                    <option value="EFECTIVO">Efectivo</option>
+                                    <option value="TARJETA">Tarjeta</option>
+                                    <option value="TRANSFERENCIA">Transferencia</option>
+                                    <option value="YAPE">Yape / Plin</option>
+                                </select>
+                            </div>
+                            <div class="adm-pago-field">
+                                <select name="tipoComprobante" class="adm-pago-select">
+                                    <option value="">Comprobante</option>
+                                    <option value="BOLETA">Boleta</option>
+                                    <option value="FACTURA">Factura</option>
+                                    <option value="RECIBO">Recibo</option>
+                                </select>
+                            </div>
+                            <div class="adm-pago-actions">
+                                <button type="submit" class="adm-action adm-action-primary">
+                                    <i class="bi bi-check-lg"></i> Cobrar &amp; Triaje
+                                </button>
+                                <button type="button" class="adm-action adm-action-view" th:onclick="'hidePagoInline(' + ${p.idCita} + ')'">
+                                    <i class="bi bi-x-lg"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+    </main>
+</div>
+
+<script>
+(function() {
+    var el = document.getElementById('admFechaTexto');
+    if (el) {
+        var dias = ['Domingo','Lunes','Martes','Miercoles','Jueves','Viernes','Sabado'];
+        var meses = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Setiembre','Octubre','Noviembre','Diciembre'];
+        var d = new Date();
+        el.textContent = dias[d.getDay()] + ' ' + d.getDate() + ' de ' + meses[d.getMonth()] + ' ' + d.getFullYear();
+    }
+})();
+
+function showPagoInline(idCita) {
+    var actions = document.getElementById('actions-' + idCita);
+    var inline = document.getElementById('pagoInline-' + idCita);
+    if (actions) actions.style.display = 'none';
+    if (inline) inline.style.display = 'block';
+}
+
+function hidePagoInline(idCita) {
+    var actions = document.getElementById('actions-' + idCita);
+    var inline = document.getElementById('pagoInline-' + idCita);
+    if (actions) actions.style.display = '';
+    if (inline) inline.style.display = 'none';
+}
+
+function filtrarTarjetas() {
+    var q = document.getElementById('admSearchInput').value.toLowerCase();
+    var cards = document.querySelectorAll('.adm-card');
+    cards.forEach(function(c) {
+        var s = c.getAttribute('data-search') || c.querySelector('.adm-card-name')?.textContent.toLowerCase() + ' ' + (c.querySelector('.adm-card-dni')?.textContent || '');
+        c.style.display = s.includes(q) ? '' : 'none';
+    });
+}
+
+function filtrarPorEstado(estado, btn) {
+    document.querySelectorAll('.adm-filter-btn').forEach(function(b) { b.classList.remove('active'); });
+    if (btn) btn.classList.add('active');
+    var cards = document.querySelectorAll('.adm-card');
+    cards.forEach(function(c) {
+        var e = c.getAttribute('data-estado') || '';
+        if (estado === 'all') { c.style.display = ''; return; }
+        var match = false;
+        if (estado === 'pendiente') match = (e === 'PROGRAMADA' || e === 'CONFIRMADA');
+        else if (estado === 'triaje') match = (e === 'EN_TRIAGE');
+        else if (estado === 'atencion') match = (e === 'EN_ATENCION');
+        else if (estado === 'atendido') match = (e === 'ATENDIDA');
+        c.style.display = match ? '' : 'none';
+    });
+}
+</script>
+
+<script th:src="@{/js/admision-board.js}"></script>
+<footer th:replace="~{fragments/header :: footer}"></footer>
+</body>
+</html>

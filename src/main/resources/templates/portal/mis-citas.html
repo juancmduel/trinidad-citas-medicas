@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/header-paciente :: head(${titulo})}"></head>
+<body class="app-body">
+<nav th:replace="~{fragments/header-paciente :: navbar}"></nav>
+<div class="app-content">
+    <div th:replace="~{fragments/header-paciente :: topbar}"></div>
+    <main class="page-main">
+        <div class="page-header">
+            <div>
+                <h1><i class="bi bi-calendar3"></i>Mis Citas</h1>
+                <p>Historial de todas tus citas médicas</p>
+            </div>
+            <div class="page-actions">
+                <a th:href="@{/portal/agendar}" class="btn btn-modern btn-primary">
+                    <i class="bi bi-calendar-plus"></i> Nueva Cita
+                </a>
+            </div>
+        </div>
+
+        <div th:if="${ok}" class="alert-professional alert-success-prof mb-4">
+            <i class="bi bi-check-circle"></i><span th:text="${ok}"></span>
+        </div>
+
+        <div class="table-container">
+            <table class="table-modern">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Fecha</th>
+                        <th>Hora</th>
+                        <th>M&eacute;dico</th>
+                        <th>Especialidad</th>
+                        <th>Estado</th>
+                        <th style="text-align:center;">Acci&oacute;n</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="c, iter : ${citas}">
+                        <td th:text="${iter.count}"></td>
+                        <td th:text="${#temporals.format(c.fechaCita, 'dd/MM/yyyy')}"></td>
+                        <td th:text="${c.horaInicio}"></td>
+                        <td th:text="${c.nombreMedico}"></td>
+                        <td th:text="${c.nombreEspecialidad}"></td>
+                        <td>
+                            <span class="badge-estado"
+                                  th:classappend="${c.estado == 'ATENDIDA'} ? 'badge-success' : (${c.estado == 'CANCELADA' || c.estado == 'NO_ASISTIO'} ? 'badge-danger' : (${c.estado == 'EN_ATENCION' or c.estado == 'EN_TRIAGE'} ? 'badge-info' : 'badge-primary'))"
+                                  th:text="${c.estado}"></span>
+                        </td>
+                        <td style="text-align:center;">
+                            <div class="action-group">
+                                <form th:if="${c.estado == 'PROGRAMADA' || c.estado == 'CONFIRMADA'}"
+                                      th:action="@{/portal/citas/{id}/cancelar(id=${c.idCita})}" method="post"
+                                      onsubmit="return confirm('&iquest;Cancelar esta cita?')">
+                                    <button type="submit" class="action-btn action-delete" title="Cancelar">
+                                        <i class="bi bi-x-circle"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(citas)}">
+                        <td colspan="7" class="table-empty">No tienes citas registradas</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+    <footer th:replace="~{fragments/header-paciente :: footer}"></footer>
+</div>
+</body>
+</html>

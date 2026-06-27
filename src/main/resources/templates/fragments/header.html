@@ -24,7 +24,7 @@
         <div class="sidebar-brand-icon"><i class="bi bi-hospital-fill" style="color:white;"></i></div>
         <div class="sidebar-brand-text">
             <span class="brand-name">TRINIDAD</span>
-            <span class="brand-sub">Sistema Médico</span>
+            <span class="brand-sub">Sistema M&eacute;dico</span>
         </div>
     </div>
 
@@ -32,72 +32,110 @@
         <div class="user-avatar"><i class="bi bi-person-fill" style="color:white;"></i></div>
         <div class="user-info">
             <span class="user-name" sec:authentication="name">Usuario</span>
-            <span class="user-role">En línea</span>
+            <span class="user-role">En l&iacute;nea</span>
         </div>
     </div>
 
     <div class="sidebar-menu" sec:authorize="isAuthenticated()">
+
+        <!-- PRINCIPAL -->
         <p class="menu-label">PRINCIPAL</p>
-        <a class="sidebar-item" th:href="@{/dashboard}">
+        <a class="sidebar-item" th:href="@{/dashboard}"
+           sec:authorize="hasAnyRole('ADMINISTRADOR', 'GERENTE', 'RECEPCIONISTA')">
             <i class="bi bi-speedometer2"></i><span>Dashboard</span>
         </a>
-        <a class="sidebar-item" th:href="@{/citas/calendario}">
+        <a class="sidebar-item" th:href="@{/medico/cola}"
+           sec:authorize="hasRole('MEDICO')">
+            <i class="bi bi-people"></i><span>Mi Cola</span>
+            <span id="medColaCountSidebar" class="med-cola-badge" style="display:none;">0</span>
+        </a>
+        <a class="sidebar-item" th:href="@{/citas/calendario}"
+           sec:authorize="hasAnyRole('ADMINISTRADOR', 'GERENTE', 'MEDICO', 'RECEPCIONISTA', 'ENFERMERA')">
             <i class="bi bi-calendar3"></i><span>Calendario</span>
         </a>
-        <a class="sidebar-item" th:href="@{/citas/agendar}">
+        <a class="sidebar-item" th:href="@{/citas/agendar}"
+           sec:authorize="hasAnyRole('ADMINISTRADOR', 'GERENTE', 'RECEPCIONISTA', 'ENFERMERA')">
             <i class="bi bi-calendar-plus"></i><span>Agendar Cita</span>
         </a>
 
-        <p class="menu-label mt-2">GESTIÓN</p>
-        <a class="sidebar-item" th:href="@{/pacientes}">
+        <!-- GESTIÓN -->
+        <p class="menu-label mt-2">GESTI&Oacute;N</p>
+        <a class="sidebar-item" th:href="@{/admision}"
+           sec:authorize="hasAnyRole('ADMINISTRADOR', 'GERENTE', 'ENFERMERA')">
+            <i class="bi bi-door-open"></i><span>Admisi&oacute;n</span>
+        </a>
+        <a class="sidebar-item" th:href="@{/pacientes}"
+           sec:authorize="hasAnyRole('ADMINISTRADOR', 'GERENTE', 'RECEPCIONISTA', 'ENFERMERA')">
             <i class="bi bi-people-fill"></i><span>Pacientes</span>
         </a>
-        <a class="sidebar-item" th:href="@{/medicos}">
-            <i class="bi bi-person-badge"></i><span>Médicos</span>
+        <a class="sidebar-item" th:href="@{/medicos}"
+           sec:authorize="hasAnyRole('ADMINISTRADOR', 'GERENTE', 'RECEPCIONISTA')">
+            <i class="bi bi-person-badge"></i><span>M&eacute;dicos</span>
         </a>
-        <a class="sidebar-item" th:href="@{/especialidades}">
+        <a class="sidebar-item" th:href="@{/especialidades}"
+           sec:authorize="hasAnyRole('ADMINISTRADOR', 'GERENTE', 'RECEPCIONISTA')">
             <i class="bi bi-heart-pulse"></i><span>Especialidades</span>
         </a>
-        <a class="sidebar-item" th:href="@{/diagnosticos}">
-            <i class="bi bi-hospital"></i><span>Diagnósticos CIE-10</span>
+        <a class="sidebar-item" th:href="@{/diagnosticos}"
+           sec:authorize="hasAnyRole('ADMINISTRADOR', 'GERENTE', 'MEDICO')">
+            <i class="bi bi-hospital"></i><span>Diagn&oacute;sticos CIE-10</span>
         </a>
-        <a class="sidebar-item" th:href="@{/citas}">
+        <a class="sidebar-item" th:href="@{/citas}"
+           sec:authorize="hasAnyRole('ADMINISTRADOR', 'GERENTE', 'MEDICO', 'RECEPCIONISTA', 'ENFERMERA')">
             <i class="bi bi-calendar-event"></i><span>Citas</span>
         </a>
-        <a class="sidebar-item" th:href="@{/recetas}">
+        <a class="sidebar-item" th:href="@{/recetas}"
+           sec:authorize="hasAnyRole('ADMINISTRADOR', 'GERENTE', 'MEDICO')">
             <i class="bi bi-file-earmark-text"></i><span>Recetas</span>
         </a>
-        <a class="sidebar-item" th:href="@{/ordenes-examen}">
-            <i class="bi bi-clipboard-check"></i><span>Órdenes de Examen</span>
+        <a class="sidebar-item" th:href="@{/ordenes-examen}"
+           sec:authorize="hasAnyRole('ADMINISTRADOR', 'GERENTE', 'MEDICO')">
+            <i class="bi bi-clipboard-check"></i><span>&Oacute;rdenes de Examen</span>
         </a>
-        <a class="sidebar-item" th:href="@{/atenciones}">
+        <a class="sidebar-item" th:href="@{/atenciones}"
+           sec:authorize="hasAnyRole('ADMINISTRADOR', 'GERENTE', 'MEDICO')">
             <i class="bi bi-bandaid"></i><span>Atenciones</span>
         </a>
-        <a class="sidebar-item" th:href="@{/pagos}">
+        <a class="sidebar-item" th:href="@{/pagos}"
+           sec:authorize="hasAnyRole('ADMINISTRADOR', 'GERENTE', 'RECEPCIONISTA', 'ENFERMERA')">
             <i class="bi bi-credit-card"></i><span>Pagos</span>
         </a>
-        <a class="sidebar-item" th:href="@{/historia-clinica}">
-            <i class="bi bi-file-earmark-medical"></i><span>Historia Clínica</span>
+        <a class="sidebar-item" th:href="@{/triaje}"
+           sec:authorize="hasAnyRole('ADMINISTRADOR', 'GERENTE', 'ENFERMERA')">
+            <i class="bi bi-heart-pulse"></i><span>Triaje</span>
+        </a>
+        <a class="sidebar-item" th:href="@{/historia-clinica}"
+           sec:authorize="hasAnyRole('ADMINISTRADOR', 'GERENTE', 'MEDICO')">
+            <i class="bi bi-file-earmark-medical"></i><span>Historia Cl&iacute;nica</span>
         </a>
 
+        <!-- HORARIOS -->
         <p class="menu-label mt-2">HORARIOS</p>
-        <a class="sidebar-item" th:href="@{/horarios}">
-            <i class="bi bi-clock"></i><span>Horarios Médicos</span>
+        <a class="sidebar-item" th:href="@{/horarios}"
+           sec:authorize="hasAnyRole('ADMINISTRADOR', 'GERENTE', 'RECEPCIONISTA', 'ENFERMERA')">
+            <i class="bi bi-clock"></i><span>Horarios M&eacute;dicos</span>
+        </a>
+        <a class="sidebar-item" th:href="@{/medico/horarios}"
+           sec:authorize="hasRole('MEDICO')">
+            <i class="bi bi-clock"></i><span>Mis Horarios</span>
         </a>
 
-        <p class="menu-label mt-2" sec:authorize="hasRole('ADMINISTRADOR')">ADMINISTRACIÓN</p>
+        <!-- ADMINISTRACIÓN -->
+        <p class="menu-label mt-2" sec:authorize="hasRole('ADMINISTRADOR')">ADMINISTRACI&Oacute;N</p>
         <a class="sidebar-item" th:href="@{/usuarios}" sec:authorize="hasRole('ADMINISTRADOR')">
             <i class="bi bi-person-gear"></i><span>Usuarios</span>
         </a>
         <a class="sidebar-item" th:href="@{/roles}" sec:authorize="hasRole('ADMINISTRADOR')">
-            <i class="bi bi-shield-lock"></i><span>Roles & Permisos</span>
+            <i class="bi bi-shield-lock"></i><span>Roles &amp; Permisos</span>
         </a>
         <a class="sidebar-item" th:href="@{/auditoria}" sec:authorize="hasRole('ADMINISTRADOR')">
-            <i class="bi bi-clock-history"></i><span>Auditoría</span>
+            <i class="bi bi-clock-history"></i><span>Auditor&iacute;a</span>
         </a>
         <a class="sidebar-item" th:href="@{/configuracion}" sec:authorize="hasRole('ADMINISTRADOR')">
-            <i class="bi bi-gear"></i><span>Configuración</span>
+            <i class="bi bi-gear"></i><span>Configuraci&oacute;n</span>
         </a>
+
+        <!-- INFORMES -->
         <p class="menu-label mt-2" sec:authorize="hasAnyRole('ADMINISTRADOR', 'GERENTE')">INFORMES</p>
         <a class="sidebar-item" th:href="@{/reportes}" sec:authorize="hasAnyRole('ADMINISTRADOR', 'GERENTE')">
             <i class="bi bi-bar-chart"></i><span>Reportes</span>
@@ -107,7 +145,7 @@
     <div class="sidebar-footer" sec:authorize="isAuthenticated()">
         <form th:action="@{/logout}" method="post">
             <button type="submit" class="sidebar-item logout-btn">
-                <i class="bi bi-box-arrow-left"></i><span>Cerrar Sesión</span>
+                <i class="bi bi-box-arrow-left"></i><span>Cerrar Sesi&oacute;n</span>
             </button>
         </form>
     </div>
@@ -139,11 +177,9 @@
         <i class="bi bi-hospital me-2"></i>TRINIDAD MEDICAL
     </div>
     <div class="topbar-right" sec:authorize="isAuthenticated()">
-        <!-- Theme toggle -->
         <button class="btn-theme" onclick="toggleTheme()" title="Cambiar tema">
             <i id="themeIcon" class="bi bi-moon-fill"></i>
         </button>
-
         <span class="topbar-user">
             <i class="bi bi-circle-fill text-success me-1" style="font-size:0.45rem;"></i>
             Bienvenido, <strong class="ms-1" style="color:var(--accent);" sec:authentication="name">Usuario</strong>
@@ -157,7 +193,6 @@
 </div>
 
 <script>
-// Tema oscuro/claro
 (function() {
     var theme = localStorage.getItem('trinidad-theme');
     if (theme === 'dark') {
@@ -194,6 +229,7 @@ function toggleTheme() {
 <footer th:fragment="footer" class="app-footer">
     <span>&copy; 2026 Trinidad &amp; Especialidades Medicas &mdash; Tarapoto, San Martin</span>
     <script th:src="@{/webjars/bootstrap/5.3.3/js/bootstrap.bundle.min.js}"></script>
+    <script th:src="@{/js/medico-cola.js}"></script>
 </footer>
 
 </body>

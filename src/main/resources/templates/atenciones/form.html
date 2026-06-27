@@ -8,107 +8,111 @@
     <main class="page-main">
         <div class="page-header">
             <div>
-                <h1><i class="bi bi-clipboard2-pulse"></i>Nueva Atención Médica</h1>
-                <p>Registro de atención médica realizada al paciente</p>
+                <h1><i class="bi bi-clipboard2-pulse"></i>Nueva Atenci&oacute;n M&eacute;dica</h1>
+                <p>Registro de atenci&oacute;n m&eacute;dica con diagn&oacute;stico, &oacute;rdenes y recetas</p>
             </div>
             <a th:href="@{/atenciones}" class="btn-volver">
                 <i class="bi bi-arrow-left"></i>Volver
             </a>
         </div>
-        <form th:action="@{/atenciones/guardar}" method="post">
+
+        <div th:if="${error}" class="alert-professional alert-danger-prof mb-4">
+            <i class="bi bi-exclamation-triangle-fill"></i><span th:text="${error}"></span>
+        </div>
+
+        <form th:action="@{/atenciones/guardar}" method="post" id="atencionForm">
+            <input type="hidden" name="citaId" th:value="${cita != null ? cita.idCita : ''}">
+            <input type="hidden" name="historiaId" th:value="${cita != null && cita.paciente != null ? cita.paciente.idPaciente : ''}">
+            <input type="hidden" name="medicoId" th:value="${cita != null && cita.medico != null ? cita.medico.idMedico : ''}">
+
             <div class="row g-4">
                 <div class="col-lg-8">
-                    <div class="form-section-card">
+                    <!-- Selección de Cita (solo si no viene precargada) -->
+                    <div class="form-section-card" th:if="${cita == null}">
                         <div class="d-flex align-items-center gap-3 mb-3">
-                            <div class="fs-icon"><i class="bi bi-person-vcard-fill"></i></div>
+                            <div class="fs-icon"><i class="bi bi-calendar-check-fill"></i></div>
                             <div>
-                                <h5 class="mb-1" style="font-weight:700;">Datos de la Cita</h5>
-                                <p style="color:var(--text-muted);font-size:13px;margin:0;">Selecciona la cita asociada</p>
+                                <h5 class="mb-1" style="font-weight:700;">Seleccionar Cita</h5>
+                                <p style="color:var(--text-muted);font-size:13px;margin:0;">Elige la cita del paciente en atenci&oacute;n</p>
                             </div>
                         </div>
-                        <input type="hidden" name="citaId" th:value="${cita.idCita}" th:if="${cita != null}">
-                        <div class="row g-3">
-                            <div class="col-md-6 form-field">
-                                <label>Cita <span class="required">*</span></label>
-                                <select name="citaId" class="form-select-professional" required
-                                        th:disabled="${cita != null}"
-                                        th:attr="data-selected=${cita != null ? cita.idCita : ''}">
-                                    <option value="">-- Seleccionar cita --</option>
-                                    <option th:each="c : ${citas}"
-                                            th:value="${c.idCita}"
-                                            th:text="${c.paciente.apellidoPaterno + ' ' + c.paciente.nombres + ' | ' + c.fechaCita + ' ' + c.horaInicio}"
-                                            th:selected="${cita != null and c.idCita == cita.idCita}">
-                                    </option>
-                                </select>
-                                <small th:if="${cita != null}" style="color:var(--text-muted);font-size:11px;">
-                                    Cita #<span th:text="${cita.idCita}"></span> - <span th:text="${cita.paciente.nombres + ' ' + cita.paciente.apellidoPaterno}"></span>
-                                </small>
+                        <div class="form-field">
+                            <select name="citaId" class="form-select-professional" id="citaSelect" required>
+                                <option value="">-- Seleccionar cita --</option>
+                                <option th:each="c : ${citas}"
+                                        th:value="${c.idCita}"
+                                        th:text="${c.paciente.nombreCompleto} + ' | ' + ${c.fechaCita} + ' ' + ${c.horaInicio} + ' - ' + ${c.especialidad.nombre}">
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Panel de Triaje (se carga vía JS cuando se selecciona una cita) -->
+                    <div class="form-section-card" id="triajePanel" style="display:none;">
+                        <div class="d-flex align-items-center gap-3 mb-3">
+                            <div class="fs-icon"><i class="bi bi-activity"></i></div>
+                            <div>
+                                <h5 class="mb-1" style="font-weight:700;">Triaje - Signos Vitales</h5>
+                                <p style="color:var(--text-muted);font-size:13px;margin:0;">Datos registrados por enfermer&iacute;a</p>
                             </div>
-                            <div class="col-md-6 form-field">
-                                <label>Motivo de Consulta</label>
-                                <input type="text" name="motivoConsulta" class="form-input-professional" placeholder="Motivo de la Atención">
+                        </div>
+                        <div class="row g-3" id="triajeData">
+                            <div class="col-md-4 text-center">
+                                <div style="font-size:0.8rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;">Presi&oacute;n Arterial</div>
+                                <div id="triajePA" style="font-size:1.3rem;font-weight:700;">--/--</div>
+                            </div>
+                            <div class="col-md-4 text-center">
+                                <div style="font-size:0.8rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;">F. Card&iacute;aca</div>
+                                <div id="triajeFC" style="font-size:1.3rem;font-weight:700;">-- lpm</div>
+                            </div>
+                            <div class="col-md-4 text-center">
+                                <div style="font-size:0.8rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;">Temperatura</div>
+                                <div id="triajeTemp" style="font-size:1.3rem;font-weight:700;">-- &deg;C</div>
+                            </div>
+                            <div class="col-md-3 text-center">
+                                <div style="font-size:0.8rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;">Sat. O2</div>
+                                <div id="triajeSat" style="font-size:1.1rem;font-weight:700;">-- %</div>
+                            </div>
+                            <div class="col-md-3 text-center">
+                                <div style="font-size:0.8rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;">Peso</div>
+                                <div id="triajePeso" style="font-size:1.1rem;font-weight:700;">-- kg</div>
+                            </div>
+                            <div class="col-md-3 text-center">
+                                <div style="font-size:0.8rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;">Urgencia</div>
+                                <div id="triajeUrgencia" style="font-size:1.1rem;font-weight:700;">--</div>
                             </div>
                         </div>
                     </div>
-                    <div class="form-section-card">
-                        <div class="d-flex align-items-center gap-3 mb-3">
-                            <div class="fs-icon"><i class="bi bi-heart-pulse-fill"></i></div>
-                            <div>
-                                <h5 class="mb-1" style="font-weight:700;">Signos Vitales</h5>
-                                <p style="color:var(--text-muted);font-size:13px;margin:0;">Registro de signos vitales del paciente</p>
-                            </div>
-                        </div>
-                        <div class="row g-3">
-                            <div class="col-md-4 form-field">
-                                <label>Presión Arterial</label>
-                                <input type="text" name="presionArterial" class="form-input-professional" placeholder="120/80">
-                            </div>
-                            <div class="col-md-4 form-field">
-                                <label>Temperatura (°C)</label>
-                                <input type="number" name="temperatura" class="form-input-professional" step="0.1" placeholder="37.0">
-                            </div>
-                            <div class="col-md-4 form-field">
-                                <label>Frec. Cardíaca (bpm)</label>
-                                <input type="number" name="frecuenciaCardiaca" class="form-input-professional" placeholder="80">
-                            </div>
-                            <div class="col-md-4 form-field">
-                                <label>Saturación O2 (%)</label>
-                                <input type="number" name="saturacionO2" class="form-input-professional" min="0" max="100" placeholder="98">
-                            </div>
-                            <div class="col-md-4 form-field">
-                                <label>Peso (kg)</label>
-                                <input type="number" name="pesoKg" class="form-input-professional" step="0.01" placeholder="70.0">
-                            </div>
-                            <div class="col-md-4 form-field">
-                                <label>Talla (cm)</label>
-                                <input type="number" name="tallaCm" class="form-input-professional" step="0.01" placeholder="170.0">
-                            </div>
-                        </div>
-                    </div>
+
+                    <!-- Evaluación Clínica -->
                     <div class="form-section-card">
                         <div class="d-flex align-items-center gap-3 mb-3">
                             <div class="fs-icon"><i class="bi bi-clipboard2-data-fill"></i></div>
                             <div>
-                                <h5 class="mb-1" style="font-weight:700;">Evaluación Clínica</h5>
-                                <p style="color:var(--text-muted);font-size:13px;margin:0;">Diagnóstico, tratamiento y observaciones</p>
+                                <h5 class="mb-1" style="font-weight:700;">Evaluaci&oacute;n Cl&iacute;nica</h5>
+                                <p style="color:var(--text-muted);font-size:13px;margin:0;">Diagn&oacute;stico, tratamiento y observaciones</p>
                             </div>
+                        </div>
+                        <div class="form-field mb-3">
+                            <label>Motivo de Consulta</label>
+                            <input type="text" name="motivoConsulta" class="form-input-professional" placeholder="Motivo de la atenci&oacute;n">
                         </div>
                         <div class="form-field mb-3">
                             <label>Anamnesis</label>
-                            <textarea name="anamnesis" class="form-input-professional" rows="3" placeholder="Descripción de los síntomas referidos por el paciente..."></textarea>
+                            <textarea name="anamnesis" class="form-input-professional" rows="3" placeholder="Descripci&oacute;n de los s&iacute;ntomas referidos por el paciente..."></textarea>
                         </div>
                         <div class="form-field mb-3">
-                            <label>Examen Físico</label>
-                            <textarea name="examenFisico" class="form-input-professional" rows="3" placeholder="Hallazgos del examen físico..."></textarea>
+                            <label>Examen F&iacute;sico</label>
+                            <textarea name="examenFisico" class="form-input-professional" rows="3" placeholder="Hallazgos del examen f&iacute;sico..."></textarea>
                         </div>
                         <div class="row g-3 mb-3">
-                            <div class="col-md-6 form-field">
-                                <label>Código CIE-10</label>
+                            <div class="col-md-4 form-field">
+                                <label>C&oacute;digo CIE-10</label>
                                 <input type="text" name="diagnosticoCie10Codigo" class="form-input-professional" placeholder="Ej: J00, I10, E11" maxlength="10">
                             </div>
-                            <div class="col-md-6 form-field">
-                                <label>Diagnóstico <span class="required">*</span></label>
-                                <textarea name="diagnosticoDesc" class="form-input-professional" rows="2" required placeholder="Diagnóstico clínico..."></textarea>
+                            <div class="col-md-8 form-field">
+                                <label>Diagn&oacute;stico <span class="required">*</span></label>
+                                <textarea name="diagnosticoDesc" class="form-input-professional" rows="2" required placeholder="Diagn&oacute;stico cl&iacute;nico..."></textarea>
                             </div>
                         </div>
                         <div class="form-field mb-3">
@@ -120,7 +124,80 @@
                             <textarea name="observaciones" class="form-input-professional" rows="2" placeholder="Notas adicionales..."></textarea>
                         </div>
                     </div>
+
+                    <!-- Órdenes de Examen -->
+                    <div class="form-section-card">
+                        <div class="d-flex align-items-center gap-3 mb-3">
+                            <div class="fs-icon"><i class="bi bi-clipboard-check"></i></div>
+                            <div>
+                                <h5 class="mb-1" style="font-weight:700;">&Oacute;rdenes de Examen</h5>
+                                <p style="color:var(--text-muted);font-size:13px;margin:0;">Agrega las &oacute;rdenes de laboratorio o imagenolog&iacute;a</p>
+                            </div>
+                        </div>
+                        <div id="ordenesContainer">
+                            <div class="orden-row p-3 mb-2" style="background:var(--bg-body);border-radius:var(--radius-sm);" data-index="0">
+                                <div class="row g-2 align-items-center">
+                                    <div class="col-md-3">
+                                        <select name="ordenesTipo" class="form-select-professional" style="font-size:13px;">
+                                            <option value="">Tipo</option>
+                                            <option value="SANGRE">Sangre</option>
+                                            <option value="ORINA">Orina</option>
+                                            <option value="HECES">Heces</option>
+                                            <option value="IMAGEN">Imagenolog&iacute;a</option>
+                                            <option value="OTRO">Otro</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <input type="text" name="ordenesNombre" class="form-input-professional" placeholder="Nombre del examen" style="font-size:13px;">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <input type="text" name="ordenesIndicaciones" class="form-input-professional" placeholder="Indicaciones" style="font-size:13px;">
+                                    </div>
+                                    <div class="col-md-1 text-center">
+                                        <button type="button" class="action-btn action-delete" onclick="removeOrden(this)" title="Quitar">
+                                            <i class="bi bi-trash3"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="button" class="btn btn-modern btn-secondary btn-sm mt-2" onclick="addOrden()">
+                            <i class="bi bi-plus-lg"></i> Agregar Orden
+                        </button>
+                    </div>
+
+                    <!-- Recetas -->
+                    <div class="form-section-card">
+                        <div class="d-flex align-items-center gap-3 mb-3">
+                            <div class="fs-icon"><i class="bi bi-file-earmark-text"></i></div>
+                            <div>
+                                <h5 class="mb-1" style="font-weight:700;">Recetas</h5>
+                                <p style="color:var(--text-muted);font-size:13px;margin:0;">Agrega las recetas y medicamentos recetados</p>
+                            </div>
+                        </div>
+                        <div id="recetasContainer">
+                            <div class="receta-row p-3 mb-2" style="background:var(--bg-body);border-radius:var(--radius-sm);" data-index="0">
+                                <div class="row g-2 align-items-center">
+                                    <div class="col-md-3">
+                                        <input type="text" name="recetasNro" class="form-input-professional" placeholder="N&deg; Receta" style="font-size:13px;">
+                                    </div>
+                                    <div class="col-md-8">
+                                        <input type="text" name="recetasObservaciones" class="form-input-professional" placeholder="Medicamentos e indicaciones" style="font-size:13px;">
+                                    </div>
+                                    <div class="col-md-1 text-center">
+                                        <button type="button" class="action-btn action-delete" onclick="removeReceta(this)" title="Quitar">
+                                            <i class="bi bi-trash3"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="button" class="btn btn-modern btn-secondary btn-sm mt-2" onclick="addReceta()">
+                            <i class="bi bi-plus-lg"></i> Agregar Receta
+                        </button>
+                    </div>
                 </div>
+
                 <div class="col-lg-4">
                     <div class="form-section-card">
                         <div class="d-flex align-items-center gap-3 mb-3">
@@ -131,7 +208,7 @@
                             </div>
                         </div>
                         <button type="submit" class="btn-guardar w-100 mb-2" style="justify-content:center;padding:12px;">
-                            <i class="bi bi-check-circle"></i> Guardar Atención
+                            <i class="bi bi-check-circle"></i> Guardar Atenci&oacute;n
                         </button>
                         <a th:href="@{/atenciones}" class="btn-volver w-100 text-center" style="justify-content:center;padding:12px;">
                             <i class="bi bi-x-circle"></i>Cancelar
@@ -140,7 +217,91 @@
                 </div>
             </div>
         </form>
+
+        <script>
+        var ordenCount = 1;
+        var recetaCount = 1;
+
+        function addOrden() {
+            var container = document.getElementById('ordenesContainer');
+            var row = document.querySelector('.orden-row').cloneNode(true);
+            row.setAttribute('data-index', ordenCount++);
+            row.querySelectorAll('input, select').forEach(function(el) { el.value = ''; });
+            container.appendChild(row);
+        }
+
+        function removeOrden(btn) {
+            var rows = document.querySelectorAll('.orden-row');
+            if (rows.length > 1) btn.closest('.orden-row').remove();
+        }
+
+        function addReceta() {
+            var container = document.getElementById('recetasContainer');
+            var row = document.querySelector('.receta-row').cloneNode(true);
+            row.setAttribute('data-index', recetaCount++);
+            row.querySelectorAll('input').forEach(function(el) { el.value = ''; });
+            container.appendChild(row);
+        }
+
+        function removeReceta(btn) {
+            var rows = document.querySelectorAll('.receta-row');
+            if (rows.length > 1) btn.closest('.receta-row').remove();
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            var citaSelect = document.getElementById('citaSelect');
+            if (citaSelect) {
+                citaSelect.addEventListener('change', function() {
+                    citaSelect.setAttribute('disabled', 'disabled');
+                    citaSelect.style.opacity = '0.5';
+                    loadTriaje(this.value);
+                });
+                if (citaSelect.value) {
+                    citaSelect.setAttribute('disabled', 'disabled');
+                    loadTriaje(citaSelect.value);
+                }
+            }
+
+            var citaIdField = document.querySelector('input[name="citaId"]');
+            var preselected = citaIdField && citaIdField.value;
+            if (preselected) {
+                document.getElementById('triajePanel').style.display = 'block';
+                loadTriaje(preselected);
+            }
+        });
+
+        function loadTriaje(citaId) {
+            if (!citaId) return;
+            document.getElementById('triajePanel').style.display = 'block';
+            var labels = document.querySelectorAll('#triajeData div[id]');
+            labels.forEach(function(el) {
+                if (el.id.startsWith('triaje')) el.textContent = 'Cargando...';
+            });
+            fetch('/trinidad/triaje/api/cita/' + citaId)
+                .then(function(r) { return r.ok ? r.json() : Promise.reject(); })
+                .then(function(d) {
+                    document.getElementById('triajePA').textContent = d.presionArterial || '--/--';
+                    document.getElementById('triajeFC').textContent = (d.frecuenciaCardiaca || '--') + ' lpm';
+                    document.getElementById('triajeTemp').textContent = (d.temperatura || '--') + ' °C';
+                    document.getElementById('triajeSat').textContent = (d.saturacionO2 || '--') + ' %';
+                    document.getElementById('triajePeso').textContent = (d.pesoKg || '--') + ' kg';
+                    var urg = document.getElementById('triajeUrgencia');
+                    urg.textContent = d.nivelUrgencia || '--';
+                    urg.style.color = d.nivelUrgencia === 'ALTA' ? 'var(--danger)' : d.nivelUrgencia === 'MEDIA' ? 'var(--warning)' : 'var(--success)';
+                })
+                .catch(function() {
+                    document.getElementById('triajePA').textContent = 'Sin datos';
+                    document.getElementById('triajeFC').textContent = '--';
+                    document.getElementById('triajeTemp').textContent = '--';
+                    document.getElementById('triajeSat').textContent = '--';
+                    document.getElementById('triajePeso').textContent = '--';
+                    document.getElementById('triajeUrgencia').textContent = '--';
+                });
+        }
+        </script>
+
     </main>
 </div>
+<footer th:replace="~{fragments/header :: footer}"></footer>
 </body>
 </html>

@@ -72,26 +72,46 @@
                         <div class="row g-4">
                             <div class="col-md-3">
                                 <div class="detail-field">
-                                    <span class="df-label">Presión Arterial</span>
-                                    <span class="df-value" th:text="${atencion.presionArterial ?: '-'}">-</span>
+                                    <span class="df-label">Presi&oacute;n Arterial</span>
+                                    <span class="df-value" th:text="${atencion.presionArterial != null ? atencion.presionArterial : (triaje?.presionArterial ?: '-')}">-</span>
                                 </div>
                             </div>
                             <div class="col-md-3">
                                 <div class="detail-field">
-                                    <span class="df-label">Frecuencia Cardíaca</span>
-                                    <span class="df-value" th:text="${atencion.frecuenciaCardiaca != null ? atencion.frecuenciaCardiaca + ' lpm' : '-'}">-</span>
+                                    <span class="df-label">Frecuencia Card&iacute;aca</span>
+                                    <span class="df-value" th:text="${atencion.frecuenciaCardiaca != null ? atencion.frecuenciaCardiaca + ' lpm' : (triaje?.frecuenciaCardiaca != null ? triaje?.frecuenciaCardiaca + ' lpm' : '-')}">-</span>
                                 </div>
                             </div>
                             <div class="col-md-3">
                                 <div class="detail-field">
                                     <span class="df-label">Temperatura</span>
-                                    <span class="df-value" th:text="${atencion.temperatura != null ? atencion.temperatura + ' °C' : '-'}">-</span>
+                                    <span class="df-value" th:text="${atencion.temperatura != null ? atencion.temperatura + ' C' : (triaje?.temperatura != null ? triaje?.temperatura + ' C' : '-')}">-</span>
                                 </div>
                             </div>
                             <div class="col-md-3">
                                 <div class="detail-field">
                                     <span class="df-label">Peso / Talla</span>
-                                    <span class="df-value" th:text="${(atencion.pesoKg != null ? atencion.pesoKg + ' kg' : '-') + ' / ' + (atencion.tallaCm != null ? atencion.tallaCm + ' cm' : '-')}">-</span>
+                                    <span class="df-value" th:text="${(atencion.pesoKg != null ? atencion.pesoKg + ' kg' : (triaje?.pesoKg != null ? triaje?.pesoKg + ' kg' : '-')) + ' / ' + (atencion.tallaCm != null ? atencion.tallaCm + ' cm' : (triaje?.tallaCm != null ? triaje?.tallaCm + ' cm' : '-'))}">-</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row g-4 mt-1" th:if="${triaje != null}">
+                            <div class="col-md-4">
+                                <div class="detail-field">
+                                    <span class="df-label">Sat. O<sub>2</sub></span>
+                                    <span class="df-value" th:text="${triaje.saturacionO2 != null ? triaje.saturacionO2 + ' %' : '-'}">-</span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="detail-field">
+                                    <span class="df-label">Nivel Urgencia</span>
+                                    <span class="df-value" th:text="${triaje.nivelUrgencia ?: '-'}">-</span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="detail-field">
+                                    <span class="df-label">Glucosa</span>
+                                    <span class="df-value" th:text="${triaje.glucosa != null ? triaje.glucosa + ' mg/dL' : '-'}">-</span>
                                 </div>
                             </div>
                         </div>

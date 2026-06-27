@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/header-paciente :: head(${titulo})}"></head>
+<body class="app-body">
+
+<nav th:replace="~{fragments/header-paciente :: navbar}"></nav>
+
+<div class="app-content">
+    <div th:replace="~{fragments/header-paciente :: topbar}"></div>
+
+    <main class="page-main">
+
+        <div class="page-header">
+            <div>
+                <h1><i class="bi bi-file-earmark-medical"></i>Historia Cl&iacute;nica</h1>
+                <p th:text="'Expediente de ' + ${paciente.nombreCompleto}"></p>
+            </div>
+        </div>
+
+        <div th:if="${historia == null}" class="alert-professional alert-info-prof mb-4">
+            <i class="bi bi-info-circle"></i> No tienes una historia cl&iacute;nica asignada a&uacute;n.
+        </div>
+
+        <div th:if="${historia != null}">
+            <div class="stats-grid mb-4">
+                <div class="stat-card">
+                    <div class="stat-icon stat-icon-total"><i class="bi bi-file-text"></i></div>
+                    <div>
+                        <div class="stat-value" th:text="${historia.nroHistoria}">HC-XXXX</div>
+                        <div class="stat-label">Nro. Historia</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon stat-icon-activo"><i class="bi bi-calendar-check"></i></div>
+                    <div>
+                        <div class="stat-value" th:text="${#temporals.format(historia.fechaApertura, 'dd/MM/yyyy')}">-</div>
+                        <div class="stat-label">Fecha Apertura</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon stat-icon-info"><i class="bi bi-clipboard-check"></i></div>
+                    <div>
+                        <div class="stat-value" th:text="${#lists.size(atenciones)}">0</div>
+                        <div class="stat-label">Atenciones</div>
+                    </div>
+                </div>
+            </div>
+
+            <div th:if="${#lists.isEmpty(atenciones)}" class="alert-professional alert-info-prof mb-4">
+                <i class="bi bi-inbox"></i> A&uacute;n no tienes atenciones registradas.
+            </div>
+
+            <div th:each="a : ${atenciones}" class="card-modern mb-4">
+                <div class="card-header-modern d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="bi bi-calendar-event me-2"></i>
+                        <span th:text="${#temporals.format(a.fechaAtencion, 'dd/MM/yyyy HH:mm')}">-</span>
+                        <small class="ms-2 text-muted" th:text="'Dr. ' + ${a.medico.nombreCompleto}">Medico</small>
+                    </h5>
+                    <span class="badge-estado badge-info" th:if="${a.diagnosticoCie10 != null}" th:text="${a.diagnosticoCie10.codigo}">CIE-10</span>
+                </div>
+                <div class="card-body-modern">
+                    <div class="row g-3">
+                        <div class="col-md-6" th:if="${a.motivoConsulta != null and !a.motivoConsulta.isEmpty()}">
+                            <strong>Motivo de Consulta:</strong>
+                            <p class="mb-0" th:text="${a.motivoConsulta}"></p>
+                        </div>
+                        <div class="col-md-6" th:if="${a.diagnosticoDesc != null and !a.diagnosticoDesc.isEmpty()}">
+                            <strong>Diagn&oacute;stico:</strong>
+                            <p class="mb-0" th:text="${a.diagnosticoDesc}"></p>
+                        </div>
+                        <div class="col-12" th:if="${a.tratamiento != null and !a.tratamiento.isEmpty()}">
+                            <strong>Tratamiento:</strong>
+                            <p class="mb-0" th:text="${a.tratamiento}"></p>
+                        </div>
+                        <div class="col-12" th:if="${a.observaciones != null and !a.observaciones.isEmpty()}">
+                            <strong>Observaciones:</strong>
+                            <p class="mb-0" th:text="${a.observaciones}"></p>
+                        </div>
+                    </div>
+
+                    <div th:if="${not #lists.isEmpty(recetasPorAtencion.get(a.idAtencion))}" class="mt-3">
+                        <hr>
+                        <h6 class="text-primary"><i class="bi bi-file-earmark-text"></i> Recetas</h6>
+                        <div th:each="r : ${recetasPorAtencion.get(a.idAtencion)}" class="mb-3 p-3" style="background:var(--bg-card);border-radius:8px;border:1px solid var(--border);">
+                            <div class="d-flex justify-content-between">
+                                <strong>Receta <span th:text="${r.nroReceta}">NRO</span></strong>
+                                <small class="text-muted" th:text="${#temporals.format(r.fechaEmision, 'dd/MM/yyyy')}">fecha</small>
+                            </div>
+                            <table class="table-modern mt-2" style="width:100%;">
+                                <thead><tr><th>Medicamento</th><th>Dosis</th><th>Frecuencia</th><th>Duraci&oacute;n</th><th>Indicaciones</th></tr></thead>
+                                <tbody>
+                                    <tr th:each="d : ${r.detalles}">
+                                        <td th:text="${d.nombreGenerico}"></td>
+                                        <td th:text="${d.dosis}"></td>
+                                        <td th:text="${d.frecuencia}"></td>
+                                        <td th:text="${d.duracionDias} + ' d&iacute;as'"></td>
+                                        <td th:text="${d.indicaciones ?: '-'}"></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div th:if="${not #lists.isEmpty(ordenesPorAtencion.get(a.idAtencion))}" class="mt-3">
+                        <hr>
+                        <h6 class="text-success"><i class="bi bi-clipboard-check"></i> &Oacute;rdenes de Examen</h6>
+                        <div th:each="o : ${ordenesPorAtencion.get(a.idAtencion)}" class="mb-2 p-2" style="background:var(--bg-card);border-radius:6px;border:1px solid var(--border);">
+                            <div class="d-flex justify-content-between">
+                                <span><strong th:text="${o.nombreExamen}"></strong> <small class="text-muted" th:text="'(' + ${o.tipoExamen} + ')'"></small></span>
+                                <span class="badge-estado" th:classappend="${o.estado == 'COMPLETADO'} ? 'badge-completado' : 'badge-proceso'"
+                                      th:text="${o.estado}"></span>
+                            </div>
+                            <small th:if="${o.indicaciones != null}" class="d-block mt-1" th:text="'Indicaciones: ' + ${o.indicaciones}"></small>
+                            <small class="d-block text-muted" th:text="'Solicitado: ' + ${#temporals.format(o.fechaSolicitud, 'dd/MM/yyyy')}"></small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <footer th:replace="~{fragments/header-paciente :: footer}"></footer>
+</div>
+
+</body>
+</html>

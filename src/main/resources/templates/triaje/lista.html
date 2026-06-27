@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: head(${titulo})}"></head>
+<body class="app-body">
+<nav th:replace="~{fragments/header :: navbar}"></nav>
+<div class="app-content">
+    <div th:replace="~{fragments/header :: topbar}"></div>
+    <main class="page-main">
+        <div class="page-header">
+            <div>
+                <h1><i class="bi bi-heart-pulse"></i>Triaje - Enfermería</h1>
+                <p>Registro de evaluaciones de enfermería realizadas</p>
+            </div>
+            <div class="page-actions">
+                <a th:href="@{/triaje/pendientes}" class="btn btn-modern btn-info">
+                    <i class="bi bi-clock"></i>Pendientes
+                </a>
+            </div>
+        </div>
+        <div th:if="${ok}" class="alert-professional alert-success-prof mb-4">
+            <i class="bi bi-check-circle"></i><span th:text="${ok}"></span>
+        </div>
+        <div class="table-container">
+            <table class="table-modern">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Paciente</th>
+                        <th>Médico</th>
+                        <th>Especialidad</th>
+                        <th>Urgencia</th>
+                        <th>Fecha</th>
+                        <th style="text-align:center;">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="t : ${triajes}">
+                        <td th:text="${t.idTriaje}"></td>
+                        <td th:text="${t.nombrePaciente}"></td>
+                        <td th:text="${t.nombreMedico}"></td>
+                        <td th:text="${t.especialidad}"></td>
+                        <td>
+                            <span class="badge-estado"
+                                  th:classappend="${t.nivelUrgencia == 'ALTA'} ? 'badge-critico' : (${t.nivelUrgencia == 'MEDIA'} ? 'badge-proceso' : 'badge-completado')"
+                                  th:text="${t.nivelUrgencia != null ? t.nivelUrgencia : 'NO ESPECIFICADO'}"></span>
+                        </td>
+                        <td th:text="${#temporals.format(t.fechaTriaje, 'dd/MM/yyyy HH:mm')}"></td>
+                        <td style="text-align:center;">
+                            <div class="action-group">
+                                <a th:href="@{/triaje/{id}(id=${t.idTriaje})}" class="action-btn action-view" title="Ver"><i class="bi bi-eye"></i></a>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(triajes)}">
+                        <td colspan="7" class="table-empty">No hay registros de triaje</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+    <footer th:replace="~{fragments/header :: footer}"></footer>
+</div>
+</body>
+</html>

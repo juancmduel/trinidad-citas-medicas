@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: head(${titulo})}"></head>
+<body class="app-body">
+<nav th:replace="~{fragments/header :: navbar}"></nav>
+<div class="app-content">
+    <div th:replace="~{fragments/header :: topbar}"></div>
+    <main class="page-main">
+        <div class="page-header">
+            <div>
+                <h1><i class="bi bi-calendar-check"></i>Reporte de Citas</h1>
+                <p>Reporte detallado de citas m&eacute;dicas</p>
+            </div>
+            <div class="page-actions d-flex gap-2">
+                <a th:href="@{/reportes/citas/pdf(desde=${desde}, hasta=${hasta}, idEspecialidad=${idEspecialidad}, idMedico=${idMedico}, estado=${estado})}" class="btn btn-modern btn-danger">
+                    <i class="bi bi-file-pdf"></i> PDF
+                </a>
+                <a th:href="@{/reportes/citas/xlsx(desde=${desde}, hasta=${hasta}, idEspecialidad=${idEspecialidad}, idMedico=${idMedico}, estado=${estado})}" class="btn btn-modern btn-success">
+                    <i class="bi bi-file-excel"></i> Excel
+                </a>
+            </div>
+        </div>
+
+        <div class="card-modern mb-4">
+            <div class="card-header-modern">
+                <h5><i class="bi bi-funnel"></i> Filtros</h5>
+            </div>
+            <div class="card-body-modern">
+                <form method="get" th:action="@{/reportes/citas}" class="row g-3">
+                    <div class="col-md-3">
+                        <label class="form-label-modern">Desde</label>
+                        <input type="date" name="desde" class="form-control-modern" th:value="${desde}" required>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label-modern">Hasta</label>
+                        <input type="date" name="hasta" class="form-control-modern" th:value="${hasta}" required>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label-modern">Especialidad</label>
+                        <select name="idEspecialidad" class="form-control-modern">
+                            <option value="">Todas</option>
+                            <option th:each="e : ${especialidades}" th:value="${e.idEspecialidad}" th:text="${e.nombre}" th:selected="${e.idEspecialidad == idEspecialidad}"></option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label-modern">M&eacute;dico</label>
+                        <select name="idMedico" class="form-control-modern">
+                            <option value="">Todos</option>
+                            <option th:each="m : ${medicos}" th:value="${m.idMedico}" th:text="${m.nombreCompleto}" th:selected="${m.idMedico == idMedico}"></option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label-modern">Estado</label>
+                        <select name="estado" class="form-control-modern">
+                            <option value="">Todos</option>
+                            <option th:each="e : ${estados}" th:value="${e}" th:text="${e}" th:selected="${e == estado}"></option>
+                        </select>
+                    </div>
+                    <div class="col-md-3 d-flex align-items-end gap-2">
+                        <button type="submit" class="btn btn-modern btn-primary">
+                            <i class="bi bi-search"></i> Filtrar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="card-modern">
+            <div class="card-header-modern">
+                <h5><i class="bi bi-table"></i> Citas</h5>
+                <span class="text-muted">Total: <strong th:text="${totalCitas}"></strong></span>
+            </div>
+            <div class="card-body-modern">
+                <div class="table-container">
+                    <table class="table-modern">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Paciente</th>
+                                <th>DNI</th>
+                                <th>Especialidad</th>
+                                <th>M&eacute;dico</th>
+                                <th>Fecha</th>
+                                <th>Hora</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="c, iter : ${citas}">
+                                <td th:text="${iter.count}"></td>
+                                <td th:text="${c.pacienteNombre}"></td>
+                                <td th:text="${c.pacienteDni}"></td>
+                                <td th:text="${c.especialidadNombre}"></td>
+                                <td th:text="${c.medicoNombre}"></td>
+                                <td th:text="${#temporals.format(c.fechaCita, 'dd/MM/yyyy')}"></td>
+                                <td th:text="${c.horaInicio}"></td>
+                                <td>
+                                    <span class="badge-estado" th:classappend="${c.estado == T(com.trinidad.citas.model.EstadoCita).ATENDIDA} ? 'badge-completado' : (${c.estado == T(com.trinidad.citas.model.EstadoCita).ANULADA} ? 'badge-critico' : 'badge-proceso')" th:text="${c.estado}"></span>
+                                </td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(citas)}">
+                                <td colspan="8" class="table-empty">No se encontraron citas en el rango seleccionado</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+    <footer th:replace="~{fragments/header :: footer}"></footer>
+</div>
+</body>
+</html>

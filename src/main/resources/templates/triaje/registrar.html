@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: head(${titulo})}"></head>
+<body class="app-body">
+<nav th:replace="~{fragments/header :: navbar}"></nav>
+<div class="app-content">
+    <div th:replace="~{fragments/header :: topbar}"></div>
+    <main class="page-main">
+
+        <div class="page-header">
+            <div>
+                <h1><i class="bi bi-heart-pulse" style="color:var(--accent);"></i> Registrar Triaje</h1>
+                <p>Complete los signos vitales y la evaluaci&oacute;n de enfermer&iacute;a para derivar al consultorio.</p>
+            </div>
+            <a th:href="@{/triaje/pendientes}" class="btn-volver">
+                <i class="bi bi-arrow-left"></i> Volver a pendientes
+            </a>
+        </div>
+
+        <div th:if="${ok}" class="alert-professional alert-success-prof mb-4">
+            <i class="bi bi-check-circle-fill"></i>
+            <span th:text="${ok}"></span>
+        </div>
+        <div th:if="${error}" class="alert-professional alert-danger-prof mb-4">
+            <i class="bi bi-exclamation-triangle-fill"></i>
+            <span th:text="${error}"></span>
+        </div>
+
+        <!-- Patient Info Card -->
+        <div th:if="${cita}" style="background:var(--card-bg);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:24px;">
+            <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
+                <div style="width:56px;height:56px;border-radius:50%;background:rgba(6,182,212,0.15);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                    <i class="bi bi-person-fill" style="font-size:1.5rem;color:var(--accent);"></i>
+                </div>
+                <div style="flex:1;min-width:200px;">
+                    <div style="font-size:1.1rem;font-weight:700;color:var(--text-primary);" th:text="${cita.paciente.nombreCompleto}">Paciente</div>
+                    <div style="display:flex;gap:16px;flex-wrap:wrap;margin-top:4px;font-size:0.85rem;color:var(--text-muted);">
+                        <span><i class="bi bi-card-text"></i> DNI: <strong style="color:var(--text-primary);" th:text="${cita.paciente.dni}"></strong></span>
+                        <span><i class="bi bi-person-badge"></i> <strong style="color:var(--text-primary);" th:text="${cita.medico.nombreCompleto}"></strong></span>
+                        <span><i class="bi bi-heart-pulse"></i> <strong style="color:var(--text-primary);" th:text="${cita.especialidad.nombre}"></strong></span>
+                        <span th:if="${cita.medico.consultorio}"><i class="bi bi-geo-alt"></i> <strong style="color:var(--text-primary);" th:text="${cita.medico.consultorio}"></strong></span>
+                    </div>
+                </div>
+                <div style="padding:6px 14px;border-radius:20px;font-size:0.78rem;font-weight:600;background:rgba(6,182,212,0.12);color:var(--accent);border:1px solid rgba(6,182,212,0.25);">
+                    <i class="bi bi-clock"></i> EN TRIAGE
+                </div>
+            </div>
+        </div>
+
+        <form th:action="@{/triaje/cita/{id}/guardar(id=${cita.idCita})}" method="post">
+            <!-- Vital Signs -->
+            <div style="background:var(--card-bg);border:1px solid var(--border);border-radius:12px;margin-bottom:20px;overflow:hidden;">
+                <div style="padding:14px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;">
+                    <i class="bi bi-activity" style="color:var(--accent);font-size:1.15rem;"></i>
+                    <h5 style="margin:0;font-weight:600;font-size:0.95rem;color:var(--text-primary);">Signos Vitales</h5>
+                </div>
+                <div style="padding:20px;">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label style="display:block;font-size:0.78rem;font-weight:600;color:var(--text-muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.3px;">
+                                <i class="bi bi-droplet" style="color:var(--accent);margin-right:4px;"></i> Presi&oacute;n Arterial
+                            </label>
+                            <input type="text" name="presionArterial" class="form-control" placeholder="ej: 120/80" maxlength="15" style="background:var(--bg-primary);border:1px solid var(--border);color:var(--text-primary);border-radius:8px;padding:10px 14px;font-size:0.88rem;">
+                        </div>
+                        <div class="col-md-4">
+                            <label style="display:block;font-size:0.78rem;font-weight:600;color:var(--text-muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.3px;">
+                                <i class="bi bi-heart" style="color:#ef4444;margin-right:4px;"></i> Frec. Card&iacute;aca (lpm)
+                            </label>
+                            <input type="number" name="frecuenciaCardiaca" class="form-control" placeholder="ej: 72" style="background:var(--bg-primary);border:1px solid var(--border);color:var(--text-primary);border-radius:8px;padding:10px 14px;font-size:0.88rem;">
+                        </div>
+                        <div class="col-md-4">
+                            <label style="display:block;font-size:0.78rem;font-weight:600;color:var(--text-muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.3px;">
+                                <i class="bi bi-thermometer-half" style="color:#f59e0b;margin-right:4px;"></i> Temperatura (&deg;C)
+                            </label>
+                            <input type="number" step="0.1" name="temperatura" class="form-control" placeholder="ej: 36.5" style="background:var(--bg-primary);border:1px solid var(--border);color:var(--text-primary);border-radius:8px;padding:10px 14px;font-size:0.88rem;">
+                        </div>
+                        <div class="col-md-3">
+                            <label style="display:block;font-size:0.78rem;font-weight:600;color:var(--text-muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.3px;">
+                                <i class="bi bi-speedometer2" style="color:#8b5cf6;margin-right:4px;"></i> Peso (kg)
+                            </label>
+                            <input type="number" step="0.01" name="pesoKg" class="form-control" placeholder="ej: 70.5" style="background:var(--bg-primary);border:1px solid var(--border);color:var(--text-primary);border-radius:8px;padding:10px 14px;font-size:0.88rem;">
+                        </div>
+                        <div class="col-md-3">
+                            <label style="display:block;font-size:0.78rem;font-weight:600;color:var(--text-muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.3px;">
+                                <i class="bi bi-rulers" style="color:#10b981;margin-right:4px;"></i> Talla (cm)
+                            </label>
+                            <input type="number" step="0.01" name="tallaCm" class="form-control" placeholder="ej: 170" style="background:var(--bg-primary);border:1px solid var(--border);color:var(--text-primary);border-radius:8px;padding:10px 14px;font-size:0.88rem;">
+                        </div>
+                        <div class="col-md-3">
+                            <label style="display:block;font-size:0.78rem;font-weight:600;color:var(--text-muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.3px;">
+                                <i class="bi bi-lungs" style="color:#06b6d4;margin-right:4px;"></i> Sat. O<sub>2</sub> (%)
+                            </label>
+                            <input type="number" name="saturacionO2" class="form-control" placeholder="ej: 98" style="background:var(--bg-primary);border:1px solid var(--border);color:var(--text-primary);border-radius:8px;padding:10px 14px;font-size:0.88rem;">
+                        </div>
+                        <div class="col-md-3">
+                            <label style="display:block;font-size:0.78rem;font-weight:600;color:var(--text-muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.3px;">
+                                <i class="bi bi-droplet-half" style="color:#f97316;margin-right:4px;"></i> Glucosa (mg/dL)
+                            </label>
+                            <input type="number" step="0.1" name="glucosa" class="form-control" placeholder="ej: 95" style="background:var(--bg-primary);border:1px solid var(--border);color:var(--text-primary);border-radius:8px;padding:10px 14px;font-size:0.88rem;">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Nursing Assessment -->
+            <div style="background:var(--card-bg);border:1px solid var(--border);border-radius:12px;margin-bottom:20px;overflow:hidden;">
+                <div style="padding:14px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;">
+                    <i class="bi bi-clipboard2-pulse" style="color:var(--accent);font-size:1.15rem;"></i>
+                    <h5 style="margin:0;font-weight:600;font-size:0.95rem;color:var(--text-primary);">Evaluaci&oacute;n de Enfermer&iacute;a</h5>
+                </div>
+                <div style="padding:20px;">
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label style="display:block;font-size:0.78rem;font-weight:600;color:var(--text-muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.3px;">
+                                <i class="bi bi-chat-dots" style="color:var(--accent);margin-right:4px;"></i> S&iacute;ntomas / Motivo de consulta
+                            </label>
+                            <textarea name="sintomas" class="form-control" rows="2" placeholder="Describa los s&iacute;ntomas referidos por el paciente" style="background:var(--bg-primary);border:1px solid var(--border);color:var(--text-primary);border-radius:8px;padding:10px 14px;font-size:0.88rem;"></textarea>
+                        </div>
+                        <div class="col-md-6">
+                            <label style="display:block;font-size:0.78rem;font-weight:600;color:var(--text-muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.3px;">
+                                <i class="bi bi-exclamation-triangle" style="color:#ef4444;margin-right:4px;"></i> Alergias Reportadas
+                            </label>
+                            <textarea name="alergiasReportadas" class="form-control" rows="2" placeholder="Alergias conocidas" style="background:var(--bg-primary);border:1px solid var(--border);color:var(--text-primary);border-radius:8px;padding:10px 14px;font-size:0.88rem;"></textarea>
+                        </div>
+                        <div class="col-md-6">
+                            <label style="display:block;font-size:0.78rem;font-weight:600;color:var(--text-muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.3px;">
+                                <i class="bi bi-capsule" style="color:#8b5cf6;margin-right:4px;"></i> Medicaci&oacute;n Actual
+                            </label>
+                            <textarea name="medicacionActual" class="form-control" rows="2" placeholder="Medicamentos que toma actualmente" style="background:var(--bg-primary);border:1px solid var(--border);color:var(--text-primary);border-radius:8px;padding:10px 14px;font-size:0.88rem;"></textarea>
+                        </div>
+                        <div class="col-md-4">
+                            <label style="display:block;font-size:0.78rem;font-weight:600;color:var(--text-muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.3px;">
+                                <i class="bi bi-shield-exclamation" style="color:var(--accent);margin-right:4px;"></i> Nivel de Urgencia
+                            </label>
+                            <select name="nivelUrgencia" class="form-control" style="background:var(--bg-primary);border:1px solid var(--border);color:var(--text-primary);border-radius:8px;padding:10px 14px;font-size:0.88rem;">
+                                <option value="">-- Seleccione --</option>
+                                <option value="BAJA" style="color:#10b981;">&bull; Baja</option>
+                                <option value="MEDIA" style="color:#f59e0b;">&bull; Media</option>
+                                <option value="ALTA" style="color:#ef4444;">&bull; Alta</option>
+                            </select>
+                        </div>
+                        <div class="col-md-8">
+                            <label style="display:block;font-size:0.78rem;font-weight:600;color:var(--text-muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.3px;">
+                                <i class="bi bi-journal-text" style="color:var(--text-muted);margin-right:4px;"></i> Observaciones
+                            </label>
+                            <textarea name="observaciones" class="form-control" rows="2" placeholder="Notas adicionales" style="background:var(--bg-primary);border:1px solid var(--border);color:var(--text-primary);border-radius:8px;padding:10px 14px;font-size:0.88rem;"></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div style="display:flex;justify-content:flex-end;gap:12px;padding:4px 0 24px;">
+                <a th:href="@{/triaje/pendientes}" class="btn btn-modern btn-secondary" style="padding:10px 24px;border-radius:8px;font-size:0.88rem;">
+                    <i class="bi bi-x-lg"></i> Cancelar
+                </a>
+                <button type="submit" style="padding:10px 28px;border-radius:8px;border:none;font-size:0.88rem;font-weight:600;background:var(--accent);color:white;cursor:pointer;display:flex;align-items:center;gap:8px;">
+                    <i class="bi bi-check-lg"></i> Guardar y derivar a consultorio
+                </button>
+            </div>
+        </form>
+
+    </main>
+</div>
+<footer th:replace="~{fragments/header :: footer}"></footer>
+</body>
+</html>
