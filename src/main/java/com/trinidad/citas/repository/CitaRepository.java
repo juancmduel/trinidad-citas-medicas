@@ -30,8 +30,6 @@ public interface CitaRepository extends JpaRepository<Cita, Long> {
     @Query("SELECT c FROM Cita c JOIN FETCH c.paciente JOIN FETCH c.medico JOIN FETCH c.especialidad ORDER BY c.fechaCita DESC, c.horaInicio")
     List<Cita> findAllConRelaciones();
 
-    Optional<Cita> findByMedico_IdMedicoAndFechaCitaAndHoraInicio(Long idMedico, LocalDate fecha, String horaInicio);
-
     List<Cita> findByMedico_IdMedicoAndEstadoOrderByFechaCitaAscHoraInicioAsc(Long idMedico, EstadoCita estado);
 
     List<Cita> findByEstado(EstadoCita estado);

@@ -25,7 +25,7 @@ public class CitaScheduler {
 
     private static final DateTimeFormatter HORA_FMT = DateTimeFormatter.ofPattern("HH:mm");
 
-    @Scheduled(fixedRate = 60_000)
+    @Scheduled(fixedDelay = 60_000)
     @Transactional
     public void marcarNoAsistidas() {
         LocalDate hoy = LocalDate.now();

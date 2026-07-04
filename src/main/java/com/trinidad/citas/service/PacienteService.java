@@ -1,5 +1,6 @@
 package com.trinidad.citas.service;
 
+import com.trinidad.citas.audit.Auditable;
 import com.trinidad.citas.dto.PacienteDTO;
 import com.trinidad.citas.exception.DuplicateResourceException;
 import com.trinidad.citas.exception.ResourceNotFoundException;
@@ -55,6 +56,7 @@ public class PacienteService {
             .orElseThrow(() -> new ResourceNotFoundException("Paciente con DNI " + dni + " no encontrado")));
     }
 
+    @Auditable(entidad = "PACIENTE", accion = "CREAR")
     public PacienteDTO crear(PacienteDTO dto) {
         if (pacienteRepository.existsByDni(dto.getDni())) {
             throw new DuplicateResourceException("Ya existe un paciente con el DNI: " + dto.getDni());
@@ -64,6 +66,7 @@ public class PacienteService {
         return toDTO(pacienteRepository.save(p));
     }
 
+    @Auditable(entidad = "PACIENTE", accion = "ACTUALIZAR")
     public PacienteDTO actualizar(Long id, PacienteDTO dto) {
         Paciente p = obtenerEntidad(id);
         if (!p.getDni().equals(dto.getDni()) && pacienteRepository.existsByDni(dto.getDni())) {
@@ -73,6 +76,7 @@ public class PacienteService {
         return toDTO(pacienteRepository.save(p));
     }
 
+    @Auditable(entidad = "PACIENTE", accion = "ELIMINAR")
     public void eliminar(Long id) {
         Paciente p = obtener(id);
         p.setActivo(0);

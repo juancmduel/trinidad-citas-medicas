@@ -3,8 +3,8 @@ package com.trinidad.citas.controller.api;
 import org.springframework.context.annotation.Profile;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.data.jpa.repository.Query;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -18,6 +18,7 @@ public class DashboardRestController {
      * GET /api/v1/dashboard/resumen - Obtiene resumen general del sistema
      */
     @GetMapping("/resumen")
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'GERENTE', 'MEDICO', 'RECEPCIONISTA', 'ENFERMERA')")
     public ResponseEntity<Map<String, Object>> obtenerResumen() {
         Map<String, Object> resumen = new HashMap<>();
         resumen.put("mensaje", "Endpoint de resumen del dashboard");
@@ -29,6 +30,7 @@ public class DashboardRestController {
      * GET /api/v1/dashboard/estadisticas - Obtiene estadísticas del sistema
      */
     @GetMapping("/estadisticas")
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'GERENTE')")
     public ResponseEntity<Map<String, Object>> obtenerEstadisticas() {
         Map<String, Object> estadisticas = new HashMap<>();
         estadisticas.put("citas_totales", 0);
@@ -42,6 +44,7 @@ public class DashboardRestController {
      * GET /api/v1/dashboard/indicadores - Obtiene KPIs del sistema
      */
     @GetMapping("/indicadores")
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'GERENTE')")
     public ResponseEntity<Map<String, Object>> obtenerIndicadores() {
         Map<String, Object> indicadores = new HashMap<>();
         indicadores.put("tasa_ocupacion", "85%");

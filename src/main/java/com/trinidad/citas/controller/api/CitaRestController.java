@@ -8,6 +8,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -22,42 +23,56 @@ public class CitaRestController {
     private final CitaService citaService;
 
     @GetMapping
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'GERENTE', 'MEDICO', 'RECEPCIONISTA', 'ENFERMERA')")
     public List<CitaDTO> listar(@RequestParam(required = false)
                                 @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fecha) {
         return fecha != null ? citaService.listarPorFecha(fecha) : citaService.listarTodas();
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'GERENTE', 'RECEPCIONISTA', 'ENFERMERA') " +
+                  "or (hasRole('MEDICO') and @citaSecurity.isMedicoAsignado(#id, principal)) " +
+                  "or (hasRole('PACIENTE') and @citaSecurity.isOwnCita(#id, principal))")
     public CitaDTO obtener(@PathVariable Long id) {
         return citaService.obtenerDTO(id);
     }
 
     @GetMapping("/paciente/{idPaciente}")
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'GERENTE', 'MEDICO', 'RECEPCIONISTA', 'ENFERMERA') " +
+                  "or (hasRole('PACIENTE') and @pacienteSecurity.isOwnPaciente(#idPaciente, principal))")
     public List<CitaDTO> porPaciente(@PathVariable Long idPaciente) {
         return citaService.listarPorPaciente(idPaciente);
     }
 
     @PostMapping
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'GERENTE', 'RECEPCIONISTA', 'PACIENTE')")
     public ResponseEntity<CitaDTO> agendar(@Valid @RequestBody CitaDTO dto) {
         return ResponseEntity.ok(citaService.agendar(dto));
     }
 
     @PutMapping("/{id}/estado")
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'GERENTE') " +
+                  "or (hasRole('MEDICO') and @citaSecurity.isMedicoAsignado(#id, principal))")
     public CitaDTO cambiarEstado(@PathVariable Long id, @RequestParam EstadoCita estado) {
         return citaService.cambiarEstado(id, estado);
     }
 
     @PostMapping("/{id}/cancelar")
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'GERENTE', 'RECEPCIONISTA') " +
+                  "or (hasRole('PACIENTE') and @citaSecurity.isOwnCita(#id, principal))")
     public CitaDTO cancelar(@PathVariable Long id) {
         return citaService.cancelar(id);
     }
 
     @PostMapping("/{id}/checkin")
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'ENFERMERA')")
     public CitaDTO checkin(@PathVariable Long id) {
         return citaService.checkin(id);
     }
 
     @PostMapping("/{id}/finalizar")
+    @PreAuthorize("hasRole('ADMINISTRADOR') " +
+                  "or (hasRole('MEDICO') and @citaSecurity.isMedicoAsignado(#id, principal))")
     public CitaDTO finalizar(@PathVariable Long id) {
         return citaService.finalizar(id);
     }

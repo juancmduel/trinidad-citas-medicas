@@ -61,7 +61,7 @@ public class Atencion {
     @Column(name = "OBSERVACIONES", length = 1000)
     private String observaciones;
 
-    // Signos vitales
+    // Signos vitales registrados durante la atención
     @Size(max = 15)
     @Column(name = "PRESION_ARTERIAL", length = 15)
     private String presionArterial;

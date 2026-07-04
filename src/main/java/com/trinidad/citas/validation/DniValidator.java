@@ -13,7 +13,7 @@ public class DniValidator implements ConstraintValidator<ValidDni, String> {
 
     @Override
     public void initialize(ValidDni constraintAnnotation) {
-        // Sin inicialización especial
+        // No se requiere configuracion adicional del validador
     }
 
     @Override

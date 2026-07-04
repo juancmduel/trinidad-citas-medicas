@@ -6,6 +6,7 @@ import com.trinidad.citas.service.OrdenExamenService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,31 +20,37 @@ public class OrdenExamenRestController {
     private final OrdenExamenService ordenExamenService;
 
     @GetMapping
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'GERENTE', 'MEDICO')")
     public List<OrdenExamenDTO> listar() {
         return ordenExamenService.listarTodos();
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'GERENTE', 'MEDICO')")
     public ResponseEntity<OrdenExamenDTO> obtener(@PathVariable Long id) {
         return ResponseEntity.ok(ordenExamenService.obtenerPorId(id));
     }
 
     @GetMapping("/atencion/{idAtencion}")
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'GERENTE', 'MEDICO')")
     public List<OrdenExamenDTO> porAtencion(@PathVariable Long idAtencion) {
         return ordenExamenService.listarPorAtencion(idAtencion);
     }
 
     @PostMapping
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'MEDICO')")
     public ResponseEntity<OrdenExamenDTO> crear(@Valid @RequestBody OrdenExamenDTO dto) {
         return ResponseEntity.ok(ordenExamenService.crear(dto));
     }
 
     @PutMapping("/{id}/estado")
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'MEDICO')")
     public ResponseEntity<OrdenExamenDTO> cambiarEstado(@PathVariable Long id, @RequestParam String estado) {
         return ResponseEntity.ok(ordenExamenService.cambiarEstado(id, estado));
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMINISTRADOR')")
     public ResponseEntity<Void> eliminar(@PathVariable Long id) {
         ordenExamenService.eliminar(id);
         return ResponseEntity.noContent().build();

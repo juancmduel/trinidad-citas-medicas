@@ -1,5 +1,6 @@
 package com.trinidad.citas.service;
 
+import com.trinidad.citas.audit.Auditable;
 import com.trinidad.citas.dto.HistoriaClinicaDTO;
 import com.trinidad.citas.exception.ResourceNotFoundException;
 import com.trinidad.citas.model.HistoriaClinica;
@@ -76,6 +77,7 @@ public class HistoriaClinicaService {
                 .orElseThrow(() -> new ResourceNotFoundException("HistoriaClinica", 0L));
     }
 
+    @Auditable(entidad = "HISTORIA_CLINICA", accion = "CREAR")
     public HistoriaClinicaDTO crear(HistoriaClinicaDTO dto) {
         HistoriaClinica h = new HistoriaClinica();
         h.setPaciente(pacienteRepository.findById(dto.getIdPaciente())
@@ -86,6 +88,7 @@ public class HistoriaClinicaService {
         return toDTO(historiaClinicaRepository.save(h));
     }
 
+    @Auditable(entidad = "HISTORIA_CLINICA", accion = "ACTUALIZAR")
     public HistoriaClinicaDTO actualizar(Long id, HistoriaClinicaDTO dto) {
         HistoriaClinica h = historiaClinicaRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("HistoriaClinica", id));

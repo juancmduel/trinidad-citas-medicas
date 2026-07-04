@@ -59,17 +59,17 @@ public class PacientePortalController {
         }
         try {
             if (usuarioRepository.existsByUsername(dto.getUsername())) {
-                throw new DuplicateResourceException("El usuario '" + dto.getUsername() + "' ya existe");
+                throw new DuplicateResourceException("El nombre de usuario '" + dto.getUsername() + "' ya está en uso. Elija otro.");
             }
             if (usuarioRepository.existsByEmail(dto.getEmail())) {
-                throw new DuplicateResourceException("El email '" + dto.getEmail() + "' ya esta registrado");
+                throw new DuplicateResourceException("El correo '" + dto.getEmail() + "' ya está registrado. Use otro correo.");
             }
             if (pacienteRepository.existsByDni(dto.getDni())) {
-                throw new DuplicateResourceException("El DNI " + dto.getDni() + " ya esta registrado");
+                throw new DuplicateResourceException("El DNI " + dto.getDni() + " ya está registrado en el sistema.");
             }
 
             Rol rolPaciente = rolRepository.findByNombre("PACIENTE")
-                    .orElseThrow(() -> new RuntimeException("Rol PACIENTE no encontrado"));
+                    .orElseThrow(() -> new RuntimeException("Error de configuración: el rol PACIENTE no está definido en el sistema"));
 
             UsuarioDTO usuarioDTO = new UsuarioDTO();
             usuarioDTO.setUsername(dto.getUsername());
@@ -80,7 +80,7 @@ public class PacientePortalController {
             UsuarioDTO usuarioCreado = usuarioService.crear(usuarioDTO);
 
             Usuario usuario = usuarioRepository.findById(usuarioCreado.getIdUsuario())
-                    .orElseThrow(() -> new RuntimeException("Error al recuperar usuario creado"));
+                    .orElseThrow(() -> new RuntimeException("Error interno al recuperar el usuario recién creado"));
 
             PacienteDTO pacienteDTO = new PacienteDTO();
             pacienteDTO.setDni(dto.getDni());

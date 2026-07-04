@@ -1,5 +1,6 @@
 package com.trinidad.citas.service;
 
+import com.trinidad.citas.audit.Auditable;
 import com.trinidad.citas.dto.OrdenExamenDTO;
 import com.trinidad.citas.exception.ResourceNotFoundException;
 import com.trinidad.citas.model.OrdenExamen;
@@ -68,6 +69,7 @@ public class OrdenExamenService {
                 .orElseThrow(() -> new ResourceNotFoundException("OrdenExamen", id)));
     }
 
+    @Auditable(entidad = "ORDEN_EXAMEN", accion = "CREAR")
     public OrdenExamenDTO crear(OrdenExamenDTO dto) {
         OrdenExamen o = new OrdenExamen();
         o.setAtencion(atencionRepository.findById(dto.getIdAtencion())
@@ -97,6 +99,7 @@ public class OrdenExamenService {
         return toDTO(ordenExamenRepository.save(o));
     }
 
+    @Auditable(entidad = "ORDEN_EXAMEN", accion = "ACTUALIZAR_ESTADO")
     public OrdenExamenDTO cambiarEstado(Long id, String estado) {
         OrdenExamen o = ordenExamenRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("OrdenExamen", id));
@@ -105,6 +108,7 @@ public class OrdenExamenService {
         return toDTO(ordenExamenRepository.save(o));
     }
 
+    @Auditable(entidad = "ORDEN_EXAMEN", accion = "ELIMINAR")
     public void eliminar(Long id) {
         ordenExamenRepository.deleteById(id);
     }

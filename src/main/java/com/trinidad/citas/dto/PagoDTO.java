@@ -20,7 +20,8 @@ public class PagoDTO {
     @DecimalMin("0.0")
     private BigDecimal monto;
 
-    @NotBlank @Size(max = 20)
+    @NotBlank(message = "Debe seleccionar un método de pago")
+    @Size(max = 20, message = "El método de pago no puede exceder 20 caracteres")
     private String metodoPago;
 
     private String estado;
@@ -33,6 +34,6 @@ public class PagoDTO {
 
     private LocalDateTime fechaPago;
 
-    // Solo respuesta
+    // Se asigna en el service desde la entidad relacionada
     private LocalDateTime fechaRegistro;
 }

@@ -28,8 +28,8 @@ public class PacienteDTO {
     @NotNull @Past
     private LocalDate fechaNacimiento;
 
-    @NotNull
-    @Pattern(regexp = "^[MF]$")
+    @NotNull(message = "Debe seleccionar un sexo")
+    @Pattern(regexp = "^[MF]$", message = "El sexo debe ser Masculino (M) o Femenino (F)")
     private String sexo;
 
     @Size(max = 15)

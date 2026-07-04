@@ -65,13 +65,13 @@ public class CitaWebController {
                              @RequestParam(required = false) Integer mes,
                              @RequestParam(required = false) Integer anio,
                              Model model) {
-        // Fecha seleccionada para la tabla
+        // Si no se pasa fecha, se usa la de hoy
         LocalDate f = (fecha != null && !fecha.isBlank()) ? LocalDate.parse(fecha) : LocalDate.now();
         model.addAttribute("citas", citaService.listarPorFechaConRelaciones(f));
         model.addAttribute("fecha", f);
         model.addAttribute("titulo", "Calendario de Citas");
 
-        // Mes/año del calendario visual
+        // Si vienen mes y año, navegamos a ese mes; si no, el mes de la fecha seleccionada
         YearMonth pagina;
         if (mes != null && anio != null) {
             pagina = YearMonth.of(anio, mes);
@@ -79,7 +79,7 @@ public class CitaWebController {
             pagina = YearMonth.from(f);
         }
 
-        // Dias del mes con citas
+        // Consultar qué días del mes tienen citas registradas
         LocalDate inicioMes = pagina.atDay(1);
         LocalDate finMes = pagina.atEndOfMonth();
         List<Object[]> counts = citaRepository.countByFechaCitaBetween(inicioMes, finMes);
@@ -89,12 +89,12 @@ public class CitaWebController {
         Map<LocalDate, Long> conteoDias = counts.stream()
             .collect(Collectors.toMap(row -> (LocalDate) row[0], row -> (Long) row[1]));
 
-        // Construir grid del calendario
+        // Armar la cuadrícula semanas/días del calendario
         int primerDiaSemana = inicioMes.getDayOfWeek().getValue() % 7; // 0=domingo
         int diasEnMes = pagina.lengthOfMonth();
         List<Map<String, Object>> diasCalendario = new ArrayList<>();
 
-        // Celdas vacias antes del dia 1
+        // Rellenar con celdas vacías hasta el primer día del mes
         for (int i = 0; i < primerDiaSemana; i++) {
             Map<String, Object> d = new HashMap<>();
             d.put("dia", null);

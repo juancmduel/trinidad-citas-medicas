@@ -25,8 +25,8 @@ public class CitaDTO {
     @FutureOrPresent
     private LocalDate fechaCita;
 
-    @NotBlank
-    @Pattern(regexp = "^([01]\\d|2[0-3]):[0-5]\\d$")
+    @NotBlank(message = "La hora de inicio es obligatoria")
+    @Pattern(regexp = "^([01]\\d|2[0-3]):[0-5]\\d$", message = "La hora debe tener formato HH:mm (ej: 14:30)")
     private String horaInicio;
 
     @Size(max = 300)
@@ -37,7 +37,7 @@ public class CitaDTO {
 
     private String estado;
 
-    // Campos de display (solo lectura, para vistas web)
+    // Se llenan desde la entidad para mostrarlos en las vistas
     private String nombrePaciente;
     private String dniPaciente;
     private String nombreMedico;

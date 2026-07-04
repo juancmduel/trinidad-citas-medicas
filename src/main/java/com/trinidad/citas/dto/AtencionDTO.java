@@ -40,11 +40,11 @@ public class AtencionDTO {
     @Size(max = 1000)
     private String observaciones;
 
-    // Solo respuesta
+    // Se completa desde la entidad para mostrarlo en las vistas
     private String nombreMedicoCompleto;
     private String nombrePacienteCompleto;
 
-    // Signos vitales
+    // Signos vitales tomados durante la atención
     @Size(max = 15)
     private String presionArterial;
 

@@ -49,3 +49,12 @@ Thumbs.db
 application-local.properties
 application-local.yml
 .env
+
+### Cookies de sesión ###
+*cookies.txt
+
+### Documentos y Carpetas externas/temporales ###
+documento/
+pipeline-output/
+TEST-SUMMARY.md
+run-local-ai.bat

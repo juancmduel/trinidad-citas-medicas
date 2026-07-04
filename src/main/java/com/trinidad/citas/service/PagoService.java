@@ -1,5 +1,6 @@
 package com.trinidad.citas.service;
 
+import com.trinidad.citas.audit.Auditable;
 import com.trinidad.citas.dto.PagoDTO;
 import com.trinidad.citas.exception.BusinessException;
 import com.trinidad.citas.exception.ResourceNotFoundException;
@@ -75,14 +76,15 @@ public class PagoService {
                 .orElseThrow(() -> new ResourceNotFoundException("Pago para cita", idCita));
     }
 
+    @Auditable(entidad = "PAGO", accion = "CREAR")
     public PagoDTO crear(PagoDTO dto) {
         if (pagoRepository.findByCita_IdCita(dto.getIdCita()).isPresent()) {
-            throw new BusinessException("La cita ya tiene un pago registrado");
+            throw new BusinessException("Esta cita ya tiene un pago registrado");
         }
         Cita cita = citaRepository.findById(dto.getIdCita())
                 .orElseThrow(() -> new ResourceNotFoundException("Cita", dto.getIdCita()));
         if (cita.getEstado() != EstadoCita.PROGRAMADA && cita.getEstado() != EstadoCita.CONFIRMADA) {
-            throw new BusinessException("Solo se puede registrar pago en citas PROGRAMADA o CONFIRMADA");
+            throw new BusinessException("El pago solo puede registrarse en citas PROGRAMADA o CONFIRMADA");
         }
 
         BigDecimal monto = dto.getMonto();
@@ -90,7 +92,7 @@ public class PagoService {
             if (cita.getEspecialidad() != null && cita.getEspecialidad().getPrecioConsulta() != null) {
                 monto = cita.getEspecialidad().getPrecioConsulta();
             } else {
-                throw new BusinessException("Debe especificar un monto valido para el pago");
+                throw new BusinessException("Debe ingresar un monto válido para el pago");
             }
         }
 
@@ -119,7 +121,7 @@ public class PagoService {
 
     public PagoDTO crearPagoSinConfirmar(PagoDTO dto) {
         if (pagoRepository.findByCita_IdCita(dto.getIdCita()).isPresent()) {
-            throw new BusinessException("La cita ya tiene un pago registrado");
+            throw new BusinessException("Esta cita ya tiene un pago registrado");
         }
         Cita cita = citaRepository.findById(dto.getIdCita())
                 .orElseThrow(() -> new ResourceNotFoundException("Cita", dto.getIdCita()));
@@ -129,7 +131,7 @@ public class PagoService {
             if (cita.getEspecialidad() != null && cita.getEspecialidad().getPrecioConsulta() != null) {
                 monto = cita.getEspecialidad().getPrecioConsulta();
             } else {
-                throw new BusinessException("Debe especificar un monto valido para el pago");
+                throw new BusinessException("Debe ingresar un monto válido para el pago");
             }
         }
 
@@ -192,6 +194,7 @@ public class PagoService {
         return saved;
     }
 
+    @Auditable(entidad = "PAGO", accion = "ANULAR")
     public void eliminar(Long id) {
         pagoRepository.deleteById(id);
     }
@@ -202,7 +205,7 @@ public class PagoService {
             case "BOLETA" -> "B001-";
             case "FACTURA" -> "F001-";
             case "RECIBO" -> "R001-";
-            default -> throw new BusinessException("Tipo de comprobante invalido: " + tipo);
+            default -> throw new BusinessException("Tipo de comprobante no válido: " + tipo + ". Use: BOLETA, FACTURA o RECIBO");
         };
         String maxNro = pagoRepository.findMaxNroComprobanteByPrefix(prefix + "%");
         int next = 1;

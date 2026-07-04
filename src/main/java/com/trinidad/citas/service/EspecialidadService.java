@@ -1,5 +1,6 @@
 package com.trinidad.citas.service;
 
+import com.trinidad.citas.audit.Auditable;
 import com.trinidad.citas.dto.EspecialidadDTO;
 import com.trinidad.citas.exception.ResourceNotFoundException;
 import com.trinidad.citas.model.Especialidad;
@@ -57,10 +58,12 @@ public class EspecialidadService {
                 .orElseThrow(() -> new ResourceNotFoundException("Especialidad", id));
     }
 
+    @Auditable(entidad = "ESPECIALIDAD", accion = "CREAR")
     public EspecialidadDTO crear(EspecialidadDTO dto) {
         return toDTO(especialidadRepository.save(fromDTO(dto)));
     }
 
+    @Auditable(entidad = "ESPECIALIDAD", accion = "ACTUALIZAR")
     public EspecialidadDTO actualizar(Long id, EspecialidadDTO dto) {
         Especialidad e = obtenerEntidad(id);
         e.setNombre(dto.getNombre());
@@ -71,6 +74,7 @@ public class EspecialidadService {
         return toDTO(especialidadRepository.save(e));
     }
 
+    @Auditable(entidad = "ESPECIALIDAD", accion = "ELIMINAR")
     public void eliminar(Long id) {
         Especialidad e = obtenerEntidad(id);
         e.setActivo(0);

@@ -1,5 +1,6 @@
 package com.trinidad.citas.service;
 
+import com.trinidad.citas.audit.Auditable;
 import com.trinidad.citas.dto.UsuarioDTO;
 import com.trinidad.citas.exception.DuplicateResourceException;
 import com.trinidad.citas.exception.ResourceNotFoundException;
@@ -69,9 +70,13 @@ public class UsuarioService {
                 .orElseThrow(() -> new ResourceNotFoundException("Usuario", 0L));
     }
 
+    @Auditable(entidad = "USUARIO", accion = "CREAR")
     public UsuarioDTO crear(UsuarioDTO dto) {
         if (usuarioRepository.findByUsername(dto.getUsername()).isPresent()) {
-            throw new DuplicateResourceException("Usuario con username '" + dto.getUsername() + "' ya existe");
+            throw new DuplicateResourceException("El nombre de usuario '" + dto.getUsername() + "' ya está registrado. Elija otro.");
+        }
+        if (dto.getEmail() != null && usuarioRepository.findByEmail(dto.getEmail()).isPresent()) {
+            throw new DuplicateResourceException("El correo '" + dto.getEmail() + "' ya está registrado. Use otro correo.");
         }
         Usuario u = new Usuario();
         u.setUsername(dto.getUsername());
@@ -90,6 +95,7 @@ public class UsuarioService {
         return toDTO(usuarioRepository.save(u));
     }
 
+    @Auditable(entidad = "USUARIO", accion = "ACTUALIZAR")
     public UsuarioDTO actualizar(Long id, UsuarioDTO dto) {
         Usuario u = usuarioRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Usuario", id));
@@ -105,16 +111,19 @@ public class UsuarioService {
         return toDTO(usuarioRepository.save(u));
     }
 
+    @Auditable(entidad = "USUARIO", accion = "ELIMINAR")
     public void eliminar(Long id) {
         usuarioRepository.deleteById(id);
     }
 
+    @Auditable(entidad = "USUARIO", accion = "CAMBIAR_ESTADO")
     public void bloquear(Long id) {
         Usuario u = obtenerEntidadPorId(id);
         u.setBloqueado(1);
         usuarioRepository.save(u);
     }
 
+    @Auditable(entidad = "USUARIO", accion = "CAMBIAR_ESTADO")
     public void desbloquear(Long id) {
         Usuario u = obtenerEntidadPorId(id);
         u.setBloqueado(0);

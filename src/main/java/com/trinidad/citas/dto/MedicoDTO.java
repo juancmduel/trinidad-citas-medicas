@@ -43,7 +43,7 @@ public class MedicoDTO {
 
     private Integer activo;
 
-    // Solo respuesta
+    // Solo lectura: se completa desde las entidades relacionadas
     private String nombreCompleto;
     private String especialidadNombre;
 }

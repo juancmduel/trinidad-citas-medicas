@@ -36,7 +36,7 @@ public class AuthService {
 
         if (usuario != null && usuario.isBloqueado()) {
             intentoLoginService.registrarIntento(request.getUsername(), false, ip, "Cuenta bloqueada");
-            throw new LockedException("Cuenta bloqueada por múltiples intentos fallidos");
+            throw new LockedException("Cuenta bloqueada por demasiados intentos fallidos. Contacte al administrador.");
         }
 
         try {
@@ -44,6 +44,8 @@ public class AuthService {
                 new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
             );
         } catch (Exception e) {
+            intentoLoginService.registrarIntento(request.getUsername(), false, ip,
+                e instanceof BadCredentialsException ? "Credenciales inválidas" : e.getMessage());
             if (usuario != null) {
                 usuario.setIntentosFallidos(usuario.getIntentosFallidos() + 1);
                 if (intentoLoginService.debeBloquear(request.getUsername())) {
@@ -51,8 +53,6 @@ public class AuthService {
                 }
                 usuarioRepository.save(usuario);
             }
-            intentoLoginService.registrarIntento(request.getUsername(), false, ip,
-                e instanceof BadCredentialsException ? "Credenciales inválidas" : e.getMessage());
             throw e;
         }
 

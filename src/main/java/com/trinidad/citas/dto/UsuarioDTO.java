@@ -32,6 +32,6 @@ public class UsuarioDTO {
     // IDs de roles asignados
     private Set<Long> rolesIds;
 
-    // Solo respuesta: nombres de roles
+    // Solo lectura: nombres de los roles asignados
     private Set<String> rolesNombres;
 }

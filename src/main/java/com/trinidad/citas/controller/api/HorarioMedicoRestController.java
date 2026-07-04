@@ -8,6 +8,7 @@ import com.trinidad.citas.service.HorarioMedicoService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -27,31 +28,37 @@ public class HorarioMedicoRestController {
     private final CitaRepository citaRepository;
 
     @GetMapping
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'GERENTE', 'RECEPCIONISTA', 'ENFERMERA', 'MEDICO')")
     public List<HorarioMedicoDTO> listar() {
         return horarioMedicoService.listarTodos();
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'GERENTE', 'RECEPCIONISTA', 'MEDICO')")
     public ResponseEntity<HorarioMedicoDTO> obtener(@PathVariable Long id) {
         return ResponseEntity.ok(horarioMedicoService.obtenerPorId(id));
     }
 
     @GetMapping("/medico/{idMedico}")
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'GERENTE', 'RECEPCIONISTA', 'ENFERMERA', 'MEDICO', 'PACIENTE')")
     public List<HorarioMedicoDTO> porMedico(@PathVariable Long idMedico) {
         return horarioMedicoService.listarPorMedico(idMedico);
     }
 
     @PostMapping
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'GERENTE')")
     public ResponseEntity<HorarioMedicoDTO> crear(@Valid @RequestBody HorarioMedicoDTO dto) {
         return ResponseEntity.ok(horarioMedicoService.crear(dto));
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'GERENTE')")
     public ResponseEntity<HorarioMedicoDTO> actualizar(@PathVariable Long id, @Valid @RequestBody HorarioMedicoDTO dto) {
         return ResponseEntity.ok(horarioMedicoService.actualizar(id, dto));
     }
 
     @GetMapping("/disponibilidad/{idMedico}")
+    @PreAuthorize("permitAll()")
     public ResponseEntity<?> verificarDisponibilidad(
             @PathVariable Long idMedico,
             @RequestParam String fecha,
@@ -87,6 +94,7 @@ public class HorarioMedicoRestController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMINISTRADOR')")
     public ResponseEntity<Void> eliminar(@PathVariable Long id) {
         horarioMedicoService.eliminar(id);
         return ResponseEntity.noContent().build();
