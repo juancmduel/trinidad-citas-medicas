@@ -7,14 +7,12 @@
     <div th:replace="~{fragments/header :: topbar}"></div>
     <main class="page-main">
 
-        <div class="d-flex align-items-center justify-content-between mb-4">
+        <div class="page-header">
             <div>
-                <h1 style="font-size:26px;font-weight:700;margin-bottom:4px;">
-                    <i class="bi bi-shield-lock me-2" style="color:var(--accent);"></i>Detalle del Rol
-                </h1>
-                <p style="color:var(--text-muted);font-size:13px;margin:0;">Información del rol de seguridad</p>
+                <h1><i class="bi bi-shield-lock"></i>Detalle del Rol</h1>
+                <p>Información del rol de seguridad</p>
             </div>
-            <span class="badge-estado-lg" th:classappend="${rol.activo == 1} ? 'be-activo' : 'be-inactivo'"
+            <span class="badge-estado badge-estado-lg" th:classappend="${rol.activo == 1} ? 'be-activo' : 'be-inactivo'"
                   th:text="${rol.activo == 1} ? 'Activo' : 'Inactivo'"></span>
         </div>
 
@@ -51,22 +49,22 @@
             </div>
             <div class="col-lg-4">
                 <div class="detail-actions">
-                    <a th:href="@{/roles/editar/{id}(id=${rol.idRol})}" class="btn btn-primary w-100 mb-2" style="padding:12px;border-radius:10px;font-weight:700;">
-                        <i class="bi bi-pencil me-2"></i>Editar Rol
+                    <a th:href="@{/roles/editar/{id}(id=${rol.idRol})}" class="action-btn w-100 mb-2">
+                        <i class="bi bi-pencil"></i>Editar Rol
                     </a>
                     <form th:action="@{/roles/toggle/{id}(id=${rol.idRol})}" method="post" style="display:block;" onsubmit="return confirm('¿Cambiar estado?')">
-                        <button type="submit" class="btn w-100 mb-2" th:classappend="${rol.activo == 1} ? 'btn btn-outline-warning' : 'btn btn-outline-success'" style="padding:12px;border-radius:10px;font-weight:600;">
-                            <i class="bi me-2" th:classappend="${rol.activo == 1} ? 'bi-pause-fill' : 'bi-play-fill'"></i>
+                        <button type="submit" class="btn-volver w-100 mb-2" th:style="${rol.activo == 1} ? 'background:var(--warning);color:white;' : 'background:var(--success);color:white;'">
+                            <i class="bi" th:classappend="${rol.activo == 1} ? 'bi-pause-fill' : 'bi-play-fill'"></i>
                             <span th:text="${rol.activo == 1} ? 'Desactivar' : 'Activar'"></span>
                         </button>
                     </form>
                     <form th:action="@{/roles/eliminar/{id}(id=${rol.idRol})}" method="post" style="display:block;" onsubmit="return confirm('¿Eliminar este rol?')">
-                        <button type="submit" class="btn btn-outline-danger w-100 mb-2" style="padding:12px;border-radius:10px;font-weight:600;">
-                            <i class="bi bi-trash3 me-2"></i>Eliminar
+                        <button type="submit" class="action-btn action-delete w-100 mb-2">
+                            <i class="bi bi-trash3"></i>Eliminar
                         </button>
                     </form>
                     <a th:href="@{/roles}" class="btn-volver w-100 text-center">
-                        <i class="bi bi-arrow-left me-1"></i>Volver al listado
+                        <i class="bi bi-arrow-left"></i>Volver al listado
                     </a>
                 </div>
             </div>

@@ -88,7 +88,7 @@ public class HorarioMedicoRestController {
             }
 
             return ResponseEntity.ok(response);
-        } catch (Exception e) {
+        } catch (Exception ignored) {
             return ResponseEntity.badRequest().body(Map.of("error", "Formato de fecha u hora inválido"));
         }
     }

@@ -1,25 +1,51 @@
 package com.trinidad.citas.controller.web;
 
-import com.trinidad.citas.dto.*;
-import com.trinidad.citas.exception.BusinessException;
-import com.trinidad.citas.exception.DuplicateResourceException;
-import com.trinidad.citas.model.*;
-import com.trinidad.citas.repository.*;
-import com.trinidad.citas.service.*;
-import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.springframework.context.annotation.Profile;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.time.LocalDate;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import com.trinidad.citas.dto.CitaDTO;
+import com.trinidad.citas.dto.HistoriaClinicaDTO;
+import com.trinidad.citas.dto.PacienteDTO;
+import com.trinidad.citas.dto.RegistroPacienteDTO;
+import com.trinidad.citas.dto.UsuarioDTO;
+import com.trinidad.citas.exception.DuplicateResourceException;
+import com.trinidad.citas.model.Atencion;
+import com.trinidad.citas.model.EstadoCita;
+import com.trinidad.citas.model.OrdenExamen;
+import com.trinidad.citas.model.Paciente;
+import com.trinidad.citas.model.Receta;
+import com.trinidad.citas.model.Rol;
+import com.trinidad.citas.model.Usuario;
+import com.trinidad.citas.repository.AtencionRepository;
+import com.trinidad.citas.repository.CitaRepository;
+import com.trinidad.citas.repository.HistoriaClinicaRepository;
+import com.trinidad.citas.repository.OrdenExamenRepository;
+import com.trinidad.citas.repository.PacienteRepository;
+import com.trinidad.citas.repository.RecetaRepository;
+import com.trinidad.citas.repository.RolRepository;
+import com.trinidad.citas.repository.UsuarioRepository;
+import com.trinidad.citas.service.CitaService;
+import com.trinidad.citas.service.EspecialidadService;
+import com.trinidad.citas.service.HistoriaClinicaService;
+import com.trinidad.citas.service.MedicoService;
+import com.trinidad.citas.service.PacienteService;
+import com.trinidad.citas.service.UsuarioService;
+
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 
 @Profile({"web", "default"})
 @Controller
@@ -37,8 +63,6 @@ public class PacientePortalController {
     private final EspecialidadService especialidadService;
     private final MedicoService medicoService;
     private final RolRepository rolRepository;
-    private final AntecedenteService antecedenteService;
-    private final MedicacionActualService medicacionActualService;
     private final AtencionRepository atencionRepository;
     private final RecetaRepository recetaRepository;
     private final OrdenExamenRepository ordenExamenRepository;

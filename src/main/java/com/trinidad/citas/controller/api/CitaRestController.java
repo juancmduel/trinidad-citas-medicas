@@ -24,24 +24,25 @@ public class CitaRestController {
 
     @GetMapping
     @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'GERENTE', 'MEDICO', 'RECEPCIONISTA', 'ENFERMERA')")
-    public List<CitaDTO> listar(@RequestParam(required = false)
+    public ResponseEntity<List<CitaDTO>> listar(@RequestParam(required = false)
                                 @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fecha) {
-        return fecha != null ? citaService.listarPorFecha(fecha) : citaService.listarTodas();
+        List<CitaDTO> citas = fecha != null ? citaService.listarPorFecha(fecha) : citaService.listarTodas();
+        return ResponseEntity.ok(citas);
     }
 
     @GetMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'GERENTE', 'RECEPCIONISTA', 'ENFERMERA') " +
                   "or (hasRole('MEDICO') and @citaSecurity.isMedicoAsignado(#id, principal)) " +
                   "or (hasRole('PACIENTE') and @citaSecurity.isOwnCita(#id, principal))")
-    public CitaDTO obtener(@PathVariable Long id) {
-        return citaService.obtenerDTO(id);
+    public ResponseEntity<CitaDTO> obtener(@PathVariable Long id) {
+        return ResponseEntity.ok(citaService.obtenerDTO(id));
     }
 
     @GetMapping("/paciente/{idPaciente}")
     @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'GERENTE', 'MEDICO', 'RECEPCIONISTA', 'ENFERMERA') " +
                   "or (hasRole('PACIENTE') and @pacienteSecurity.isOwnPaciente(#idPaciente, principal))")
-    public List<CitaDTO> porPaciente(@PathVariable Long idPaciente) {
-        return citaService.listarPorPaciente(idPaciente);
+    public ResponseEntity<List<CitaDTO>> porPaciente(@PathVariable Long idPaciente) {
+        return ResponseEntity.ok(citaService.listarPorPaciente(idPaciente));
     }
 
     @PostMapping
@@ -53,27 +54,27 @@ public class CitaRestController {
     @PutMapping("/{id}/estado")
     @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'GERENTE') " +
                   "or (hasRole('MEDICO') and @citaSecurity.isMedicoAsignado(#id, principal))")
-    public CitaDTO cambiarEstado(@PathVariable Long id, @RequestParam EstadoCita estado) {
-        return citaService.cambiarEstado(id, estado);
+    public ResponseEntity<CitaDTO> cambiarEstado(@PathVariable Long id, @RequestParam EstadoCita estado) {
+        return ResponseEntity.ok(citaService.cambiarEstado(id, estado));
     }
 
     @PostMapping("/{id}/cancelar")
     @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'GERENTE', 'RECEPCIONISTA') " +
                   "or (hasRole('PACIENTE') and @citaSecurity.isOwnCita(#id, principal))")
-    public CitaDTO cancelar(@PathVariable Long id) {
-        return citaService.cancelar(id);
+    public ResponseEntity<CitaDTO> cancelar(@PathVariable Long id) {
+        return ResponseEntity.ok(citaService.cancelar(id));
     }
 
     @PostMapping("/{id}/checkin")
     @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'ENFERMERA')")
-    public CitaDTO checkin(@PathVariable Long id) {
-        return citaService.checkin(id);
+    public ResponseEntity<CitaDTO> checkin(@PathVariable Long id) {
+        return ResponseEntity.ok(citaService.checkin(id));
     }
 
     @PostMapping("/{id}/finalizar")
     @PreAuthorize("hasRole('ADMINISTRADOR') " +
                   "or (hasRole('MEDICO') and @citaSecurity.isMedicoAsignado(#id, principal))")
-    public CitaDTO finalizar(@PathVariable Long id) {
-        return citaService.finalizar(id);
+    public ResponseEntity<CitaDTO> finalizar(@PathVariable Long id) {
+        return ResponseEntity.ok(citaService.finalizar(id));
     }
 }

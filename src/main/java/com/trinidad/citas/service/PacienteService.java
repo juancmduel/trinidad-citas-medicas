@@ -102,6 +102,7 @@ public class PacienteService {
         dto.setSeguroSalud(p.getSeguroSalud());
         dto.setContactoEmergenciaNombre(p.getContactoEmergenciaNombre());
         dto.setContactoEmergenciaTelefono(p.getContactoEmergenciaTelefono());
+        dto.setActivo(p.getActivo());
         return dto;
     }
 

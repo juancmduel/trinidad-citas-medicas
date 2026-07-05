@@ -12,8 +12,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.security.Principal;
-
 @Profile({"web", "default"})
 @Controller
 @RequestMapping("/triaje")
@@ -57,14 +55,9 @@ public class TriajeWebController {
     @PostMapping("/cita/{citaId}/guardar")
     public String guardar(@PathVariable Long citaId,
                           @ModelAttribute TriajeDTO dto,
-                          Principal principal,
                           RedirectAttributes ra) {
         try {
-            Long idEnfermera = null;
-            if (principal != null) {
-                var usuario = citaService.obtenerEntidad(citaId).getMedico().getUsuario();
-            }
-            triajeService.registrar(citaId, idEnfermera, dto);
+            triajeService.registrar(citaId, null, dto);
             ra.addFlashAttribute("ok", "Triaje registrado correctamente. Paciente derivado al consultorio.");
             return "redirect:/triaje/pendientes";
         } catch (Exception e) {

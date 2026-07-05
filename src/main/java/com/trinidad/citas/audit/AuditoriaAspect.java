@@ -1,5 +1,6 @@
 package com.trinidad.citas.audit;
 
+import com.trinidad.citas.config.AppConstants;
 import com.trinidad.citas.model.AuditoriaLog;
 import com.trinidad.citas.service.AuditoriaLogService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -104,9 +105,10 @@ public class AuditoriaAspect {
         } else {
             detalle += String.format(" | OK (%d ms)", durationMs);
         }
-        // Truncar a 2000 caracteres (limite de la columna)
-        if (detalle.length() > 2000) {
-            detalle = detalle.substring(0, 1997) + "...";
+        // Truncar al maximo permitido por la columna en BD
+        int maxLen = AppConstants.AUDITORIA_DETALLE_MAX;
+        if (detalle.length() > maxLen) {
+            detalle = detalle.substring(0, maxLen - 3) + "...";
         }
         al.setDetalle(detalle);
 
@@ -132,25 +134,29 @@ public class AuditoriaAspect {
                 Method m = result.getClass().getMethod("getId");
                 Object id = m.invoke(result);
                 if (id != null) return id.toString();
-            } catch (NoSuchMethodException ignored) {
+            } catch (NoSuchMethodException e) {
+                log.trace("No hay metodo getId() en {}, se busca por metodos *Id(): {}", result.getClass().getSimpleName(), e.getMessage());
                 for (Method m : result.getClass().getMethods()) {
                     String name = m.getName();
                     if (name.endsWith("Id") && !"getId".equals(name)
                             && m.getParameterCount() == 0) {
                         Class<?> ret = m.getReturnType();
+                        // Soporta: Long, long, Integer, int, String, y subclases de Number
                         if (ret == Long.class || ret == long.class
-                                || ret == Integer.class || ret == int.class) {
+                                || ret == Integer.class || ret == int.class
+                                || ret == String.class
+                                || Number.class.isAssignableFrom(ret)) {
                             try {
                                 Object id = m.invoke(result);
                                 if (id != null) return id.toString();
-                            } catch (Exception ignored2) {
-                                // Algunos getters pueden lanzar excepcion, lo ignoramos
+                            } catch (Exception e2) {
+                                log.trace("Getter {}.{} lanzó excepción: {}", result.getClass().getSimpleName(), name, e2.getMessage());
                             }
                         }
                     }
                 }
-            } catch (Exception ignored) {
-                // Falló la reflexión, no tenemos ID
+            } catch (Exception e) {
+                log.trace("Falló reflexión para extraer ID de {}: {}", result.getClass().getSimpleName(), e.getMessage());
             }
         }
 
@@ -182,8 +188,8 @@ public class AuditoriaAspect {
                 }
                 return ip;
             }
-        } catch (Exception ignored) {
-            // Sin request HTTP (tests unitarios, tareas programadas, etc.)
+        } catch (Exception e) {
+            log.trace("No se pudo obtener IP (sin request HTTP): {}", e.getMessage());
         }
         return null;
     }

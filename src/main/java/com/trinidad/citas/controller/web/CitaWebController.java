@@ -124,7 +124,7 @@ public class CitaWebController {
         YearMonth next = pagina.plusMonths(1);
 
         model.addAttribute("pagina", pagina);
-        model.addAttribute("monthName", pagina.getMonth().getDisplayName(TextStyle.FULL, new Locale("es", "ES")));
+        model.addAttribute("monthName", pagina.getMonth().getDisplayName(TextStyle.FULL, Locale.forLanguageTag("es-ES")));
         model.addAttribute("calendarYear", pagina.getYear());
         model.addAttribute("calendarMonth", pagina.getMonthValue());
         model.addAttribute("diasCalendario", diasCalendario);

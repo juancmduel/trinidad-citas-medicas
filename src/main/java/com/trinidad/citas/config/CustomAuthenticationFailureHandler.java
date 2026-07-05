@@ -1,6 +1,5 @@
 package com.trinidad.citas.config;
 
-import com.trinidad.citas.model.Usuario;
 import com.trinidad.citas.repository.UsuarioRepository;
 import com.trinidad.citas.service.IntentoLoginService;
 import jakarta.servlet.http.HttpServletRequest;

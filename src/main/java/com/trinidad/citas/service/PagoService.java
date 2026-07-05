@@ -1,5 +1,15 @@
 package com.trinidad.citas.service;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.trinidad.citas.audit.Auditable;
 import com.trinidad.citas.dto.PagoDTO;
 import com.trinidad.citas.exception.BusinessException;
@@ -9,20 +19,15 @@ import com.trinidad.citas.model.EstadoCita;
 import com.trinidad.citas.model.Pago;
 import com.trinidad.citas.repository.CitaRepository;
 import com.trinidad.citas.repository.PagoRepository;
-import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
 @Transactional
 public class PagoService {
+
+    private static final Logger log = LoggerFactory.getLogger(PagoService.class);
 
     private final PagoRepository pagoRepository;
     private final CitaRepository citaRepository;
@@ -78,6 +83,29 @@ public class PagoService {
 
     @Auditable(entidad = "PAGO", accion = "CREAR")
     public PagoDTO crear(PagoDTO dto) {
+        PagoDTO saved = crearPagoBase(dto);
+        // Confirmar la cita si el pago se registró como PAGADO
+        Cita cita = citaRepository.findById(dto.getIdCita())
+                .orElseThrow(() -> new ResourceNotFoundException("Cita", dto.getIdCita()));
+        if ("PAGADO".equals(saved.getEstado()) && cita.getEstado() == EstadoCita.PROGRAMADA) {
+            citaService.confirmarPago(dto.getIdCita());
+        }
+        return saved;
+    }
+
+    /**
+     * Crea un pago SIN confirmar la cita automáticamente.
+     * Útil para flujos donde la confirmación se hace en un paso posterior.
+     */
+    public PagoDTO crearPagoSinConfirmar(PagoDTO dto) {
+        return crearPagoBase(dto);
+    }
+
+    /**
+     * Lógica base compartida para crear un pago.
+     * Valida datos, calcula montos, genera comprobante y persiste.
+     */
+    private PagoDTO crearPagoBase(PagoDTO dto) {
         if (pagoRepository.findByCita_IdCita(dto.getIdCita()).isPresent()) {
             throw new BusinessException("Esta cita ya tiene un pago registrado");
         }
@@ -86,45 +114,6 @@ public class PagoService {
         if (cita.getEstado() != EstadoCita.PROGRAMADA && cita.getEstado() != EstadoCita.CONFIRMADA) {
             throw new BusinessException("El pago solo puede registrarse en citas PROGRAMADA o CONFIRMADA");
         }
-
-        BigDecimal monto = dto.getMonto();
-        if (monto == null || monto.compareTo(BigDecimal.ZERO) <= 0) {
-            if (cita.getEspecialidad() != null && cita.getEspecialidad().getPrecioConsulta() != null) {
-                monto = cita.getEspecialidad().getPrecioConsulta();
-            } else {
-                throw new BusinessException("Debe ingresar un monto válido para el pago");
-            }
-        }
-
-        String nroComprobante = dto.getNroComprobante();
-        String tipoComprobante = dto.getTipoComprobante();
-        if (tipoComprobante != null && !tipoComprobante.isBlank() && (nroComprobante == null || nroComprobante.isBlank())) {
-            nroComprobante = generarNroComprobante(tipoComprobante);
-        }
-
-        Pago p = new Pago();
-        p.setCita(cita);
-        p.setMonto(monto);
-        p.setMetodoPago(dto.getMetodoPago());
-        p.setEstado(dto.getEstado() != null ? dto.getEstado() : "PENDIENTE");
-        p.setNroComprobante(nroComprobante);
-        p.setTipoComprobante(tipoComprobante);
-        if ("PAGADO".equals(p.getEstado())) {
-            p.setFechaPago(dto.getFechaPago() != null ? dto.getFechaPago() : LocalDateTime.now());
-        }
-        PagoDTO saved = toDTO(pagoRepository.save(p));
-        if ("PAGADO".equals(p.getEstado())) {
-            citaService.confirmarPago(dto.getIdCita());
-        }
-        return saved;
-    }
-
-    public PagoDTO crearPagoSinConfirmar(PagoDTO dto) {
-        if (pagoRepository.findByCita_IdCita(dto.getIdCita()).isPresent()) {
-            throw new BusinessException("Esta cita ya tiene un pago registrado");
-        }
-        Cita cita = citaRepository.findById(dto.getIdCita())
-                .orElseThrow(() -> new ResourceNotFoundException("Cita", dto.getIdCita()));
 
         BigDecimal monto = dto.getMonto();
         if (monto == null || monto.compareTo(BigDecimal.ZERO) <= 0) {
@@ -194,9 +183,16 @@ public class PagoService {
         return saved;
     }
 
+    /**
+     * Anulación/eliminación lógica: desactiva el pago (activo=0) en lugar de borrarlo.
+     * Preserva el histórico financiero y la auditoría.
+     */
     @Auditable(entidad = "PAGO", accion = "ANULAR")
     public void eliminar(Long id) {
-        pagoRepository.deleteById(id);
+        Pago p = pagoRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Pago", id));
+        p.setActivo(0);
+        pagoRepository.save(p);
     }
 
     @Transactional(readOnly = true)
@@ -212,7 +208,9 @@ public class PagoService {
         if (maxNro != null && maxNro.startsWith(prefix)) {
             try {
                 next = Integer.parseInt(maxNro.substring(prefix.length())) + 1;
-            } catch (NumberFormatException ignored) {}
+            } catch (NumberFormatException e) {
+                log.warn("No se pudo parsear el correlativo del comprobante '{}': {}", maxNro, e.getMessage());
+            }
         }
         return prefix + String.format("%06d", next);
     }

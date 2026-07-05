@@ -7,6 +7,7 @@ import jakarta.validation.ConstraintValidatorContext;
  * Implementación del validador de DNI peruano.
  * Acepta exactamente 8 dígitos numéricos (0-9).
  */
+@SuppressWarnings("unused")
 public class DniValidator implements ConstraintValidator<ValidDni, String> {
 
     private static final String DNI_PATTERN = "^\\d{8}$";

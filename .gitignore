@@ -58,3 +58,10 @@ documento/
 pipeline-output/
 TEST-SUMMARY.md
 run-local-ai.bat
+run.ps1
+download-models.ps1
+generate-image.ps1
+run-comfyui.ps1
+
+### Otros entornos locales ###
+.opencode/

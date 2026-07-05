@@ -13,6 +13,7 @@ public class EspecialidadDTO {
     private Long idEspecialidad;
 
     @NotBlank @Size(max = 80)
+    @Pattern(regexp = "^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\\s]+$", message = "Nombre: solo se permiten letras y espacios")
     private String nombre;
 
     @Size(max = 300)
@@ -27,4 +28,9 @@ public class EspecialidadDTO {
     private Integer duracionMinutos;
 
     private Integer activo;
+
+    // ── Campos visuales (se llenan en el controller) ──────────────
+    private String icono;      // clase Bootstrap Icon, ej: "bi bi-heart-pulse"
+    private String color;      // color acento, ej: "#ef4444"
+    private String bgColor;    // color de fondo claro, ej: "#fee2e2"
 }

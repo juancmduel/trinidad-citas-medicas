@@ -1,13 +1,15 @@
 package com.trinidad.citas.security;
 
-import com.trinidad.citas.model.Cita;
-import com.trinidad.citas.repository.CitaRepository;
-import com.trinidad.citas.repository.MedicoRepository;
-import com.trinidad.citas.repository.PacienteRepository;
-import lombok.RequiredArgsConstructor;
+import java.security.Principal;
+
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
-import java.security.Principal;
+import com.trinidad.citas.repository.CitaRepository;
+
+import lombok.RequiredArgsConstructor;
 
 /**
  * Bean de seguridad para verificar pertenencia (ownership) de citas.
@@ -19,8 +21,6 @@ import java.security.Principal;
 public class CitaSecurity {
 
     private final CitaRepository citaRepository;
-    private final MedicoRepository medicoRepository;
-    private final PacienteRepository pacienteRepository;
     private final PacienteSecurity pacienteSecurity;
 
     /**
@@ -49,6 +49,21 @@ public class CitaSecurity {
      * Verifica si el médico autenticado es el asignado a la cita, o si es ADMIN.
      */
     public boolean isMedicoAsignadoOrAdmin(Long idCita, Principal principal) {
+        if (principal == null) return false;
+        // Verificar si es ADMINISTRADOR
+        if (hasRole("ROLE_ADMINISTRADOR")) return true;
+        // Si no es ADMIN, verificar si es el medico asignado
         return isMedicoAsignado(idCita, principal);
+    }
+
+    /**
+     * Verifica si el usuario autenticado tiene un rol específico.
+     */
+    private boolean hasRole(String role) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null) return false;
+        return auth.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .anyMatch(role::equals);
     }
 }

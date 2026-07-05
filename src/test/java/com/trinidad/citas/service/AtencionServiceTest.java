@@ -1,27 +1,37 @@
 package com.trinidad.citas.service;
 
-import com.trinidad.citas.dto.AtencionDTO;
-import com.trinidad.citas.exception.BusinessException;
-import com.trinidad.citas.exception.ResourceNotFoundException;
-import com.trinidad.citas.model.*;
-import com.trinidad.citas.repository.*;
+import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.time.LocalDateTime;
-import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.then;
-import static org.mockito.Mockito.never;
+import com.trinidad.citas.dto.AtencionDTO;
+import com.trinidad.citas.exception.BusinessException;
+import com.trinidad.citas.exception.ResourceNotFoundException;
+import com.trinidad.citas.model.Atencion;
+import com.trinidad.citas.model.Cita;
+import com.trinidad.citas.model.EstadoCita;
+import com.trinidad.citas.model.HistoriaClinica;
+import com.trinidad.citas.model.Medico;
+import com.trinidad.citas.model.Paciente;
+import com.trinidad.citas.model.Pago;
+import com.trinidad.citas.repository.AtencionRepository;
+import com.trinidad.citas.repository.CitaRepository;
+import com.trinidad.citas.repository.DiagnosticoCie10Repository;
+import com.trinidad.citas.repository.HistoriaClinicaRepository;
+import com.trinidad.citas.repository.MedicoRepository;
+import com.trinidad.citas.repository.PagoRepository;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("AtencionService — registro de atenciones médicas")

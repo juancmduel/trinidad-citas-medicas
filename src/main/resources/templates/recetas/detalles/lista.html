@@ -43,12 +43,12 @@
                         <td th:text="${detalle.frecuencia}"></td>
                         <td th:text="${detalle.duracionDias + ' día(s)'}"></td>
                         <td th:text="${detalle.viaAdministracion ?: '-'}"></td>
-                        <td><div class="acciones-tabla" style="justify-content:flex-end;">
-                            <a th:href="@{/recetas/{recetaId}/detalles/editar/{id}(recetaId=${receta.idReceta}, id=${detalle.idDetalle})}" class="btn-editar">
+                        <td><div class="action-group" style="justify-content:flex-end;">
+                            <a th:href="@{/recetas/{recetaId}/detalles/editar/{id}(recetaId=${receta.idReceta}, id=${detalle.idDetalle})}" class="action-btn action-edit">
                                 <i class="bi bi-pencil"></i>
                             </a>
                             <a th:href="@{/recetas/{recetaId}/detalles/eliminar/{id}(recetaId=${receta.idReceta}, id=${detalle.idDetalle})}"
-                               class="btn-eliminar"
+                               class="action-btn action-delete"
                                onclick="return confirm('¿Eliminar este medicamento?')">
                                 <i class="bi bi-trash"></i>
                             </a>

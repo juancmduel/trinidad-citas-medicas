@@ -4,7 +4,6 @@ import com.trinidad.citas.dto.TriajeDTO;
 import com.trinidad.citas.model.EstadoCita;
 import com.trinidad.citas.repository.CitaRepository;
 import com.trinidad.citas.repository.MedicoRepository;
-import com.trinidad.citas.service.CitaService;
 import com.trinidad.citas.service.HorarioMedicoService;
 import com.trinidad.citas.service.TriajeService;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +23,6 @@ public class MedicoColaController {
 
     private final CitaRepository citaRepository;
     private final MedicoRepository medicoRepository;
-    private final CitaService citaService;
     private final TriajeService triajeService;
     private final HorarioMedicoService horarioMedicoService;
 

@@ -111,9 +111,15 @@ public class UsuarioService {
         return toDTO(usuarioRepository.save(u));
     }
 
+    /**
+     * Eliminación lógica: desactiva el usuario (activo=0) en lugar de borrarlo.
+     * Esto preserva la integridad referencial y el histórico de auditoría.
+     */
     @Auditable(entidad = "USUARIO", accion = "ELIMINAR")
     public void eliminar(Long id) {
-        usuarioRepository.deleteById(id);
+        Usuario u = obtenerEntidadPorId(id);
+        u.setActivo(0);
+        usuarioRepository.save(u);
     }
 
     @Auditable(entidad = "USUARIO", accion = "CAMBIAR_ESTADO")

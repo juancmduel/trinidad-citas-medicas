@@ -7,15 +7,13 @@
     <div th:replace="~{fragments/header :: topbar}"></div>
     <main class="page-main">
 
-        <div class="d-flex align-items-center justify-content-between mb-4">
+        <div class="page-header">
             <div>
-                <h1 style="font-size:26px;font-weight:700;margin-bottom:4px;">
-                    <i class="bi bi-envelope me-2" style="color:var(--accent);"></i>Correo Electrónico
-                </h1>
-                <p style="color:var(--text-muted);font-size:13px;margin:0;">Configuración del servidor de correo</p>
+                <h1><i class="bi bi-envelope"></i>Correo Electrónico</h1>
+                <p>Configuración del servidor de correo</p>
             </div>
             <a th:href="@{/configuracion}" class="btn-volver">
-                <i class="bi bi-arrow-left me-1"></i>Volver
+                <i class="bi bi-arrow-left"></i>Volver
             </a>
         </div>
 

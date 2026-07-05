@@ -27,6 +27,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 @Service
@@ -39,6 +40,7 @@ public class ReporteService {
     private final CitaRepository citaRepository;
     private final EspecialidadRepository especialidadRepository;
     private final PagoRepository pagoRepository;
+    private final CitaService citaService;
 
     private static final DateTimeFormatter DATE_FMT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
     private static final DateTimeFormatter DATETIME_FMT = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
@@ -74,28 +76,12 @@ public class ReporteService {
         return filtrarCitas(desde, hasta, idEspecialidad, idMedico, estado).size();
     }
 
+    /**
+     * Reutiliza CitaService.toDTO() para evitar duplicación de lógica de mapeo.
+     * @see CitaService#toDTO(Cita)
+     */
     private CitaDTO toCitaDTO(Cita c) {
-        CitaDTO dto = new CitaDTO();
-        dto.setIdCita(c.getIdCita());
-        dto.setFechaCita(c.getFechaCita());
-        dto.setHoraInicio(c.getHoraInicio());
-        dto.setMotivoConsulta(c.getMotivoConsulta());
-        dto.setCanalReserva(c.getCanalReserva());
-        dto.setEstado(c.getEstado() != null ? c.getEstado().name() : null);
-        if (c.getPaciente() != null) {
-            dto.setIdPaciente(c.getPaciente().getIdPaciente());
-            dto.setNombrePaciente(c.getPaciente().getNombreCompleto());
-            dto.setDniPaciente(c.getPaciente().getDni());
-        }
-        if (c.getMedico() != null) {
-            dto.setIdMedico(c.getMedico().getIdMedico());
-            dto.setNombreMedico(c.getMedico().getNombreCompleto());
-        }
-        if (c.getEspecialidad() != null) {
-            dto.setIdEspecialidad(c.getEspecialidad().getIdEspecialidad());
-            dto.setNombreEspecialidad(c.getEspecialidad().getNombre());
-        }
-        return dto;
+        return citaService.toDTO(c);
     }
 
     // ────────────────────────────────────────────────────────────────
@@ -270,13 +256,21 @@ public class ReporteService {
             agregarHeader(table, "Fecha Pago", "Comprobante", "Paciente", "Monto", "Metodo", "Estado", "Fecha Cita");
             com.lowagie.text.Font cellFont = com.lowagie.text.FontFactory.getFont(com.lowagie.text.FontFactory.HELVETICA, 8);
             for (Pago p : pagos) {
+                String nombrePaciente = Optional.ofNullable(p.getCita())
+                    .map(c -> c.getPaciente())
+                    .map(pac -> pac.getNombreCompleto())
+                    .orElse("-");
+                String fechaCita = Optional.ofNullable(p.getCita())
+                    .map(c -> c.getFechaCita())
+                    .map(f -> f.format(DATE_FMT))
+                    .orElse("-");
                 table.addCell(crearCell(p.getFechaPago() != null ? p.getFechaPago().format(DATETIME_FMT) : "-", cellFont));
                 table.addCell(crearCell(p.getNroComprobante() != null ? p.getNroComprobante() : "-", cellFont));
-                table.addCell(crearCell(p.getCita().getPaciente().getNombreCompleto(), cellFont));
+                table.addCell(crearCell(nombrePaciente, cellFont));
                 table.addCell(crearCell("S/ " + p.getMonto().toString(), cellFont));
                 table.addCell(crearCell(p.getMetodoPago(), cellFont));
                 table.addCell(crearCell(p.getEstado(), cellFont));
-                table.addCell(crearCell(p.getCita().getFechaCita().format(DATE_FMT), cellFont));
+                table.addCell(crearCell(fechaCita, cellFont));
             }
             doc.add(table);
             doc.add(new Paragraph(" "));
@@ -313,14 +307,22 @@ public class ReporteService {
             }
             int rowIdx = 1;
             for (Pago p : pagos) {
+                String nombrePaciente = Optional.ofNullable(p.getCita())
+                    .map(c -> c.getPaciente())
+                    .map(pac -> pac.getNombreCompleto())
+                    .orElse("-");
+                String fechaCita = Optional.ofNullable(p.getCita())
+                    .map(c -> c.getFechaCita())
+                    .map(f -> f.format(DATE_FMT))
+                    .orElse("-");
                 Row row = sheet.createRow(rowIdx++);
                 row.createCell(0).setCellValue(p.getFechaPago() != null ? p.getFechaPago().format(DATETIME_FMT) : "-");
                 row.createCell(1).setCellValue(p.getNroComprobante() != null ? p.getNroComprobante() : "-");
-                row.createCell(2).setCellValue(p.getCita().getPaciente().getNombreCompleto());
+                row.createCell(2).setCellValue(nombrePaciente);
                 row.createCell(3).setCellValue(p.getMonto().doubleValue());
                 row.createCell(4).setCellValue(p.getMetodoPago());
                 row.createCell(5).setCellValue(p.getEstado());
-                row.createCell(6).setCellValue(p.getCita().getFechaCita().format(DATE_FMT));
+                row.createCell(6).setCellValue(fechaCita);
             }
             Row totalRow = sheet.createRow(rowIdx + 1);
             Cell totalLabel = totalRow.createCell(2);
@@ -355,16 +357,27 @@ public class ReporteService {
     }
 
     private IngresoDTO toIngresoDTO(Pago p) {
+        String nombrePaciente = Optional.ofNullable(p.getCita())
+            .map(c -> c.getPaciente())
+            .map(pac -> pac.getNombreCompleto())
+            .orElse("-");
+        String dniPaciente = Optional.ofNullable(p.getCita())
+            .map(c -> c.getPaciente())
+            .map(pac -> pac.getDni())
+            .orElse("-");
+        LocalDate fechaCita = Optional.ofNullable(p.getCita())
+            .map(Cita::getFechaCita)
+            .orElse(null);
         return IngresoDTO.builder()
             .idPago(p.getIdPago())
             .nroComprobante(p.getNroComprobante())
-            .paciente(p.getCita().getPaciente().getNombreCompleto())
-            .dniPaciente(p.getCita().getPaciente().getDni())
+            .paciente(nombrePaciente)
+            .dniPaciente(dniPaciente)
             .monto(p.getMonto())
             .metodoPago(p.getMetodoPago())
             .estado(p.getEstado())
             .fechaPago(p.getFechaPago())
-            .fechaCita(p.getCita().getFechaCita())
+            .fechaCita(fechaCita)
             .build();
     }
 

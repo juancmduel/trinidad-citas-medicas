@@ -1,14 +1,8 @@
 package com.trinidad.citas.security;
 
-import io.github.bucket4j.Bandwidth;
-import io.github.bucket4j.Bucket;
-import io.github.bucket4j.BucketConfiguration;
-import io.github.bucket4j.Refill;
-import io.github.bucket4j.local.LocalBucket;
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.time.Duration;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -17,16 +11,25 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import java.io.IOException;
-import java.time.Duration;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
+
+import io.github.bucket4j.Bandwidth;
+import io.github.bucket4j.Bucket;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * Filtro de rate limiting basado en Bucket4j (token bucket).
  * <p>
  * Se registra en la cadena de Spring Security DESPUES del filtro JWT,
  * por lo que puede distinguir entre usuarios autenticados y anonimos.
+ * <p>
+ * Usa Caffeine Cache con expiracion automatica para evitar memory leaks:
+ * los buckets de IPs/usurios inactivos se eliminan automaticamente
+ * despues de 10 minutos sin actividad.
  * <p>
  * Limites:
  * <ul>
@@ -40,11 +43,18 @@ public class RateLimitingFilter extends OncePerRequestFilter {
 
     private static final Logger log = LoggerFactory.getLogger(RateLimitingFilter.class);
 
-    private final Map<String, LocalBucket> buckets = new ConcurrentHashMap<>();
+    /**
+     * Cache de buckets con expiracion por falta de uso (10 min).
+     * Esto evita el memory leak: buckets inactivos se eliminan automaticamente.
+     */
+    private final Cache<String, Bucket> bucketCache = Caffeine.newBuilder()
+        .expireAfterAccess(Duration.ofMinutes(10))
+        .maximumSize(10_000)
+        .build();
 
-    private static final Bandwidth AUTH_LIMIT      = Bandwidth.classic(5,   Refill.intervally(5,   Duration.ofMinutes(1)));
-    private static final Bandwidth USER_LIMIT      = Bandwidth.classic(120, Refill.intervally(120, Duration.ofMinutes(1)));
-    private static final Bandwidth ANONYMOUS_LIMIT = Bandwidth.classic(30,  Refill.intervally(30,  Duration.ofMinutes(1)));
+    private static final Bandwidth AUTH_LIMIT      = Bandwidth.builder().capacity(5).refillIntervally(5, Duration.ofMinutes(1)).build();
+    private static final Bandwidth USER_LIMIT      = Bandwidth.builder().capacity(120).refillIntervally(120, Duration.ofMinutes(1)).build();
+    private static final Bandwidth ANONYMOUS_LIMIT = Bandwidth.builder().capacity(30).refillIntervally(30, Duration.ofMinutes(1)).build();
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
@@ -60,10 +70,11 @@ public class RateLimitingFilter extends OncePerRequestFilter {
             return;
         }
 
-        String clientKey = resolveClientKey(request, path);
+        String clientKey = resolveClientKey(request);
         Bandwidth limit = resolveLimit(path);
-        LocalBucket bucket = buckets.computeIfAbsent(clientKey,
-                k -> Bucket.builder().addLimit(limit).build());
+
+        // Obtener o crear bucket desde la cache (se limpia solo al expirar)
+        Bucket bucket = bucketCache.get(clientKey, k -> Bucket.builder().addLimit(limit).build());
 
         if (bucket.tryConsume(1)) {
             filterChain.doFilter(request, response);
@@ -84,7 +95,7 @@ public class RateLimitingFilter extends OncePerRequestFilter {
             || path.contains("/h2-console");
     }
 
-    private String resolveClientKey(HttpServletRequest request, String path) {
+    private String resolveClientKey(HttpServletRequest request) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth != null && auth.isAuthenticated()
                 && !"anonymousUser".equals(auth.getPrincipal())) {

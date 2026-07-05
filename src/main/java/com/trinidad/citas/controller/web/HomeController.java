@@ -1,19 +1,18 @@
 package com.trinidad.citas.controller.web;
 
 import org.springframework.context.annotation.Profile;
-import com.trinidad.citas.service.ReporteService;
+import com.trinidad.citas.service.DashboardService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
-@Profile({"web", "default"})
+@Profile("web")
 @Controller
 @RequiredArgsConstructor
 public class HomeController {
 
-    private final ReporteService reporteService;
+    private final DashboardService dashboardService;
 
     @GetMapping({"/", "/index"})
     public String home() {
@@ -26,8 +25,8 @@ public class HomeController {
     }
 
     @GetMapping("/dashboard")
-    public String dashboard(Authentication auth, Model model) {
-        model.addAttribute("kpis", reporteService.obtenerKpisDashboard());
+    public String dashboard(Model model) {
+        model.addAttribute("kpis", dashboardService.obtenerKpisDashboard());
         return "dashboard/index";
     }
 }

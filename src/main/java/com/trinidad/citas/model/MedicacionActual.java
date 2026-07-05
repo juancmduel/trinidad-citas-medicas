@@ -19,6 +19,7 @@ public class MedicacionActual {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "ID_HISTORIA", nullable = false)
+    @ToString.Exclude
     private HistoriaClinica historia;
 
     @NotBlank

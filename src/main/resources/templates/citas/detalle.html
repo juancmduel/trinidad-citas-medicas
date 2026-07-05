@@ -73,10 +73,10 @@
                                 <div class="detail-field">
                                     <span class="df-label">Estado</span>
                                     <span class="badge-estado badge-estado-lg"
-                                          th:classappend="${cita.estado.name() == 'PROGRAMADA'} ? 'badge-estado-warning' :
-                                                          (${cita.estado.name() == 'CONFIRMADA'} ? 'badge-estado-primary' :
-                                                          (${cita.estado.name() == 'ATENDIDA'} ? 'badge-estado-success' :
-                                                          (${cita.estado.name() == 'CANCELADA'} ? 'badge-estado-danger' : 'badge-estado-info')))"
+                                          th:classappend="${cita.estado.name() == 'PROGRAMADA'} ? 'badge-warning' :
+                                                          (${cita.estado.name() == 'CONFIRMADA'} ? 'badge-primary' :
+                                                          (${cita.estado.name() == 'ATENDIDA'} ? 'badge-success' :
+                                                          (${cita.estado.name() == 'CANCELADA'} ? 'badge-danger' : 'badge-info')))"
                                           th:text="${cita.estado}"></span>
                                 </div>
                             </div>

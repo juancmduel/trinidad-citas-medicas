@@ -1,32 +1,39 @@
 package com.trinidad.citas.service;
 
-import com.trinidad.citas.dto.CitaDTO;
-import com.trinidad.citas.exception.BusinessException;
-import com.trinidad.citas.exception.ResourceNotFoundException;
-import com.trinidad.citas.model.*;
-import com.trinidad.citas.repository.*;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
+import org.mockito.Captor;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import static org.mockito.Mockito.never;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import com.trinidad.citas.dto.CitaDTO;
+import com.trinidad.citas.exception.BusinessException;
+import com.trinidad.citas.exception.ResourceNotFoundException;
+import com.trinidad.citas.model.Cita;
+import com.trinidad.citas.model.Especialidad;
+import com.trinidad.citas.model.EstadoCita;
+import com.trinidad.citas.model.Medico;
+import com.trinidad.citas.model.Paciente;
+import com.trinidad.citas.repository.CitaRepository;
+import com.trinidad.citas.repository.EspecialidadRepository;
+import com.trinidad.citas.repository.MedicoRepository;
+import com.trinidad.citas.repository.PacienteRepository;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("CitaService — lógica de negocio de citas")

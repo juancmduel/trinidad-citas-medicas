@@ -89,7 +89,17 @@ public class SecurityConfig {
                     new AntPathRequestMatcher("/h2-console/**")
                 )
             )
-            .headers(headers -> headers.frameOptions(frame -> frame.sameOrigin()))
+            .headers(headers -> headers
+                .frameOptions(frame -> frame.sameOrigin())
+                .contentSecurityPolicy(csp -> csp
+                    .policyDirectives("default-src 'self'; " +
+                        "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; " +
+                        "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com https://cdnjs.cloudflare.com; " +
+                        "font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; " +
+                        "img-src 'self' data: https://images.unsplash.com; " +
+                        "frame-ancestors 'self'")
+                )
+            )
             .authorizeHttpRequests(auth -> auth
                 // ════════════════════════════════════════════════════════════
                 //  RUTAS PÚBLICAS (sin autenticación)
@@ -130,8 +140,9 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.DELETE, "/api/v1/medicos/**").hasRole("ADMINISTRADOR")
 
                 // ── Citas ──
+                // La validacion fina por rol + pertenencia esta en @PreAuthorize del controller
                 .requestMatchers(HttpMethod.GET, "/api/v1/citas/**").hasAnyRole("ADMINISTRADOR", "GERENTE", "MEDICO", "RECEPCIONISTA", "ENFERMERA", "PACIENTE")
-                .requestMatchers(HttpMethod.POST, "/api/v1/citas/**").hasAnyRole("ADMINISTRADOR", "GERENTE", "RECEPCIONISTA", "PACIENTE", "ENFERMERA", "MEDICO")
+                .requestMatchers(HttpMethod.POST, "/api/v1/citas/**").hasAnyRole("ADMINISTRADOR", "GERENTE", "RECEPCIONISTA", "PACIENTE")
                 .requestMatchers(HttpMethod.PUT, "/api/v1/citas/**").hasAnyRole("ADMINISTRADOR", "GERENTE", "MEDICO")
                 .requestMatchers(HttpMethod.DELETE, "/api/v1/citas/**").hasAnyRole("ADMINISTRADOR", "GERENTE", "RECEPCIONISTA")
 

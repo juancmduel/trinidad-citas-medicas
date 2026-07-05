@@ -3,70 +3,82 @@
    Tema dual: Light (clinica) / Dark (glassmorphism)
    ================================================================ */
 
-/* ======================== VARIABLES / LIGHT THEME (default) ======================== */
+/* ======================== VARIABLES / LIGHT THEME — Celeste Pastel (default) ======================== */
 :root {
-    --bg-body:        #f0f5fa;
+    --bg-body:        #f0f7ff;
     --bg-deep:        #e4eaf2;
     --bg-card:        #ffffff;
     --bg-card-hover:  #f8fafc;
     --sidebar-bg:     #ffffff;
     --navbar-bg:      #ffffff;
-    --accent:         #0ea5e9;
+    --accent:         #38bdf8;
     --accent-green:   #10b981;
     --border:         #e2e8f0;
-    --border-accent:  rgba(14, 165, 233, 0.30);
-    --text-primary:   #0f172a;
-    --text-secondary: #475569;
+    --border-accent:  rgba(56, 189, 248, 0.30);
+    --text-primary:   #1e293b;
+    --text-secondary: #64748b;
     --text-muted:     #94a3b8;
     --danger:         #ef4444;
     --warning:        #f59e0b;
     --success:        #10b981;
     --shadow-sm:      0 1px 3px rgba(0,0,0,0.06);
     --shadow:         0 4px 16px rgba(0,0,0,0.07);
-    --shadow-hover:   0 8px 24px rgba(14,165,233,0.12);
+    --shadow-hover:   0 8px 24px rgba(56,189,248,0.12);
     --sidebar-width:  250px;
     --topbar-height:  65px;
     --radius:         16px;
     --radius-sm:      8px;
     --transition:     all 0.3s ease;
     --topbar-user-bg: #f1f5f9;
-    --hover-bg:       rgba(14,165,233,0.06);
-    --hover-border:   rgba(14,165,233,0.40);
-    --table-hover:    rgba(14,165,233,0.04);
-    --scrollbar-bg:   rgba(14,165,233,0.15);
-    --scrollbar-hover: rgba(14,165,233,0.35);
+    --hover-bg:       rgba(56,189,248,0.06);
+    --hover-border:   rgba(56,189,248,0.40);
+    --table-hover:    rgba(56,189,248,0.04);
+    --scrollbar-bg:   rgba(56,189,248,0.15);
+    --scrollbar-hover: rgba(56,189,248,0.35);
     --input-bg:       #ffffff;
     --input-border:   #cbd5e1;
-    --linear-bg:      #f0f5fa;
+    --linear-bg:      #f0f7ff;
+    /* Landing page extras */
+    --landing-hero-overlay: rgba(6,18,32,0.20);
+    --landing-hero-text: #1e293b;
+    --landing-badge-bg: #e0f2fe;
+    --landing-card-shadow: 0 4px 24px rgba(56,189,248,0.10);
+    --landing-footer-bg: #1e293b;
 }
 
 /* ======================== DARK THEME ======================== */
 [data-theme="dark"] {
     --bg-body:        linear-gradient(135deg, #0a1628 0%, #0d2444 40%, #0a2035 70%, #061220 100%);
     --bg-deep:        #061220;
-    --bg-card:        rgba(255, 255, 255, 0.08);
-    --bg-card-hover:  rgba(255, 255, 255, 0.13);
-    --sidebar-bg:     rgba(10, 22, 40, 0.55);
-    --navbar-bg:      rgba(10, 22, 40, 0.82);
+    --bg-card:        rgba(255, 255, 255, 0.10);
+    --bg-card-hover:  rgba(255, 255, 255, 0.16);
+    --sidebar-bg:     rgba(10, 22, 40, 0.62);
+    --navbar-bg:      rgba(10, 22, 40, 0.85);
     --accent:         #06b6d4;
     --accent-green:   #10b981;
-    --border:         rgba(255, 255, 255, 0.10);
-    --border-accent:  rgba(6, 182, 212, 0.35);
+    --border:         rgba(255, 255, 255, 0.12);
+    --border-accent:  rgba(6, 182, 212, 0.40);
     --text-primary:   #ffffff;
-    --text-secondary: rgba(255, 255, 255, 0.72);
-    --text-muted:     rgba(255, 255, 255, 0.45);
-    --shadow-sm:      0 1px 3px rgba(0,0,0,0.20);
-    --shadow:         0 8px 24px rgba(0,0,0,0.35);
-    --shadow-hover:   0 8px 24px rgba(6,182,212,0.22);
-    --topbar-user-bg: rgba(255,255,255,0.05);
-    --hover-bg:       rgba(6,182,212,0.09);
-    --hover-border:   rgba(6,182,212,0.40);
-    --table-hover:    rgba(6,182,212,0.08);
-    --scrollbar-bg:   rgba(6,182,212,0.30);
+    --text-secondary: rgba(255, 255, 255, 0.78);
+    --text-muted:     rgba(255, 255, 255, 0.50);
+    --shadow-sm:      0 1px 3px rgba(0,0,0,0.25);
+    --shadow:         0 8px 24px rgba(0,0,0,0.40);
+    --shadow-hover:   0 8px 24px rgba(6,182,212,0.28);
+    --topbar-user-bg: rgba(255,255,255,0.07);
+    --hover-bg:       rgba(6,182,212,0.12);
+    --hover-border:   rgba(6,182,212,0.45);
+    --table-hover:    rgba(6,182,212,0.10);
+    --scrollbar-bg:   rgba(6,182,212,0.32);
     --scrollbar-hover: rgba(6,182,212,0.55);
-    --input-bg:       rgba(10,22,40,0.70);
-    --input-border:   rgba(255,255,255,0.15);
+    --input-bg:       rgba(10,22,40,0.78);
+    --input-border:   rgba(255,255,255,0.18);
     --linear-bg:      #0a1628;
+    /* Landing page extras */
+    --landing-hero-overlay: rgba(6,18,32,0.65);
+    --landing-hero-text: #ffffff;
+    --landing-badge-bg: rgba(6,182,212,0.15);
+    --landing-card-shadow: 0 4px 24px rgba(0,0,0,0.25);
+    --landing-footer-bg: #040d17;
 }
 
 /* ======================== RESET ======================== */

@@ -128,8 +128,15 @@ public class AtencionService {
         return saved;
     }
 
+    /**
+     * Eliminación lógica: desactiva la atención (activo=0) en lugar de borrarla.
+     * Preserva la integridad de históricos clínicos y auditoría.
+     */
     @Auditable(entidad = "ATENCION", accion = "ELIMINAR")
     public void eliminar(Long id) {
-        atencionRepository.deleteById(id);
+        Atencion a = atencionRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Atencion", id));
+        a.setActivo(0);
+        atencionRepository.save(a);
     }
 }

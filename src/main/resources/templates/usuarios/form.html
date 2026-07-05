@@ -7,16 +7,13 @@
     <div th:replace="~{fragments/header :: topbar}"></div>
     <main class="page-main">
 
-        <div class="d-flex align-items-center justify-content-between mb-4">
+        <div class="page-header">
             <div>
-                <h1 style="font-size:26px;font-weight:700;margin-bottom:4px;">
-                    <i class="bi bi-person-gear me-2" style="color:var(--accent);"></i>
-                    <span th:text="${usuario.idUsuario != null} ? 'Editar Usuario' : 'Nuevo Usuario'">Usuario</span>
-                </h1>
-                <p style="color:var(--text-muted);font-size:13px;margin:0;">Gestión de cuentas de usuario del sistema</p>
+                <h1><i class="bi bi-person-gear"></i><span th:text="${usuario.idUsuario != null} ? 'Editar Usuario' : 'Nuevo Usuario'">Usuario</span></h1>
+                <p>Gestión de cuentas de usuario del sistema</p>
             </div>
             <a th:href="@{/usuarios}" class="btn-volver">
-                <i class="bi bi-arrow-left me-1"></i>Volver
+                <i class="bi bi-arrow-left"></i>Volver
             </a>
         </div>
 
@@ -117,12 +114,12 @@
                                 <p style="color:var(--text-muted);font-size:13px;margin:0;">Finaliza o descarta</p>
                             </div>
                         </div>
-                        <button type="submit" class="btn btn-success w-100 mb-2" style="padding:12px;border-radius:10px;font-weight:700;">
-                            <i class="bi bi-check-circle me-2"></i>
+                        <button type="submit" class="btn-guardar w-100">
+                            <i class="bi bi-check-circle"></i>
                             <span th:text="${usuario.idUsuario != null} ? 'Guardar Cambios' : 'Crear Usuario'"></span>
                         </button>
-                        <a th:href="@{/usuarios}" class="btn btn-outline-secondary w-100" style="padding:12px;border-radius:10px;font-weight:600;">
-                            <i class="bi bi-x-circle me-2"></i>Cancelar
+                        <a th:href="@{/usuarios}" class="btn-volver w-100">
+                            <i class="bi bi-x-circle"></i>Cancelar
                         </a>
                     </div>
 

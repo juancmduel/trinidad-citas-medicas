@@ -72,7 +72,7 @@
                     <i class="bi bi-list-check"></i>
                     Citas del <span th:text="${#temporals.format(fecha, 'dd/MM/yyyy')}"></span>
                 </h5>
-                <span class="badge-estado badge-estado-primary" th:text="${#lists.size(citas)} + ' cita(s)'"></span>
+                <span class="badge-estado badge-primary" th:text="${#lists.size(citas)} + ' cita(s)'"></span>
             </div>
             <div class="p-4">
                 <div th:if="${not #lists.isEmpty(citas)}" class="table-container">
@@ -98,21 +98,21 @@
                                 <td th:text="${c.nombreEspecialidad}"></td>
                                 <td>
                                     <span class="badge-estado"
-                                          th:classappend="${c.estado == 'PROGRAMADA'} ? 'badge-estado-warning' :
-                                                          (${c.estado == 'CONFIRMADA'} ? 'badge-estado-primary' :
-                                                          (${c.estado == 'EN_ATENCION'} ? 'badge-estado-info' :
-                                                          (${c.estado == 'ATENDIDA'} ? 'badge-estado-success' :
-                                                          (${c.estado == 'CANCELADA'} ? 'badge-estado-danger' : 'badge-estado-warning'))))"
+                                          th:classappend="${c.estado == 'PROGRAMADA'} ? 'badge-warning' :
+                                                          (${c.estado == 'CONFIRMADA'} ? 'badge-primary' :
+                                                          (${c.estado == 'EN_ATENCION'} ? 'badge-info' :
+                                                          (${c.estado == 'ATENDIDA'} ? 'badge-success' :
+                                                          (${c.estado == 'CANCELADA'} ? 'badge-danger' : 'badge-warning'))))"
                                           th:text="${c.estado}"></span>
                                 </td>
-                                <td><div class="acciones-tabla" style="justify-content:flex-end;">
-                                    <a th:href="@{/citas/{id}(id=${c.idCita})}" class="btn-ver" title="Ver detalle">
+                                <td><div class="action-group" style="justify-content:flex-end;">
+                                    <a th:href="@{/citas/{id}(id=${c.idCita})}" class="action-btn action-view" title="Ver detalle">
                                         <i class="bi bi-eye"></i>
                                     </a>
                                     <form th:action="@{/citas/{id}/cancelar(id=${c.idCita})}" method="post"
                                           class="d-inline" onsubmit="return confirm('Cancelar esta cita?')"
                                           th:if="${c.estado == 'PROGRAMADA' or c.estado == 'CONFIRMADA'}">
-                                        <button class="btn-eliminar" title="Cancelar cita">
+                                        <button class="action-btn action-delete" title="Cancelar cita">
                                             <i class="bi bi-x-circle"></i>
                                         </button>
                                     </form>

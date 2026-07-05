@@ -9,88 +9,105 @@
         <div class="page-header">
             <div>
                 <h1><i class="bi bi-cash-stack"></i>Reporte de Ingresos</h1>
-                <p>Análisis de pagos y transacciones por rango de fechas</p>
+                <p>An&aacute;lisis de pagos y transacciones por rango de fechas</p>
+            </div>
+            <div class="d-flex gap-2">
+                <a th:href="@{/reportes}" class="btn-volver">
+                    <i class="bi bi-arrow-left"></i> Volver
+                </a>
+                <a th:href="@{/reportes/ingresos/pdf(desde=${desde}, hasta=${hasta})}" class="btn-professional btn-danger-prof">
+                    <i class="bi bi-file-pdf"></i> PDF
+                </a>
+                <a th:href="@{/reportes/ingresos/xlsx(desde=${desde}, hasta=${hasta})}" class="btn-professional btn-success-prof">
+                    <i class="bi bi-file-excel"></i> Excel
+                </a>
             </div>
         </div>
 
-        <div class="card-modern mb-4">
-            <div class="card-header-modern">
-                <h5><i class="bi bi-funnel"></i> Filtros</h5>
+        <!-- Filtros -->
+        <div class="card-professional mb-4">
+            <div class="card-header-professional">
+                <h5><i class="bi bi-funnel"></i>Filtros</h5>
             </div>
-            <div class="card-body-modern">
+            <div style="padding:1.5rem;">
                 <form method="get" th:action="@{/reportes/ingresos}" class="row g-3">
                     <div class="col-md-3">
-                        <label class="form-label-modern">Desde</label>
-                        <input type="date" name="desde" class="form-control-modern" th:value="${desde}" required>
+                        <div class="input-group-modern">
+                            <div class="input-icon"><i class="bi bi-calendar3"></i></div>
+                            <div class="input-group-modern-body">
+                                <label class="form-label-modern">Desde</label>
+                                <input type="date" name="desde" class="form-control-modern" th:value="${desde}" required>
+                            </div>
+                        </div>
                     </div>
                     <div class="col-md-3">
-                        <label class="form-label-modern">Hasta</label>
-                        <input type="date" name="hasta" class="form-control-modern" th:value="${hasta}" required>
+                        <div class="input-group-modern">
+                            <div class="input-icon"><i class="bi bi-calendar3"></i></div>
+                            <div class="input-group-modern-body">
+                                <label class="form-label-modern">Hasta</label>
+                                <input type="date" name="hasta" class="form-control-modern" th:value="${hasta}" required>
+                            </div>
+                        </div>
                     </div>
                     <div class="col-md-3 d-flex align-items-end gap-2">
-                        <button type="submit" class="btn btn-modern btn-primary">
+                        <button type="submit" class="btn-professional btn-primary-prof">
                             <i class="bi bi-search"></i> Filtrar
                         </button>
-                        <a th:href="@{/reportes/ingresos/pdf(desde=${desde}, hasta=${hasta})}"
-                           class="btn btn-modern btn-danger">
-                            <i class="bi bi-file-pdf"></i> PDF
-                        </a>
-                        <a th:href="@{/reportes/ingresos/xlsx(desde=${desde}, hasta=${hasta})}"
-                           class="btn btn-modern btn-success">
-                            <i class="bi bi-file-excel"></i> Excel
-                        </a>
                     </div>
                 </form>
             </div>
         </div>
 
-        <div class="card-modern">
-            <div class="card-header-modern">
-                <h5><i class="bi bi-table"></i> Ingresos</h5>
-                <span class="text-muted">
-                    Mostrando <strong th:text="${#lists.size(ingresos)}"></strong> transacciones
+        <!-- Tabla de Ingresos -->
+        <div class="table-container">
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--border);">
+                <h5 style="margin:0;display:flex;align-items:center;gap:8px;font-size:14px;">
+                    <i class="bi bi-table" style="color:var(--accent);"></i>Ingresos
+                </h5>
+                <span style="font-size:12px;color:var(--text-muted);">
+                    Mostrando <strong style="color:var(--accent);" th:text="${#lists.size(ingresos)}"></strong> transacciones
                     | Total: <strong style="color:#16a34a;">S/ <span th:text="${#numbers.formatDecimal(totalIngresos, 1, 2)}"></span></strong>
                 </span>
             </div>
-            <div class="card-body-modern">
-                <div class="table-container">
-                    <table class="table-modern">
-                        <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>Fecha Pago</th>
-                                <th>Comprobante</th>
-                                <th>Paciente</th>
-                                <th>DNI</th>
-                                <th>Monto</th>
-                                <th>Método</th>
-                                <th>Estado</th>
-                                <th>Fecha Cita</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr th:each="i, iter : ${ingresos}">
-                                <td th:text="${iter.count}"></td>
-                                <td th:text="${i.fechaPago != null ? #temporals.format(i.fechaPago, 'dd/MM/yyyy HH:mm') : '-'}"></td>
-                                <td th:text="${i.nroComprobante} ?: '-'"></td>
-                                <td th:text="${i.paciente}"></td>
-                                <td th:text="${i.dniPaciente}"></td>
-                                <td style="font-weight:600;">S/ <span th:text="${#numbers.formatDecimal(i.monto, 1, 2)}"></span></td>
-                                <td th:text="${i.metodoPago}"></td>
-                                <td>
-                                    <span class="badge-estado"
-                                          th:classappend="${i.estado == 'PAGADO'} ? 'badge-completado' : (${i.estado == 'ANULADO'} ? 'badge-critico' : 'badge-proceso')"
-                                          th:text="${i.estado}"></span>
-                                </td>
-                                <td th:text="${#temporals.format(i.fechaCita, 'dd/MM/yyyy')}"></td>
-                            </tr>
-                            <tr th:if="${#lists.isEmpty(ingresos)}">
-                                <td colspan="9" class="table-empty">No se encontraron pagos en el rango seleccionado</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+            <table class="table-modern">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Fecha Pago</th>
+                        <th>Comprobante</th>
+                        <th>Paciente</th>
+                        <th>DNI</th>
+                        <th>Monto</th>
+                        <th>M&eacute;todo</th>
+                        <th>Estado</th>
+                        <th>Fecha Cita</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="i, iter : ${ingresos}">
+                        <td th:text="${iter.count}"></td>
+                        <td th:text="${i.fechaPago != null ? #temporals.format(i.fechaPago, 'dd/MM/yyyy HH:mm') : '-'}"></td>
+                        <td th:text="${i.nroComprobante} ?: '-'"></td>
+                        <td><strong th:text="${i.paciente}"></strong></td>
+                        <td th:text="${i.dniPaciente}"></td>
+                        <td style="font-weight:700;color:var(--success);">S/ <span th:text="${#numbers.formatDecimal(i.monto, 1, 2)}"></span></td>
+                        <td><span class="badge-metodo" th:text="${i.metodoPago}"></span></td>
+                        <td>
+                            <span th:if="${i.estado == 'PAGADO'}" class="badge-estado badge-completado">Pagado</span>
+                            <span th:if="${i.estado == 'PENDIENTE'}" class="badge-estado badge-proceso">Pendiente</span>
+                            <span th:if="${i.estado == 'ANULADO'}" class="badge-estado badge-cancelado">Anulado</span>
+                            <span th:if="${i.estado == 'REEMBOLSADO'}" class="badge-estado badge-info">Reembolsado</span>
+                        </td>
+                        <td th:text="${i.fechaCita != null ? #temporals.format(i.fechaCita, 'dd/MM/yyyy') : '-'}"></td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(ingresos)}">
+                        <td colspan="9" class="table-empty">
+                            <i class="bi bi-inbox"></i>
+                            <p>No se encontraron pagos en el rango seleccionado</p>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
     </main>
     <footer th:replace="~{fragments/header :: footer}"></footer>

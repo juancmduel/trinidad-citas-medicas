@@ -13,13 +13,13 @@
                 <p>Información del medicamento recetado</p>
             </div>
             <div class="d-flex gap-2">
-                <a th:href="@{/recetas/{recetaId}/detalles/editar/{id}(recetaId=${receta.idReceta}, id=${detalle.idDetalle})}" class="btn-editar">
-                    <i class="bi bi-pencil"></i> Editar
+                <a th:href="@{/recetas/{recetaId}/detalles/editar/{id}(recetaId=${receta.idReceta}, id=${detalle.idDetalle})}" class="action-btn action-edit" title="Editar">
+                    <i class="bi bi-pencil"></i>
                 </a>
                 <a th:href="@{/recetas/{recetaId}/detalles/eliminar/{id}(recetaId=${receta.idReceta}, id=${detalle.idDetalle})}"
-                   class="btn-eliminar"
+                   class="action-btn action-delete" title="Eliminar"
                    onclick="return confirm('¿Eliminar este medicamento?')">
-                    <i class="bi bi-trash"></i> Eliminar
+                    <i class="bi bi-trash"></i>
                 </a>
                 <a th:href="@{/recetas/{id}(id=${receta.idReceta})}" class="btn-ver">
                     <i class="bi bi-arrow-left"></i> Volver

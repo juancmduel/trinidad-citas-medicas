@@ -362,11 +362,11 @@
 
 <style>
     .timeline { position:relative; padding:20px 0 20px 40px; }
-    .timeline-line { position:absolute; left:18px; top:0; bottom:0; width:2px; background:#e2e8f0; }
+    .timeline-line { position:absolute; left:18px; top:0; bottom:0; width:2px; background:var(--border); }
     .timeline-item { position:relative; margin-bottom:24px; }
     .timeline-item:last-child { margin-bottom:0; }
-    .timeline-dot { position:absolute; left:-32px; top:16px; width:14px; height:14px; border-radius:50%; border:3px solid #fff; box-shadow:0 0 0 2px #e2e8f0; z-index:1; }
-    .timeline-card { background:var(--card-bg); border-radius:8px; padding:14px 16px; box-shadow:0 1px 3px rgba(0,0,0,0.06); }
+    .timeline-dot { position:absolute; left:-32px; top:16px; width:14px; height:14px; border-radius:50%; border:3px solid var(--bg-card); box-shadow:0 0 0 2px var(--border); z-index:1; }
+    .timeline-card { background:var(--bg-card); border-radius:8px; padding:14px 16px; box-shadow:var(--shadow-sm); }
     .timeline-card-header { display:flex; align-items:center; gap:10px; margin-bottom:6px; }
     .timeline-icon { font-size:1.1rem; width:22px; text-align:center; }
     .timeline-info { display:flex; align-items:baseline; gap:10px; flex-wrap:wrap; }

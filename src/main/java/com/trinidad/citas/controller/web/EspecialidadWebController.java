@@ -2,6 +2,7 @@ package com.trinidad.citas.controller.web;
 
 import com.trinidad.citas.dto.EspecialidadDTO;
 import com.trinidad.citas.service.EspecialidadService;
+import com.trinidad.citas.service.EspecialidadVisualHelper;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Profile;
@@ -18,10 +19,19 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 public class EspecialidadWebController {
 
     private final EspecialidadService especialidadService;
+    private final EspecialidadVisualHelper visualHelper;
 
     @GetMapping
     public String lista(Model model) {
-        model.addAttribute("especialidades", especialidadService.listarTodas());
+        var especialidades = especialidadService.listarTodas();
+        // Enriquecer cada DTO con datos visuales (ícono + colores)
+        for (var e : especialidades) {
+            var v = visualHelper.get(e.getNombre());
+            e.setIcono(v.icono());
+            e.setColor(v.color());
+            e.setBgColor(v.bgLight());
+        }
+        model.addAttribute("especialidades", especialidades);
         return "especialidades/lista";
     }
 

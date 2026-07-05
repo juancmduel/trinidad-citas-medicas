@@ -7,12 +7,10 @@
     <div th:replace="~{fragments/header :: topbar}"></div>
     <main class="page-main">
 
-        <div class="d-flex align-items-center justify-content-between mb-4">
+        <div class="page-header">
             <div>
-                <h1 style="font-size:26px;font-weight:700;margin-bottom:4px;">
-                    <i class="bi bi-clock-history me-2" style="color:var(--accent);"></i>Detalle de Evento
-                </h1>
-                <p style="color:var(--text-muted);font-size:13px;margin:0;">Información completa del evento de auditoría</p>
+                <h1><i class="bi bi-clock-history"></i>Detalle de Evento</h1>
+                <p>Información completa del evento de auditoría</p>
             </div>
             <span class="badge-accion-lg"
                   th:classappend="${log.accion == 'CREATE'} ? 'ba-lg-create' : (${log.accion == 'UPDATE'} ? 'ba-lg-update' : (${log.accion == 'DELETE'} ? 'ba-lg-delete' : 'ba-lg-other'))"

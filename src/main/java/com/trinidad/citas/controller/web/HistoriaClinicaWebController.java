@@ -1,27 +1,51 @@
 package com.trinidad.citas.controller.web;
 
-import com.trinidad.citas.dto.*;
-import com.trinidad.citas.model.HistoriaClinica;
-import com.trinidad.citas.model.EstadoCita;
-import com.trinidad.citas.repository.CitaRepository;
-import com.trinidad.citas.repository.PacienteRepository;
-import com.trinidad.citas.service.*;
-import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.util.*;
+import com.trinidad.citas.dto.AtencionDTO;
+import com.trinidad.citas.dto.HistoriaClinicaDTO;
+import com.trinidad.citas.dto.OrdenExamenDTO;
+import com.trinidad.citas.dto.RecetaDTO;
+import com.trinidad.citas.dto.TriajeDTO;
+import com.trinidad.citas.model.HistoriaClinica;
+import com.trinidad.citas.repository.CitaRepository;
+import com.trinidad.citas.repository.PacienteRepository;
+import com.trinidad.citas.service.AntecedenteService;
+import com.trinidad.citas.service.AtencionService;
+import com.trinidad.citas.service.HistoriaClinicaService;
+import com.trinidad.citas.service.MedicacionActualService;
+import com.trinidad.citas.service.OrdenExamenService;
+import com.trinidad.citas.service.RecetaService;
+import com.trinidad.citas.service.TriajeService;
+
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 
 @Profile({"web", "default"})
 @Controller
 @RequestMapping("/historia-clinica")
 @RequiredArgsConstructor
 public class HistoriaClinicaWebController {
+
+    private static final Logger log = LoggerFactory.getLogger(HistoriaClinicaWebController.class);
 
     private final HistoriaClinicaService historiaClinicaService;
     private final AntecedenteService antecedenteService;
@@ -40,6 +64,7 @@ public class HistoriaClinicaWebController {
     }
 
     @GetMapping("/{id}")
+    @SuppressWarnings({"rawtypes", "unchecked"})
     public String detalle(@PathVariable Long id, Model model) {
         var historia = historiaClinicaService.obtenerEntidad(id);
         var atenciones = atencionService.listarPorHistoria(id);
@@ -76,7 +101,9 @@ public class HistoriaClinicaWebController {
                             "PA: " + t.getPresionArterial() + " | FC: " + t.getFrecuenciaCardiaca() + " | Temp: " + t.getTemperatura(),
                             "bi-activity", "var(--warning)"));
                 }
-            } catch (Exception ignored) {}
+            } catch (Exception e) {
+                log.warn("No se pudo obtener triaje para cita {}: {}", c.getIdCita(), e.getMessage());
+            }
         }
         for (AtencionDTO a : atenciones) {
             timeline.add(evento("ATENCION", a.getFechaAtencion(), "Atención Médica",

@@ -1,22 +1,31 @@
 package com.trinidad.citas.repository;
 
-import com.trinidad.citas.model.Cita;
-import com.trinidad.citas.model.EstadoCita;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
-import org.springframework.stereotype.Repository;
-
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
-@Repository
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+
+import com.trinidad.citas.model.Cita;
+import com.trinidad.citas.model.EstadoCita;
+
+import jakarta.persistence.LockModeType;
+
 public interface CitaRepository extends JpaRepository<Cita, Long> {
 
     List<Cita> findByPaciente_IdPacienteOrderByFechaCitaDescHoraInicioDesc(Long idPaciente);
 
     List<Cita> findByMedico_IdMedicoAndFechaCitaOrderByHoraInicioAsc(Long idMedico, LocalDate fecha);
+
+    /**
+     * Busca citas de un medico en una fecha con bloqueo pesimista (PESSIMISTIC_WRITE).
+     * Usado en agendamiento para evitar condicion de carrera (AL-08).
+     */
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("SELECT c FROM Cita c WHERE c.medico.idMedico = :idMedico AND c.fechaCita = :fecha")
+    List<Cita> findByMedico_IdMedicoAndFechaCitaComLock(@Param("idMedico") Long idMedico, @Param("fecha") LocalDate fecha);
 
     List<Cita> findByMedico_IdMedicoAndFechaCita(Long idMedico, LocalDate fecha);
 
@@ -61,7 +70,7 @@ public interface CitaRepository extends JpaRepository<Cita, Long> {
            "WHERE c.fechaCita BETWEEN :inicio AND :fin ORDER BY c.fechaCita, c.horaInicio")
     List<Cita> findByFechaCitaBetweenConRelaciones(@Param("inicio") LocalDate inicio, @Param("fin") LocalDate fin);
 
-    /** RN-11: citas PROGRAMADA/CONFIRMADA sin check-in cuya hora ya pasó hace > 30 min */
+    /** RN-11: citas PROGRAMADA/CONFIRMADA sin check-in cuya hora ya pasÃ³ hace > 30 min */
     @Query("SELECT c FROM Cita c WHERE c.estado IN ('PROGRAMADA', 'CONFIRMADA') " +
            "AND c.fechaCita = :hoy " +
            "AND c.horaInicio <= :limiteHora " +

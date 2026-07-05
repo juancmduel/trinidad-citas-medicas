@@ -20,10 +20,12 @@ public class Triaje {
 
     @OneToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "ID_CITA", nullable = false, unique = true)
+    @ToString.Exclude
     private Cita cita;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ID_ENFERMERA")
+    @ToString.Exclude
     private Usuario enfermera;
 
     @Column(name = "FECHA_TRIAJE")

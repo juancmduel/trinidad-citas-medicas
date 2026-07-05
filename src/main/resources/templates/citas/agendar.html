@@ -10,15 +10,13 @@
 
     <main class="page-main">
 
-        <div class="d-flex align-items-center justify-content-between mb-4">
+        <div class="page-header">
             <div>
-                <h1 style="font-size:26px;font-weight:700;margin-bottom:4px;">
-                    <i class="bi bi-calendar-plus me-2" style="color:var(--accent);"></i>Agendar Nueva Cita
-                </h1>
-                <p style="color:var(--text-muted);font-size:13px;margin:0;">Completa los pasos para reservar una cita médica</p>
+                <h1><i class="bi bi-calendar-plus"></i>Agendar Nueva Cita</h1>
+                <p>Completa los pasos para reservar una cita médica</p>
             </div>
             <a th:href="@{/citas}" class="btn-volver">
-                <i class="bi bi-arrow-left me-1"></i>Volver
+                <i class="bi bi-arrow-left"></i>Volver
             </a>
         </div>
 
@@ -201,17 +199,17 @@
                                     <div class="canal-grid">
                                         <label class="canal-card selected" id="canal-web" onclick="selectCanal('WEB', this)">
                                             <input type="radio" name="canalRadio" value="WEB" checked>
-                                            <i class="fas fa-globe"></i>
+                                            <i class="bi bi-globe"></i>
                                             <span>Web</span>
                                         </label>
                                         <label class="canal-card" id="canal-tel" onclick="selectCanal('TELEFONO', this)">
                                             <input type="radio" name="canalRadio" value="TELEFONO">
-                                            <i class="fas fa-phone"></i>
+                                            <i class="bi bi-telephone"></i>
                                             <span>Teléfono</span>
                                         </label>
                                         <label class="canal-card" id="canal-pre" onclick="selectCanal('PRESENCIAL', this)">
                                             <input type="radio" name="canalRadio" value="PRESENCIAL">
-                                            <i class="fas fa-hospital"></i>
+                                            <i class="bi bi-building"></i>
                                             <span>Presencial</span>
                                         </label>
                                     </div>

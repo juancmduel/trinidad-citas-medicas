@@ -20,8 +20,14 @@ public class EspecialidadService {
     private final EspecialidadRepository especialidadRepository;
 
     public EspecialidadDTO toDTO(Especialidad e) {
-        return new EspecialidadDTO(e.getIdEspecialidad(), e.getNombre(), e.getDescripcion(),
-                e.getPrecioConsulta(), e.getDuracionMinutos(), e.getActivo());
+        var dto = new EspecialidadDTO();
+        dto.setIdEspecialidad(e.getIdEspecialidad());
+        dto.setNombre(e.getNombre());
+        dto.setDescripcion(e.getDescripcion());
+        dto.setPrecioConsulta(e.getPrecioConsulta());
+        dto.setDuracionMinutos(e.getDuracionMinutos());
+        dto.setActivo(e.getActivo());
+        return dto;
     }
 
     public Especialidad fromDTO(EspecialidadDTO dto) {

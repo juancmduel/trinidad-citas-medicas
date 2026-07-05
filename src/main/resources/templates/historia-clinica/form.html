@@ -112,12 +112,12 @@
                                 <p style="color:var(--text-muted);font-size:13px;margin:0;">Finaliza o descarta los cambios</p>
                             </div>
                         </div>
-                        <button type="submit" class="btn btn-success w-100 mb-2" style="padding:12px;border-radius:10px;font-weight:700;font-size:14px;">
-                            <i class="bi bi-check-circle me-2"></i>
+                        <button type="submit" class="btn-guardar w-100">
+                            <i class="bi bi-check-circle"></i>
                             <span th:text="${historia.idHistoria != null} ? 'Guardar Cambios' : 'Crear Historia'"></span>
                         </button>
-                        <a th:href="@{/historia-clinica}" class="btn btn-outline-secondary w-100" style="padding:12px;border-radius:10px;font-weight:600;">
-                            <i class="bi bi-x-circle me-2"></i>Cancelar
+                        <a th:href="@{/historia-clinica}" class="btn-volver w-100">
+                            <i class="bi bi-x-circle"></i>Cancelar
                         </a>
                     </div>
 

@@ -37,17 +37,12 @@ public class EmailService {
         String nombreCompleto = cita.getPaciente().getNombres() + " " + cita.getPaciente().getApellidoPaterno();
         String medico         = cita.getMedico() != null ? "Dr(a). " + cita.getMedico().getNombreCompleto() : "-";
         String especialidad   = cita.getEspecialidad() != null ? cita.getEspecialidad().getNombre() : "-";
+        // Nro. de cita para mostrar en plantilla (solo referencia visual, no expone datos sensibles)
         String nroCita        = "CIT-" + String.format("%05d", cita.getIdCita());
 
-        String qrContenido = "=== CITA MEDICA - TRINIDAD SALUD ===\n"
-            + "ID Cita     : " + nroCita + "\n"
-            + "Paciente    : " + nombreCompleto + "\n"
-            + "DNI         : " + cita.getPaciente().getDni() + "\n"
-            + "Medico      : " + medico + "\n"
-            + "Especialidad: " + especialidad + "\n"
-            + "Fecha       : " + cita.getFechaCita() + "\n"
-            + "Hora        : " + cita.getHoraInicio() + "\n"
-            + "Estado      : " + cita.getEstado();
+        // ⚠ El QR solo contiene el ID de referencia, NO datos personales (DNI, nombre, etc.)
+        // por seguridad y cumplimiento de proteccion de datos.
+        String qrContenido = "CITA:" + cita.getIdCita();
 
         String html = plantillaConfirmacion(nombreCompleto, medico, especialidad, nroCita,
             cita.getFechaCita().toString(), cita.getHoraInicio(), cita.getEstado().toString());
@@ -66,13 +61,8 @@ public class EmailService {
         String medico         = cita.getMedico() != null ? "Dr(a). " + cita.getMedico().getNombreCompleto() : "-";
         String nroCita        = "CIT-" + String.format("%05d", cita.getIdCita());
 
-        String qrContenido = "=== RECORDATORIO CITA - TRINIDAD SALUD ===\n"
-            + "ID Cita  : " + nroCita + "\n"
-            + "Paciente : " + nombreCompleto + "\n"
-            + "DNI      : " + cita.getPaciente().getDni() + "\n"
-            + "Medico   : " + medico + "\n"
-            + "Fecha    : " + cita.getFechaCita() + "\n"
-            + "Hora     : " + cita.getHoraInicio();
+        // ⚠ El QR solo contiene el ID de referencia, NO datos personales (DNI, nombre, etc.)
+        String qrContenido = "CITA:" + cita.getIdCita();
 
         String html = plantillaRecordatorio(nombreCompleto, medico, nroCita,
             cita.getFechaCita().toString(), cita.getHoraInicio());
@@ -265,7 +255,7 @@ public class EmailService {
             helper.setText(htmlBody, true);
             helper.addInline("qr-cita", new ByteArrayResource(qrBytes), "image/png");
             mailSender.send(mensaje);
-            log.info("[EMAIL] Enviado a {} | {}", destino, asunto);
+            log.info("[EMAIL] Enviado exitosamente a {} | Asunto: {} | Remitente: {}", destino, asunto, fromEmail);
         } catch (Exception e) {
             log.error("[EMAIL] Error al enviar a {}: {}", destino, e.getMessage());
         }
