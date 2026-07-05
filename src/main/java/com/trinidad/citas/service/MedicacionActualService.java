@@ -1,5 +1,6 @@
 package com.trinidad.citas.service;
 
+import com.trinidad.citas.audit.Auditable;
 import com.trinidad.citas.dto.MedicacionActualDTO;
 import com.trinidad.citas.exception.ResourceNotFoundException;
 import com.trinidad.citas.model.MedicacionActual;
@@ -48,6 +49,7 @@ public class MedicacionActualService {
                 .stream().map(this::toDTO).toList();
     }
 
+    @Auditable(entidad = "MEDICACION_ACTUAL", accion = "CREAR")
     public MedicacionActualDTO crear(MedicacionActualDTO dto) {
         MedicacionActual m = new MedicacionActual();
         m.setHistoria(historiaClinicaRepository.findById(dto.getIdHistoria())
@@ -62,6 +64,7 @@ public class MedicacionActualService {
         return toDTO(medicacionActualRepository.save(m));
     }
 
+    @Auditable(entidad = "MEDICACION_ACTUAL", accion = "ELIMINAR")
     public void desactivar(Long id) {
         MedicacionActual m = medicacionActualRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("MedicacionActual", id));

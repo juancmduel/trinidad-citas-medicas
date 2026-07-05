@@ -5,10 +5,13 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
+import java.util.HashSet;
+import java.util.Set;
+
 @Entity
 @Table(name = "ROL")
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
-@ToString
+@ToString(exclude = "permisos")
 public class Rol {
 
     @Id
@@ -29,4 +32,13 @@ public class Rol {
     @Column(name = "ACTIVO", nullable = false)
     @Builder.Default
     private Integer activo = 1;
+
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+        name = "ROL_PERMISO",
+        joinColumns = @JoinColumn(name = "ID_ROL"),
+        inverseJoinColumns = @JoinColumn(name = "ID_PERMISO")
+    )
+    @Builder.Default
+    private Set<Permiso> permisos = new HashSet<>();
 }

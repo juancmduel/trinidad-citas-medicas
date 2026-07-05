@@ -29,7 +29,7 @@
             <span th:text="${param.error}"></span>
         </div>
 
-        <!-- Stats -->
+        <!-- Stats con iconos mejorados -->
         <div class="stats-grid mb-4">
             <div class="stat-card">
                 <div class="stat-icon stat-icon-total"><i class="bi bi-grid-3x3-gap-fill"></i></div>
@@ -41,14 +41,14 @@
             <div class="stat-card">
                 <div class="stat-icon stat-icon-activo"><i class="bi bi-check-circle-fill"></i></div>
                 <div>
-                    <div class="stat-value" th:text="${especialidades.![activo == 1].size()}">0</div>
+                    <div class="stat-value" th:text="${#lists.size(especialidades.?[activo == 1])}">0</div>
                     <div class="stat-label">Activas</div>
                 </div>
             </div>
             <div class="stat-card">
                 <div class="stat-icon stat-icon-inactivo"><i class="bi bi-x-circle-fill"></i></div>
                 <div>
-                    <div class="stat-value" th:text="${especialidades.![activo == 0].size()}">0</div>
+                    <div class="stat-value" th:text="${#lists.size(especialidades.?[activo == 0])}">0</div>
                     <div class="stat-label">Inactivas</div>
                 </div>
             </div>
@@ -57,39 +57,42 @@
         <!-- Search -->
         <div class="search-bar mb-4">
             <i class="bi bi-search"></i>
-            <input type="text" id="searchInput" class="form-input-professional" placeholder="Buscar especialidad..." oninput="filterCards()">
+            <input type="text" id="searchInput" class="form-input-professional" placeholder="Buscar especialidad por nombre o descripción..." oninput="filterCards()">
         </div>
 
-        <!-- Grid -->
+        <!-- Grid de Especialidades -->
         <div class="esp-grid">
             <div th:each="e : ${especialidades}" class="esp-card" th:data-search="${e.nombre + ' ' + e.descripcion}">
                 <div class="esp-card-inner">
                     <div class="esp-top">
-                        <div class="esp-icon" th:classappend="${e.activo == 1} ? 'esp-icon-active' : 'esp-icon-inactive'">
-                            <i class="bi bi-stethoscope"></i>
+                        <!-- Icono dinámico por especialidad -->
+                        <div class="esp-icon" th:style="'background:' + (e.bgColor ?: '#f3f4f6') + '; color:' + (e.color ?: '#6b7280') + ';'">
+                            <i th:class="${e.icono} ?: 'bi bi-stethoscope'"></i>
                         </div>
-                        <div th:if="${e.activo == 1}" class="esp-badge esp-badge-active">Activo</div>
-                        <div th:unless="${e.activo == 1}" class="esp-badge esp-badge-inactive">Inactivo</div>
+                        <div th:if="${e.activo == 1}" class="badge-estado badge-activo">Activo</div>
+                        <div th:unless="${e.activo == 1}" class="badge-estado badge-inactivo">Inactivo</div>
                     </div>
                     <div class="esp-body">
                         <h5 class="esp-name" th:text="${e.nombre}">Cardiología</h5>
-                        <div class="esp-duration"><i class="bi bi-clock me-1"></i><span th:text="${e.duracionMinutos} + ' min'">30 min</span></div>
+                        <div class="esp-meta">
+                            <span class="esp-meta-item"><i class="bi bi-clock me-1"></i><span th:text="${e.duracionMinutos} + ' min'">30 min</span></span>
+                            <span class="esp-meta-item"><i class="bi bi-currency-dollar me-1"></i>S/ <span th:text="${#numbers.formatDecimal(e.precioConsulta, 1, 2, 'DEFAULT')}">150.00</span></span>
+                        </div>
                         <p class="esp-desc" th:text="${e.descripcion ?: 'Sin descripción'}">Descripción de la especialidad</p>
                     </div>
                     <div class="esp-footer">
-                        <div class="esp-price">S/. <span th:text="${#numbers.formatDecimal(e.precioConsulta, 1, 2, 'DEFAULT')}">150.00</span></div>
                         <div class="esp-actions">
-                            <a th:href="@{/especialidades/editar/{id}(id=${e.idEspecialidad})}" class="esp-btn esp-btn-edit" title="Editar">
-                                <i class="bi bi-pencil"></i>
+                            <a th:href="@{/especialidades/editar/{id}(id=${e.idEspecialidad})}" class="esp-btn esp-btn-edit" title="Editar especialidad">
+                                <i class="bi bi-pencil-fill"></i>
                             </a>
                             <form th:action="@{/especialidades/toggle/{id}(id=${e.idEspecialidad})}" method="post" style="display:inline;" onsubmit="return confirm('¿Cambiar estado de esta especialidad?')">
-                                <button type="submit" class="esp-btn" th:classappend="${e.activo == 1} ? 'esp-btn-deactivate' : 'esp-btn-activate'" th:title="${e.activo == 1} ? 'Desactivar' : 'Activar'">
+                                <button type="submit" class="esp-btn" th:classappend="${e.activo == 1} ? 'esp-btn-deactivate' : 'esp-btn-activate'" th:title="${e.activo == 1} ? 'Desactivar especialidad' : 'Activar especialidad'">
                                     <i class="bi" th:classappend="${e.activo == 1} ? 'bi-pause-fill' : 'bi-play-fill'"></i>
                                 </button>
                             </form>
                             <form th:action="@{/especialidades/eliminar/{id}(id=${e.idEspecialidad})}" method="post" style="display:inline;" onsubmit="return confirm('¿Desactivar esta especialidad? Se eliminará de las opciones disponibles.')">
-                                <button type="submit" class="esp-btn esp-btn-delete" title="Eliminar">
-                                    <i class="bi bi-trash3"></i>
+                                <button type="submit" class="esp-btn esp-btn-delete" title="Eliminar especialidad">
+                                    <i class="bi bi-trash3-fill"></i>
                                 </button>
                             </form>
                         </div>
@@ -102,8 +105,6 @@
                 <a th:href="@{/especialidades/nuevo}" class="btn-guardar">Crear primera especialidad</a>
             </div>
         </div>
-
-        
 
         <script>
         function filterCards() {

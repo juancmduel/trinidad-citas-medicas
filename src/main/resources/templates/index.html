@@ -4,267 +4,439 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Trinidad | Centro de Salud Integral</title>
+    <meta name="description" content="Centro de salud integral en Tarapoto. Atención médica especializada, agendamiento online e historia clínica digital.">
     <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.3/css/bootstrap.min.css}">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/trinidad.css}">
     <link rel="stylesheet" th:href="@{/css/landing.css}">
+    <script>
+        (function() {
+            var t = localStorage.getItem('trinidad-theme');
+            if (t === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+        })();
+    </script>
 </head>
 <body>
-<canvas id="bg-canvas"></canvas>
+
+<!-- ===== NAVBAR ===== -->
+<nav class="navbar-landing navbar navbar-expand-lg">
+    <div class="container">
+        <a class="navbar-brand" th:href="@{/}">
+            <i class="bi bi-hospital-fill"></i> TRINIDAD
+        </a>
+        <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navLanding"
+                style="color:var(--text-primary);font-size:1.5rem;">
+            <i class="bi bi-list"></i>
+        </button>
+        <div class="collapse navbar-collapse" id="navLanding">
+            <ul class="navbar-nav ms-auto align-items-lg-center gap-1">
+                <li class="nav-item"><a class="nav-link active" th:href="@{/}">Inicio</a></li>
+                <li class="nav-item"><a class="nav-link" href="#servicios">Servicios</a></li>
+                <li class="nav-item"><a class="nav-link" href="#instalaciones">Instalaciones</a></li>
+                <li class="nav-item"><a class="nav-link" href="#especialidades">Especialidades</a></li>
+                <li class="nav-item"><a class="nav-link" href="#contacto">Contacto</a></li>
+                <li class="nav-item ms-lg-2">
+                    <button class="btn-theme-landing" onclick="toggleTheme()" title="Cambiar tema">
+                        <i id="themeIconLanding" class="bi bi-moon-fill"></i>
+                    </button>
+                </li>
+                <li class="nav-item ms-lg-2">
+                    <a th:href="@{/login}" class="btn-login-nav">
+                        <i class="bi bi-lock-fill"></i> Ingresar
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
 
 <div class="wrapper">
-    <!-- HERO -->
-    <section class="hero">
-        <div class="hero-content">
-            <div class="logo-hero"><i class="bi bi-heart-pulse-fill"></i></div>
-            <h1>TRINIDAD</h1>
-            <p class="subtitle">Centro de Salud Integral</p>
-            <p class="description">Plataforma integral de gestión médica con atención especializada, agendamiento inteligente y acceso seguro a historias clínicas electrónicas. Cuidamos tu salud con tecnología certificada y profesionales de alto nivel.</p>
-            <div class="cta-buttons">
-                <a th:href="@{/login}" class="btn-cta btn-primary"><i class="bi bi-lock-fill"></i> Iniciar Sesión</a>
-                <a href="#servicios" class="btn-cta btn-secondary"><i class="bi bi-arrow-down"></i> Ver Servicios</a>
+
+    <!-- ===== HERO CAROUSEL ===== -->
+    <section class="hero-carousel">
+        <div id="heroCarousel" class="carousel slide carousel-fade" data-bs-ride="carousel" data-bs-interval="5000">
+            <div class="carousel-indicators">
+                <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="0" class="active"></button>
+                <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="1"></button>
+                <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="2"></button>
             </div>
+            <div class="carousel-inner">
+                <div class="carousel-item active">
+                    <img src="https://images.unsplash.com/photo-1631217868264-e5b90bb7e133?w=1920&q=80"
+                         class="d-block w-100" alt="Sala de espera" loading="lazy">
+                    <div class="carousel-overlay"></div>
+                    <div class="carousel-caption">
+                        <div class="hero-badge"><i class="bi bi-shield-check"></i> Excelencia Médica</div>
+                        <h1>Tu salud,<br>nuestra prioridad</h1>
+                        <p>Más de 15 especialidades médicas con profesionales certificados. Atención personalizada en un solo lugar.</p>
+                        <div>
+                            <a th:href="@{/login}" class="btn-hero-primary">
+                                <i class="bi bi-calendar-plus"></i> Agendar Cita
+                            </a>
+                            <a href="#servicios" class="btn-hero-outline">
+                                <i class="bi bi-arrow-down"></i> Conocer Más
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="carousel-item">
+                    <img src="https://images.unsplash.com/photo-1579684385127-1ef15d508118?w=1920&q=80"
+                         class="d-block w-100" alt="Consultorio médico" loading="lazy">
+                    <div class="carousel-overlay"></div>
+                    <div class="carousel-caption">
+                        <div class="hero-badge"><i class="bi bi-person-badge"></i> Profesionales</div>
+                        <h1>Médicos<br>especialistas</h1>
+                        <p>Más de 50 médicos especialistas comprometidos con tu bienestar y recuperación.</p>
+                        <div>
+                            <a th:href="@{/login}" class="btn-hero-primary">
+                                <i class="bi bi-person-plus"></i> Crear Cuenta
+                            </a>
+                            <a href="#especialidades" class="btn-hero-outline">
+                                <i class="bi bi-arrow-down"></i> Ver Especialidades
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="carousel-item">
+                    <img src="https://images.unsplash.com/photo-1551076805-e1869033e561?w=1920&q=80"
+                         class="d-block w-100" alt="Tecnología médica" loading="lazy">
+                    <div class="carousel-overlay"></div>
+                    <div class="carousel-caption">
+                        <div class="hero-badge"><i class="bi bi-telegram"></i> Innovación Digital</div>
+                        <h1>Tecnología al<br>servicio de tu salud</h1>
+                        <p>Agendamiento online, historia clínica digital, telemedicina y resultados desde cualquier lugar.</p>
+                        <div>
+                            <a th:href="@{/login}" class="btn-hero-primary">
+                                <i class="bi bi-box-arrow-in-right"></i> Iniciar Sesión
+                            </a>
+                            <a href="#servicios" class="btn-hero-outline">
+                                <i class="bi bi-arrow-down"></i> Ver Servicios
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
+                <i class="bi bi-chevron-left fs-4"></i>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
+                <i class="bi bi-chevron-right fs-4"></i>
+            </button>
         </div>
     </section>
 
-    <!-- STATS -->
+    <!-- ===== STATS ===== -->
     <section class="stats-section">
-        <div class="stats-container">
-            <div class="section-title">
-                <h2>Nuestra Trayectoria</h2>
-                <p>Números que respaldan nuestro compromiso con la salud</p>
-            </div>
-            <div class="stats-grid">
-                <div class="stat-card">
+        <div class="container">
+            <div class="row">
+                <div class="col-6 col-lg-3 stat-item">
                     <div class="stat-icon"><i class="bi bi-people-fill"></i></div>
-                    <div class="stat-value">500+</div>
+                    <div class="stat-number">500+</div>
                     <div class="stat-label">Pacientes Activos</div>
-                    <div class="stat-desc">Confianza consolidada</div>
                 </div>
-                <div class="stat-card">
+                <div class="col-6 col-lg-3 stat-item">
                     <div class="stat-icon"><i class="bi bi-person-check-fill"></i></div>
-                    <div class="stat-value">50+</div>
-                    <div class="stat-label">Médicos Certificados</div>
-                    <div class="stat-desc">Profesionales calificados</div>
+                    <div class="stat-number">50+</div>
+                    <div class="stat-label">Médicos</div>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-icon"><i class="bi bi-stethoscope"></i></div>
-                    <div class="stat-value">15+</div>
+                <div class="col-6 col-lg-3 stat-item">
+                    <div class="stat-icon"><i class="bi bi-heart-pulse"></i></div>
+                    <div class="stat-number">15+</div>
                     <div class="stat-label">Especialidades</div>
-                    <div class="stat-desc">Cobertura médica completa</div>
                 </div>
-                <div class="stat-card">
+                <div class="col-6 col-lg-3 stat-item">
                     <div class="stat-icon"><i class="bi bi-clock-history"></i></div>
-                    <div class="stat-value">24/7</div>
+                    <div class="stat-number">24/7</div>
                     <div class="stat-label">Disponibilidad</div>
-                    <div class="stat-desc">Sin interrupciones</div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- SERVICIOS -->
-    <section class="services-section" id="servicios">
-        <div class="services-container">
-            <div class="section-title">
+    <!-- ===== SERVICIOS ===== -->
+    <section class="section-padding" id="servicios">
+        <div class="container">
+            <div class="section-title-center">
                 <h2>Nuestros Servicios</h2>
-                <p>Soluciones integrales para la gestión de tu salud</p>
+                <p>Todo lo que necesitas para el cuidado de tu salud en un solo lugar</p>
+                <div class="section-accent-bar"></div>
             </div>
-            <div class="services-grid">
-                <div class="service-card">
-                    <div class="service-header">
-                        <div class="service-icon-box"><i class="bi bi-calendar-check-fill"></i></div>
-                        <h3 class="service-title">Agendamiento Online</h3>
+            <div class="row g-4">
+                <div class="col-md-6 col-lg-4">
+                    <div class="landing-card">
+                        <div class="lc-icon"><i class="bi bi-calendar-check-fill"></i></div>
+                        <h3 class="lc-title">Agendamiento Online</h3>
+                        <p class="lc-desc">Reserva tus citas desde cualquier dispositivo. Consulta disponibilidad en tiempo real y confirma en segundos.</p>
+                        <a th:href="@{/login}" class="lc-link">Agendar <i class="bi bi-arrow-right"></i></a>
                     </div>
-                    <p class="service-desc">Sistema inteligente de reserva de citas con disponibilidad en tiempo real. Confirma tu cita en segundos desde cualquier dispositivo.</p>
-                    <a href="#" class="service-link"><i class="bi bi-arrow-right"></i> Agendar Ahora</a>
                 </div>
-
-                <div class="service-card">
-                    <div class="service-header">
-                        <div class="service-icon-box"><i class="bi bi-file-medical-fill"></i></div>
-                        <h3 class="service-title">Historia Clínica Digital</h3>
+                <div class="col-md-6 col-lg-4">
+                    <div class="landing-card">
+                        <div class="lc-icon"><i class="bi bi-file-medical-fill"></i></div>
+                        <h3 class="lc-title">Historia Clínica Digital</h3>
+                        <p class="lc-desc">Accede a tu historial médico completo desde cualquier lugar. Diagnósticos, tratamientos y más.</p>
+                        <a th:href="@{/login}" class="lc-link">Acceder <i class="bi bi-arrow-right"></i></a>
                     </div>
-                    <p class="service-desc">Acceso seguro a tu historial médico completo. Diagnósticos, tratamientos, exámenes y recetas digitales en una plataforma única.</p>
-                    <a href="#" class="service-link"><i class="bi bi-arrow-right"></i> Acceder Portal</a>
                 </div>
-
-                <div class="service-card">
-                    <div class="service-header">
-                        <div class="service-icon-box"><i class="bi bi-prescription2"></i></div>
-                        <h3 class="service-title">Recetas Digitales</h3>
+                <div class="col-md-6 col-lg-4">
+                    <div class="landing-card">
+                        <div class="lc-icon"><i class="bi bi-prescription2"></i></div>
+                        <h3 class="lc-title">Recetas Digitales</h3>
+                        <p class="lc-desc">Prescripciones electrónicas válidas en farmacias afiliadas. Sin papeles ni filas innecesarias.</p>
+                        <a th:href="@{/login}" class="lc-link">Ver Más <i class="bi bi-arrow-right"></i></a>
                     </div>
-                    <p class="service-desc">Prescripciones médicas certificadas y seguras. Válidas en todas las farmacias afiliadas con entrega a domicilio opcional.</p>
-                    <a href="#" class="service-link"><i class="bi bi-arrow-right"></i> Ver Más</a>
+                </div>
+                <div class="col-md-6 col-lg-4">
+                    <div class="landing-card">
+                        <div class="lc-icon"><i class="bi bi-telegram"></i></div>
+                        <h3 class="lc-title">Telemedicina</h3>
+                        <p class="lc-desc">Consultas a distancia con videollamada segura. Atención especializada desde la comodidad de tu hogar.</p>
+                        <a th:href="@{/login}" class="lc-link">Agendar Teleconsulta <i class="bi bi-arrow-right"></i></a>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-4">
+                    <div class="landing-card">
+                        <div class="lc-icon"><i class="bi bi-clipboard2-pulse"></i></div>
+                        <h3 class="lc-title">Resultados en Línea</h3>
+                        <p class="lc-desc">Consulta tus resultados de exámenes en cuanto estén listos. Notificaciones automáticas sin esperar.</p>
+                        <a th:href="@{/login}" class="lc-link">Consultar <i class="bi bi-arrow-right"></i></a>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-4">
+                    <div class="landing-card">
+                        <div class="lc-icon"><i class="bi bi-shield-check"></i></div>
+                        <h3 class="lc-title">Portal del Paciente</h3>
+                        <p class="lc-desc">Gestión completa de tu salud: citas, historial, pagos y más. Acceso seguro disponible 24/7.</p>
+                        <a th:href="@{/login}" class="lc-link">Ingresar <i class="bi bi-arrow-right"></i></a>
+                    </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- ESPECIALIDADES -->
-    <section class="especialidades-section">
-        <div class="table-container">
-            <div class="section-title">
-                <h2>Especialidades Disponibles</h2>
-                <p>Profesionales certificados en todas las áreas médicas</p>
+    <!-- ===== INSTALACIONES ===== -->
+    <section class="section-padding section-alt" id="instalaciones">
+        <div class="container">
+            <div class="section-title-center">
+                <h2>Nuestras Instalaciones</h2>
+                <p>Espacios diseñados para tu comodidad durante tu visita</p>
+                <div class="section-accent-bar"></div>
             </div>
-            <div class="table-wrapper">
-                <table>
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <div class="gallery-img">
+                        <img src="https://images.unsplash.com/photo-1631217868264-e5b90bb7e133?w=800&q=80" alt="Sala de espera" loading="lazy">
+                        <div class="gallery-overlay"><span><i class="bi bi-building me-2"></i>Sala de Espera</span></div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="gallery-img">
+                        <img src="https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?w=800&q=80" alt="Consultorio" loading="lazy">
+                        <div class="gallery-overlay"><span><i class="bi bi-person-badge me-2"></i>Consultorios</span></div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="gallery-img">
+                        <img src="https://images.unsplash.com/photo-1551076805-e1869033e561?w=600&q=80" alt="Equipo médico" loading="lazy">
+                        <div class="gallery-overlay"><span><i class="bi bi-tools me-2"></i>Equipamiento</span></div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="gallery-img">
+                        <img src="https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=600&q=80" alt="Atención médica" loading="lazy">
+                        <div class="gallery-overlay"><span><i class="bi bi-heart-pulse me-2"></i>Atención Especializada</span></div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="gallery-img">
+                        <img src="https://images.unsplash.com/photo-1629909613654-28e377c37b09?w=600&q=80" alt="Recepción" loading="lazy">
+                        <div class="gallery-overlay"><span><i class="bi bi-door-open me-2"></i>Recepción</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== ESPECIALIDADES ===== -->
+    <section class="section-padding" id="especialidades">
+        <div class="container">
+            <div class="section-title-center">
+                <h2>Especialidades</h2>
+                <p>Profesionales certificados en todas las áreas</p>
+                <div class="section-accent-bar"></div>
+            </div>
+            <div class="spec-table-wrapper">
+                <table class="spec-table">
                     <thead>
                         <tr>
-                            <th><i class="bi bi-diagram-3"></i> Especialidad</th>
-                            <th><i class="bi bi-person-check-fill"></i> Médicos</th>
-                            <th><i class="bi bi-clock-fill"></i> Duración</th>
-                            <th><i class="bi bi-tag-fill"></i> Tarifa</th>
+                            <th>Especialidad</th>
+                            <th>Médicos</th>
+                            <th>Duración</th>
+                            <th>Tarifa</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr><td><span class="badge-esp"><i class="bi bi-heart-fill"></i> Cardiología</span></td><td><span class="badge-count">8</span></td><td><span class="badge-duration">30 min</span></td><td><span class="badge-price">S/. 150</span></div></td></tr>
-                        <tr><td><span class="badge-esp"><i class="bi bi-capsule-pill"></i> Pediatría</span></td><td><span class="badge-count">12</span></td><td><span class="badge-duration">25 min</span></td><td><span class="badge-price">S/. 100</span></div></td></tr>
-                        <tr><td><span class="badge-esp"><i class="bi bi-brain"></i> Neurología</span></td><td><span class="badge-count">6</span></td><td><span class="badge-duration">40 min</span></td><td><span class="badge-price">S/. 180</span></div></td></tr>
-                        <tr><td><span class="badge-esp"><i class="bi bi-eye-fill"></i> Oftalmología</span></td><td><span class="badge-count">5</span></td><td><span class="badge-duration">20 min</span></td><td><span class="badge-price">S/. 120</span></div></td></tr>
-                        <tr><td><span class="badge-esp"><i class="bi bi-tooth"></i> Odontología</span></td><td><span class="badge-count">10</span></td><td><span class="badge-duration">45 min</span></td><td><span class="badge-price">S/. 80</span></div></td></tr>
-                        <tr><td><span class="badge-esp"><i class="bi bi-hospital"></i> Cirugía General</span></td><td><span class="badge-count">4</span></td><td><span class="badge-duration">60 min</span></td><td><span class="badge-price">S/. 250</span></div></td></tr>
-                        <tr><td><span class="badge-esp"><i class="bi bi-flower2"></i> Dermatología</span></td><td><span class="badge-count">7</span></td><td><span class="badge-duration">30 min</span></td><td><span class="badge-price">S/. 110</span></div></td></tr>
-                        <tr><td><span class="badge-esp"><i class="bi bi-lungs"></i> Neumología</span></td><td><span class="badge-count">5</span></td><td><span class="badge-duration">35 min</span></td><td><span class="badge-price">S/. 140</span></div></td></tr>
+                        <tr><td><span class="badge-spec"><i class="bi bi-heart-fill"></i> Cardiología</span></td><td>8</td><td>30 min</td><td style="color:var(--pastel-blue-dark, #0284c7);font-weight:700;">S/. 150</td></tr>
+                        <tr><td><span class="badge-spec"><i class="bi bi-balloon-heart-fill"></i> Pediatría</span></td><td>12</td><td>25 min</td><td style="color:var(--pastel-blue-dark, #0284c7);font-weight:700;">S/. 100</td></tr>
+                        <tr><td><span class="badge-spec"><i class="bi bi-cpu"></i> Neurología</span></td><td>6</td><td>40 min</td><td style="color:var(--pastel-blue-dark, #0284c7);font-weight:700;">S/. 180</td></tr>
+                        <tr><td><span class="badge-spec"><i class="bi bi-eye-fill"></i> Oftalmología</span></td><td>5</td><td>20 min</td><td style="color:var(--pastel-blue-dark, #0284c7);font-weight:700;">S/. 120</td></tr>
+                        <tr><td><span class="badge-spec"><i class="bi bi-emoji-smile"></i> Odontología</span></td><td>10</td><td>45 min</td><td style="color:var(--pastel-blue-dark, #0284c7);font-weight:700;">S/. 80</td></tr>
+                        <tr><td><span class="badge-spec"><i class="bi bi-activity"></i> Traumatología</span></td><td>4</td><td>30 min</td><td style="color:var(--pastel-blue-dark, #0284c7);font-weight:700;">S/. 200</td></tr>
+                        <tr><td><span class="badge-spec"><i class="bi bi-eyedropper"></i> Dermatología</span></td><td>7</td><td>30 min</td><td style="color:var(--pastel-blue-dark, #0284c7);font-weight:700;">S/. 110</td></tr>
+                        <tr><td><span class="badge-spec"><i class="bi bi-lungs"></i> Neumología</span></td><td>5</td><td>35 min</td><td style="color:var(--pastel-blue-dark, #0284c7);font-weight:700;">S/. 140</td></tr>
                     </tbody>
                 </table>
             </div>
+            <div class="text-center mt-4">
+                <a th:href="@{/login}" class="btn-hero-primary" style="display:inline-flex;">
+                    <i class="bi bi-calendar-plus"></i> Agendar Cita
+                </a>
+            </div>
         </div>
     </section>
 
-    <!-- VENTAJAS -->
-    <section class="advantages-section">
-        <div class="advantages-container">
-            <div class="section-title">
+    <!-- ===== VENTAJAS ===== -->
+    <section class="section-padding section-alt">
+        <div class="container">
+            <div class="section-title-center">
                 <h2>¿Por Qué Elegirnos?</h2>
-                <p>Estándares de calidad reconocidos a nivel nacional</p>
+                <p>Estándares de calidad que nos distinguen</p>
+                <div class="section-accent-bar"></div>
             </div>
-            <div class="advantages-grid">
-                <div class="advantage-box">
-                    <div class="adv-icon"><i class="bi bi-shield-check"></i></div>
-                    <h4 class="advantage-title">100% Seguridad</h4>
-                    <p class="advantage-desc">Encriptación nivel hospitalario. Cumplimiento normativo HIPAA. Protección máxima de datos personales y médicos.</p>
+            <div class="row g-4">
+                <div class="col-sm-6 col-lg-3">
+                    <div class="adv-card">
+                        <div class="adv-icon"><i class="bi bi-shield-check"></i></div>
+                        <h4 class="adv-title">100% Seguridad</h4>
+                        <p class="adv-desc">Protección de tus datos con encriptación de nivel hospitalario.</p>
+                    </div>
                 </div>
-                <div class="advantage-box">
-                    <div class="adv-icon"><i class="bi bi-lightning-charge-fill"></i></div>
-                    <h4 class="advantage-title">Velocidad y Eficiencia</h4>
-                    <p class="advantage-desc">Agendamiento en segundos. Cero trámites burocráticos. Gestión automática de historiales clínicos.</p>
+                <div class="col-sm-6 col-lg-3">
+                    <div class="adv-card">
+                        <div class="adv-icon"><i class="bi bi-lightning-charge-fill"></i></div>
+                        <h4 class="adv-title">Velocidad y Eficiencia</h4>
+                        <p class="adv-desc">Agendamiento en segundos. Gestión automática sin trámites.</p>
+                    </div>
                 </div>
-                <div class="advantage-box">
-                    <div class="adv-icon"><i class="bi bi-award-fill"></i></div>
-                    <h4 class="advantage-title">Profesionales Certificados</h4>
-                    <p class="advantage-desc">Médicos especialistas con experiencia. Licencias actualizadas. Evaluación continua de competencias.</p>
+                <div class="col-sm-6 col-lg-3">
+                    <div class="adv-card">
+                        <div class="adv-icon"><i class="bi bi-award-fill"></i></div>
+                        <h4 class="adv-title">Profesionales</h4>
+                        <p class="adv-desc">Médicos certificados con evaluación continua de competencias.</p>
+                    </div>
                 </div>
-                <div class="advantage-box">
-                    <div class="adv-icon"><i class="bi bi-headset"></i></div>
-                    <h4 class="advantage-title">Soporte 24/7</h4>
-                    <p class="advantage-desc">Atención integral en cualquier momento. Equipo disponible sin interrupciones. Respuesta rápida a consultas.</p>
+                <div class="col-sm-6 col-lg-3">
+                    <div class="adv-card">
+                        <div class="adv-icon"><i class="bi bi-headset"></i></div>
+                        <h4 class="adv-title">Soporte 24/7</h4>
+                        <p class="adv-desc">Atención integral en cualquier momento, sin interrupciones.</p>
+                    </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- FOOTER -->
-    <footer class="footer-main">
-        <div class="footer-container">
-            <div class="footer-grid">
-                <div class="footer-col">
-                    <h5>TRINIDAD</h5>
-                    <p>Centro de Salud Integral de referencia en el norte del Perú. Comprometidos con la excelencia médica y la innovación tecnológica para el bienestar de nuestros pacientes.</p>
+    <!-- ===== CTA ===== -->
+    <section class="cta-section" id="contacto">
+        <div class="container text-center">
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <h2>¿Listo para cuidar tu salud?</h2>
+                    <p class="mb-4 fs-5">Agenda tu primera cita y accede a todos nuestros servicios.</p>
+                    <div class="d-flex justify-content-center gap-3 flex-wrap">
+                        <a th:href="@{/login}" class="btn-cta-primary">
+                            <i class="bi bi-person-plus"></i> Crear Cuenta
+                        </a>
+                        <a th:href="@{/login}" class="btn-cta-outline">
+                            <i class="bi bi-box-arrow-in-right"></i> Iniciar Sesión
+                        </a>
+                    </div>
                 </div>
+            </div>
+        </div>
+    </section>
 
-                <div class="footer-col">
+    <!-- ===== FOOTER ===== -->
+    <footer class="footer-main">
+        <div class="container">
+            <div class="row g-5">
+                <div class="col-lg-4">
+                    <h5><i class="bi bi-hospital-fill me-2" style="color:#38bdf8;"></i>TRINIDAD</h5>
+                    <p>Centro de Salud Integral en el norte del Perú. Excelencia médica e innovación tecnológica para el bienestar de nuestros pacientes.</p>
+                    <p><strong style="color:rgba(255,255,255,0.5);">RUC:</strong> 20494088208</p>
+                </div>
+                <div class="col-lg-2 col-md-4">
                     <h5>NAVEGACIÓN</h5>
                     <ul>
-                        <li><a th:href="@{/}"><i class="bi bi-house-fill"></i> Inicio</a></li>
-                        <li><a href="#servicios"><i class="bi bi-briefcase-fill"></i> Servicios</a></li>
-                        <li><a th:href="@{/login}"><i class="bi bi-person-circle"></i> Portal Paciente</a></li>
-                        <li><a href="#"><i class="bi bi-calendar-check"></i> Agendar Cita</a></li>
+                        <li><a th:href="@{/}">Inicio</a></li>
+                        <li><a href="#servicios">Servicios</a></li>
+                        <li><a href="#instalaciones">Instalaciones</a></li>
+                        <li><a href="#especialidades">Especialidades</a></li>
+                        <li><a th:href="@{/login}">Portal Paciente</a></li>
                     </ul>
                 </div>
-
-                <div class="footer-col">
+                <div class="col-lg-3 col-md-4">
                     <h5>CONTACTO</h5>
-                    <div class="contact-item">
-                        <i class="bi bi-telephone-fill"></i>
-                        <span><strong>+51 942 123 456</strong><br>Lunes a Viernes 8am - 8pm</span>
+                    <div class="d-flex align-items-start gap-3 mb-3">
+                        <i class="bi bi-telephone-fill" style="color:#38bdf8;"></i>
+                        <div><strong style="color:rgba(255,255,255,0.6);">+51 942 123 456</strong><br><span style="font-size:0.82rem;color:rgba(255,255,255,0.35);">Lun - Vie 8am - 8pm</span></div>
                     </div>
-                    <div class="contact-item">
-                        <i class="bi bi-envelope-fill"></i>
-                        <span>info@trinidad-salud.pe</span>
+                    <div class="d-flex align-items-start gap-3 mb-3">
+                        <i class="bi bi-envelope-fill" style="color:#38bdf8;"></i>
+                        <div><span style="font-size:0.82rem;color:rgba(255,255,255,0.35);">info@trinidad-salud.pe</span></div>
                     </div>
-                    <div class="contact-item">
-                        <i class="bi bi-geo-alt-fill"></i>
-                        <span>Tarapoto, San Martín - Perú<br>Emergencias 24/7</span>
+                    <div class="d-flex align-items-start gap-3">
+                        <i class="bi bi-geo-alt-fill" style="color:#38bdf8;"></i>
+                        <div><span style="font-size:0.82rem;color:rgba(255,255,255,0.35);">Tarapoto, San Martín<br>Emergencias 24/7</span></div>
                     </div>
                 </div>
-
-                <div class="footer-col">
-                    <h5>INFORMACIÓN LEGAL</h5>
-                    <p><strong>Razón Social:</strong><br>Trinidad & Especialidades Médicas S.A.C.</p>
-                    <p><strong>RUC:</strong> 20494088208</p>
-                    <p style="margin-top: 20px; font-size: 0.85rem; color: var(--secondary);"><i class="bi bi-check-circle-fill"></i> Licencia Sanitaria Vigente<br><i class="bi bi-check-circle-fill"></i> Certificación ISO 9001<br><i class="bi bi-check-circle-fill"></i> MINSA Registrado</p>
+                <div class="col-lg-3 col-md-4">
+                    <h5>LEGAL</h5>
+                    <p style="font-size:0.85rem;color:rgba(255,255,255,0.35);"><strong style="color:rgba(255,255,255,0.5);">Razón Social:</strong><br>Trinidad & Especialidades Médicas S.A.C.</p>
+                    <p style="font-size:0.8rem;">
+                        <i class="bi bi-check-circle-fill me-1" style="color:#38bdf8;font-size:10px;"></i>Licencia Sanitaria Vigente<br>
+                        <i class="bi bi-check-circle-fill me-1" style="color:#38bdf8;font-size:10px;"></i>Certificación ISO 9001<br>
+                        <i class="bi bi-check-circle-fill me-1" style="color:#38bdf8;font-size:10px;"></i>MINSA Registrado
+                    </p>
                 </div>
             </div>
-
             <div class="footer-divider"></div>
-
             <div class="footer-bottom">
-                <p>&copy; 2026 <span class="highlight">TRINIDAD & ESPECIALIDADES MÉDICAS S.A.C.</span> | RUC: 20494088208</p>
-                <p>Todos los derechos reservados | <a href="#" style="color: var(--secondary); text-decoration: none;">Política de Privacidad</a> | <a href="#" style="color: var(--secondary); text-decoration: none;">Términos de Servicio</a></p>
-                <p style="margin-top: 15px; color: var(--secondary);">Desarrollado con ❤️ para la salud integral de la comunidad</p>
+                <p>&copy; 2026 <strong style="color:rgba(255,255,255,0.4);">TRINIDAD & ESPECIALIDADES MÉDICAS S.A.C.</strong></p>
+                <p>Todos los derechos reservados | <a href="#">Política de Privacidad</a> | <a href="#">Términos</a></p>
             </div>
         </div>
     </footer>
+
 </div>
 
-<script>
-    const canvas = document.getElementById('bg-canvas');
-    const ctx = canvas.getContext('2d');
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-    const particles = [];
-    const particleCount = 40;
-    class Particle {
-        constructor() {
-            this.x = Math.random() * canvas.width;
-            this.y = Math.random() * canvas.height;
-            this.vx = (Math.random() - 0.5) * 0.3;
-            this.vy = (Math.random() - 0.5) * 0.3;
-            this.radius = Math.random() * 1.2;
-            const colors = ['rgba(0,61,122,', 'rgba(0,168,84,', 'rgba(255,107,53,'];
-            this.color = colors[Math.floor(Math.random() * colors.length)];
-        }
-        update() {
-            this.x += this.vx;
-            this.y += this.vy;
-            if (this.x < 0) this.x = canvas.width;
-            if (this.x > canvas.width) this.x = 0;
-            if (this.y < 0) this.y = canvas.height;
-            if (this.y > canvas.height) this.y = 0;
-        }
-        draw() {
-            ctx.fillStyle = this.color + Math.random() * 0.2 + ')';
-            ctx.beginPath();
-            ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-            ctx.fill();
-        }
-    }
-    for (let i = 0; i < particleCount; i++) particles.push(new Particle());
-    function animate() {
-        ctx.fillStyle = 'rgba(15,20,25,0.01)';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        particles.forEach(p => { p.update(); p.draw(); });
-        requestAnimationFrame(animate);
-    }
-    animate();
-    window.addEventListener('resize', () => {
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-    });
-</script>
 <script th:src="@{/webjars/bootstrap/5.3.3/js/bootstrap.bundle.min.js}"></script>
+
+<script>
+(function() {
+    var t = localStorage.getItem('trinidad-theme');
+    var icon = document.getElementById('themeIconLanding');
+    if (icon) {
+        icon.className = t === 'dark' ? 'bi bi-sun-fill' : 'bi bi-moon-fill';
+    }
+})();
+function toggleTheme() {
+    var html = document.documentElement;
+    var isDark = html.getAttribute('data-theme') === 'dark';
+    var icon = document.getElementById('themeIconLanding');
+    html.classList.add('theme-transitioning');
+    if (isDark) {
+        html.removeAttribute('data-theme');
+        localStorage.setItem('trinidad-theme', 'light');
+        if (icon) icon.className = 'bi bi-moon-fill';
+    } else {
+        html.setAttribute('data-theme', 'dark');
+        localStorage.setItem('trinidad-theme', 'dark');
+        if (icon) icon.className = 'bi bi-sun-fill';
+    }
+    setTimeout(function() { html.classList.remove('theme-transitioning'); }, 500);
+}
+</script>
 </body>
 </html>
-

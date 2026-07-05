@@ -47,7 +47,7 @@ public class DiagnosticoCie10WebController {
         if (dto.getCodigo() != null && !dto.getCodigo().isBlank()) {
             try {
                 diagnosticoService.actualizar(dto.getCodigo(), dto);
-            } catch (Exception e) {
+            } catch (Exception ignored) {
                 diagnosticoService.crear(dto);
             }
         } else {

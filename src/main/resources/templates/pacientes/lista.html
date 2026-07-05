@@ -34,31 +34,31 @@
                         <th>Teléfono</th>
                         <th>Distrito</th>
                         <th>Tipo Sangre</th>
-                        <th class="text-end">Acciones</th>
+                        <th style="text-align:center;">Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr th:each="p : ${pacientes}">
                         <td>
-                            <span class="badge-estado badge-estado-primary" th:text="${p.dni}"></span>
+                            <span class="badge-estado badge-primary" th:text="${p.dni}"></span>
                         </td>
                         <td>
                             <strong th:text="${p.apellidoPaterno + ' ' + p.apellidoMaterno + ', ' + p.nombres}"></strong>
                         </td>
                         <td>
-                            <span th:if="${p.sexo == 'M'}" class="badge-estado badge-estado-info">Masculino</span>
-                            <span th:if="${p.sexo == 'F'}" class="badge-estado badge-estado-danger">Femenino</span>
+                            <span th:if="${p.sexo == 'M'}" class="badge-estado badge-info">Masculino</span>
+                            <span th:if="${p.sexo == 'F'}" class="badge-estado badge-danger">Femenino</span>
                         </td>
                         <td th:text="${p.telefono ?: '-'}"></td>
                         <td th:text="${p.distrito ?: '-'}"></td>
                         <td>
-                            <span class="badge-estado badge-estado-primary" th:text="${p.tipoSangre ?: 'N/D'}"></span>
+                            <span class="badge-estado badge-primary" th:text="${p.tipoSangre ?: 'N/D'}"></span>
                         </td>
-                        <td><div class="acciones-tabla">
-                            <a th:href="@{/pacientes/{id}(id=${p.idPaciente})}" class="btn-ver" title="Ver">
+                        <td><div class="action-group">
+                            <a th:href="@{/pacientes/{id}(id=${p.idPaciente})}" class="action-btn action-view" title="Ver">
                                 <i class="bi bi-eye"></i>
                             </a>
-                            <a th:href="@{/pacientes/{id}/editar(id=${p.idPaciente})}" class="btn-editar" title="Editar">
+                            <a th:href="@{/pacientes/{id}/editar(id=${p.idPaciente})}" class="action-btn action-edit" title="Editar">
                                 <i class="bi bi-pencil"></i>
                             </a>
                         </div></td></tr>

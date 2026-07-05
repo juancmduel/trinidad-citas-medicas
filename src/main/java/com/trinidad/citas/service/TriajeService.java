@@ -1,5 +1,6 @@
 package com.trinidad.citas.service;
 
+import com.trinidad.citas.audit.Auditable;
 import com.trinidad.citas.dto.TriajeDTO;
 import com.trinidad.citas.exception.BusinessException;
 import com.trinidad.citas.exception.ResourceNotFoundException;
@@ -71,16 +72,17 @@ public class TriajeService {
                 .orElseThrow(() -> new ResourceNotFoundException("Triaje para cita", idCita));
     }
 
+    @Auditable(entidad = "TRIAJE", accion = "CREAR")
     public TriajeDTO registrar(Long idCita, Long idEnfermera, TriajeDTO dto) {
         Cita cita = citaRepository.findById(idCita)
                 .orElseThrow(() -> new ResourceNotFoundException("Cita", idCita));
 
         if (cita.getEstado() != EstadoCita.EN_TRIAGE) {
-            throw new BusinessException("La cita debe estar en estado EN_TRIAGE para registrar triaje");
+            throw new BusinessException("El triaje solo puede registrarse cuando la cita está EN_TRIAGE");
         }
 
         if (triajeRepository.findByCita_IdCita(idCita).isPresent()) {
-            throw new BusinessException("Esta cita ya tiene un triaje registrado");
+            throw new BusinessException("Esta cita ya tiene un triaje registrado. Si necesita corregirlo, edítelo.");
         }
 
         Triaje triaje = new Triaje();

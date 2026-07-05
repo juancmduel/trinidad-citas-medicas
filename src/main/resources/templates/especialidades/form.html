@@ -12,10 +12,12 @@
 
         <div class="page-header">
             <div>
-                <h1><i class="bi bi-heart-pulse"></i>
+                <h1><i class="bi bi-heart-pulse" style="color:var(--accent);"></i>
                     <span th:text="${especialidad.idEspecialidad != null} ? 'Editar Especialidad' : 'Nueva Especialidad'">Especialidad</span>
                 </h1>
-                <p>Gestione las especialidades médicas disponibles</p>
+                <p th:text="${especialidad.idEspecialidad != null} ? 'Modifique los datos de la especialidad médica' : 'Registre una nueva especialidad médica en el catálogo'">
+                    Gestione las especialidades médicas disponibles
+                </p>
             </div>
             <a th:href="@{/especialidades}" class="btn-volver">
                 <i class="bi bi-arrow-left"></i>Volver
@@ -34,7 +36,7 @@
                     <!-- Datos Básicos -->
                     <div class="form-section-card">
                         <div class="d-flex align-items-center gap-3 mb-3">
-                            <div class="fs-icon"><i class="bi bi-info-circle-fill"></i></div>
+                            <div class="fs-icon" style="background:#dbeafe;color:#3b82f6;"><i class="bi bi-info-circle-fill"></i></div>
                             <div>
                                 <h5 class="mb-1" style="font-weight:700;">Datos Básicos</h5>
                                 <p style="color:var(--text-muted);font-size:13px;margin:0;">Información principal de la especialidad</p>
@@ -58,7 +60,7 @@
                     <!-- Configuración de Consulta -->
                     <div class="form-section-card">
                         <div class="d-flex align-items-center gap-3 mb-3">
-                            <div class="fs-icon"><i class="bi bi-gear-fill"></i></div>
+                            <div class="fs-icon" style="background:#d1fae5;color:#10b981;"><i class="bi bi-gear-fill"></i></div>
                             <div>
                                 <h5 class="mb-1" style="font-weight:700;">Configuración de Consulta</h5>
                                 <p style="color:var(--text-muted);font-size:13px;margin:0;">Tarifa y duración estándar de las citas</p>
@@ -93,7 +95,7 @@
                     <!-- Estado -->
                     <div class="form-section-card">
                         <div class="d-flex align-items-center gap-3 mb-3">
-                            <div class="fs-icon"><i class="bi bi-toggle-on"></i></div>
+                            <div class="fs-icon" style="background:#fef3c7;color:#f59e0b;"><i class="bi bi-toggle-on"></i></div>
                             <div>
                                 <h5 class="mb-1" style="font-weight:700;">Estado</h5>
                                 <p style="color:var(--text-muted);font-size:13px;margin:0;">Control de disponibilidad</p>
@@ -121,7 +123,7 @@
                     <!-- Acciones -->
                     <div class="form-section-card">
                         <div class="d-flex align-items-center gap-3 mb-3">
-                            <div class="fs-icon"><i class="bi bi-lightning-fill"></i></div>
+                            <div class="fs-icon" style="background:#ede9fe;color:#8b5cf6;"><i class="bi bi-lightning-fill"></i></div>
                             <div>
                                 <h5 class="mb-1" style="font-weight:700;">Acciones</h5>
                                 <p style="color:var(--text-muted);font-size:13px;margin:0;">Finaliza o descarta los cambios</p>

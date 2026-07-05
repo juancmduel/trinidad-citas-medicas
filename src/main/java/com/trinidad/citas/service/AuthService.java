@@ -7,9 +7,9 @@ import com.trinidad.citas.model.Usuario;
 import com.trinidad.citas.repository.UsuarioRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.LockedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -22,6 +22,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AuthService {
 
     private final AuthenticationManager authenticationManager;
@@ -34,26 +35,22 @@ public class AuthService {
         String ip = obtenerIp();
         Usuario usuario = usuarioRepository.findByUsername(request.getUsername()).orElse(null);
 
-        if (usuario != null && usuario.isBloqueado()) {
-            intentoLoginService.registrarIntento(request.getUsername(), false, ip, "Cuenta bloqueada");
-            throw new LockedException("Cuenta bloqueada por múltiples intentos fallidos");
-        }
-
+        // ⚠ No diferenciar entre "usuario bloqueado", "credenciales invalidas" o "usuario no existe"
+        // para evitar enumeracion de usuarios (AL-09). Siempre mismo mensaje generico.
         try {
             authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
             );
         } catch (Exception e) {
+            intentoLoginService.registrarIntento(request.getUsername(), false, ip, "Credenciales invalidas");
             if (usuario != null) {
                 usuario.setIntentosFallidos(usuario.getIntentosFallidos() + 1);
                 if (intentoLoginService.debeBloquear(request.getUsername())) {
                     usuario.setBloqueado(1);
+                    usuarioRepository.save(usuario);
                 }
-                usuarioRepository.save(usuario);
             }
-            intentoLoginService.registrarIntento(request.getUsername(), false, ip,
-                e instanceof BadCredentialsException ? "Credenciales inválidas" : e.getMessage());
-            throw e;
+            throw new BadCredentialsException("Credenciales invalidas");
         }
 
         UserDetails userDetails = userDetailsService.loadUserByUsername(request.getUsername());
@@ -80,14 +77,18 @@ public class AuthService {
     }
 
     private String obtenerIp() {
-        ServletRequestAttributes attrs = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-        if (attrs != null) {
-            HttpServletRequest request = attrs.getRequest();
-            String ip = request.getHeader("X-Forwarded-For");
-            if (ip == null || ip.isBlank()) {
-                ip = request.getRemoteAddr();
+        try {
+            ServletRequestAttributes attrs = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+            if (attrs != null) {
+                HttpServletRequest request = attrs.getRequest();
+                String ip = request.getHeader("X-Forwarded-For");
+                if (ip == null || ip.isBlank()) {
+                    ip = request.getRemoteAddr();
+                }
+                return ip != null ? ip : "unknown";
             }
-            return ip;
+        } catch (Exception e) {
+            log.warn("No se pudo obtener la IP del cliente: {}", e.getMessage());
         }
         return "unknown";
     }

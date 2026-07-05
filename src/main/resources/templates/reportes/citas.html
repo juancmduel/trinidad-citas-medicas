@@ -11,53 +11,82 @@
                 <h1><i class="bi bi-calendar-check"></i>Reporte de Citas</h1>
                 <p>Reporte detallado de citas m&eacute;dicas</p>
             </div>
-            <div class="page-actions d-flex gap-2">
-                <a th:href="@{/reportes/citas/pdf(desde=${desde}, hasta=${hasta}, idEspecialidad=${idEspecialidad}, idMedico=${idMedico}, estado=${estado})}" class="btn btn-modern btn-danger">
+            <div class="d-flex gap-2">
+                <a th:href="@{/reportes}" class="btn-volver">
+                    <i class="bi bi-arrow-left"></i> Volver
+                </a>
+                <a th:href="@{/reportes/citas/pdf(desde=${desde}, hasta=${hasta}, idEspecialidad=${idEspecialidad}, idMedico=${idMedico}, estado=${estado})}" class="btn-professional btn-danger-prof">
                     <i class="bi bi-file-pdf"></i> PDF
                 </a>
-                <a th:href="@{/reportes/citas/xlsx(desde=${desde}, hasta=${hasta}, idEspecialidad=${idEspecialidad}, idMedico=${idMedico}, estado=${estado})}" class="btn btn-modern btn-success">
+                <a th:href="@{/reportes/citas/xlsx(desde=${desde}, hasta=${hasta}, idEspecialidad=${idEspecialidad}, idMedico=${idMedico}, estado=${estado})}" class="btn-professional btn-success-prof">
                     <i class="bi bi-file-excel"></i> Excel
                 </a>
             </div>
         </div>
 
-        <div class="card-modern mb-4">
-            <div class="card-header-modern">
-                <h5><i class="bi bi-funnel"></i> Filtros</h5>
+        <!-- Filtros -->
+        <div class="card-professional mb-4">
+            <div class="card-header-professional">
+                <h5><i class="bi bi-funnel"></i>Filtros</h5>
             </div>
-            <div class="card-body-modern">
+            <div class="card-body-professional" style="padding:1.5rem;">
                 <form method="get" th:action="@{/reportes/citas}" class="row g-3">
                     <div class="col-md-3">
-                        <label class="form-label-modern">Desde</label>
-                        <input type="date" name="desde" class="form-control-modern" th:value="${desde}" required>
+                        <div class="input-group-modern">
+                            <div class="input-icon"><i class="bi bi-calendar3"></i></div>
+                            <div class="input-group-modern-body">
+                                <label class="form-label-modern">Desde</label>
+                                <input type="date" name="desde" class="form-control-modern" th:value="${desde}" required>
+                            </div>
+                        </div>
                     </div>
                     <div class="col-md-3">
-                        <label class="form-label-modern">Hasta</label>
-                        <input type="date" name="hasta" class="form-control-modern" th:value="${hasta}" required>
+                        <div class="input-group-modern">
+                            <div class="input-icon"><i class="bi bi-calendar3"></i></div>
+                            <div class="input-group-modern-body">
+                                <label class="form-label-modern">Hasta</label>
+                                <input type="date" name="hasta" class="form-control-modern" th:value="${hasta}" required>
+                            </div>
+                        </div>
                     </div>
                     <div class="col-md-3">
-                        <label class="form-label-modern">Especialidad</label>
-                        <select name="idEspecialidad" class="form-control-modern">
-                            <option value="">Todas</option>
-                            <option th:each="e : ${especialidades}" th:value="${e.idEspecialidad}" th:text="${e.nombre}" th:selected="${e.idEspecialidad == idEspecialidad}"></option>
-                        </select>
+                        <div class="input-group-modern">
+                            <div class="input-icon"><i class="bi bi-stethoscope"></i></div>
+                            <div class="input-group-modern-body">
+                                <label class="form-label-modern">Especialidad</label>
+                                <select name="idEspecialidad" class="form-control-modern">
+                                    <option value="">Todas</option>
+                                    <option th:each="e : ${especialidades}" th:value="${e.idEspecialidad}" th:text="${e.nombre}" th:selected="${e.idEspecialidad == idEspecialidad}"></option>
+                                </select>
+                            </div>
+                        </div>
                     </div>
                     <div class="col-md-3">
-                        <label class="form-label-modern">M&eacute;dico</label>
-                        <select name="idMedico" class="form-control-modern">
-                            <option value="">Todos</option>
-                            <option th:each="m : ${medicos}" th:value="${m.idMedico}" th:text="${m.nombreCompleto}" th:selected="${m.idMedico == idMedico}"></option>
-                        </select>
+                        <div class="input-group-modern">
+                            <div class="input-icon"><i class="bi bi-person-badge"></i></div>
+                            <div class="input-group-modern-body">
+                                <label class="form-label-modern">M&eacute;dico</label>
+                                <select name="idMedico" class="form-control-modern">
+                                    <option value="">Todos</option>
+                                    <option th:each="m : ${medicos}" th:value="${m.idMedico}" th:text="${m.nombreCompleto}" th:selected="${m.idMedico == idMedico}"></option>
+                                </select>
+                            </div>
+                        </div>
                     </div>
                     <div class="col-md-3">
-                        <label class="form-label-modern">Estado</label>
-                        <select name="estado" class="form-control-modern">
-                            <option value="">Todos</option>
-                            <option th:each="e : ${estados}" th:value="${e}" th:text="${e}" th:selected="${e == estado}"></option>
-                        </select>
+                        <div class="input-group-modern">
+                            <div class="input-icon"><i class="bi bi-tag"></i></div>
+                            <div class="input-group-modern-body">
+                                <label class="form-label-modern">Estado</label>
+                                <select name="estado" class="form-control-modern">
+                                    <option value="">Todos</option>
+                                    <option th:each="e : ${estados}" th:value="${e}" th:text="${e}" th:selected="${e == estado}"></option>
+                                </select>
+                            </div>
+                        </div>
                     </div>
                     <div class="col-md-3 d-flex align-items-end gap-2">
-                        <button type="submit" class="btn btn-modern btn-primary">
+                        <button type="submit" class="btn-professional btn-primary-prof">
                             <i class="bi bi-search"></i> Filtrar
                         </button>
                     </div>
@@ -65,46 +94,55 @@
             </div>
         </div>
 
-        <div class="card-modern">
-            <div class="card-header-modern">
-                <h5><i class="bi bi-table"></i> Citas</h5>
-                <span class="text-muted">Total: <strong th:text="${totalCitas}"></strong></span>
+        <!-- Tabla de Citas -->
+        <div class="table-container">
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--border);">
+                <h5 style="margin:0;display:flex;align-items:center;gap:8px;font-size:14px;">
+                    <i class="bi bi-table" style="color:var(--accent);"></i>Citas
+                </h5>
+                <span style="font-size:12px;color:var(--text-muted);">Total: <strong style="color:var(--accent);" th:text="${totalCitas}"></strong></span>
             </div>
-            <div class="card-body-modern">
-                <div class="table-container">
-                    <table class="table-modern">
-                        <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>Paciente</th>
-                                <th>DNI</th>
-                                <th>Especialidad</th>
-                                <th>M&eacute;dico</th>
-                                <th>Fecha</th>
-                                <th>Hora</th>
-                                <th>Estado</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr th:each="c, iter : ${citas}">
-                                <td th:text="${iter.count}"></td>
-                                <td th:text="${c.pacienteNombre}"></td>
-                                <td th:text="${c.pacienteDni}"></td>
-                                <td th:text="${c.especialidadNombre}"></td>
-                                <td th:text="${c.medicoNombre}"></td>
-                                <td th:text="${#temporals.format(c.fechaCita, 'dd/MM/yyyy')}"></td>
-                                <td th:text="${c.horaInicio}"></td>
-                                <td>
-                                    <span class="badge-estado" th:classappend="${c.estado == T(com.trinidad.citas.model.EstadoCita).ATENDIDA} ? 'badge-completado' : (${c.estado == T(com.trinidad.citas.model.EstadoCita).ANULADA} ? 'badge-critico' : 'badge-proceso')" th:text="${c.estado}"></span>
-                                </td>
-                            </tr>
-                            <tr th:if="${#lists.isEmpty(citas)}">
-                                <td colspan="8" class="table-empty">No se encontraron citas en el rango seleccionado</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+            <table class="table-modern">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Paciente</th>
+                        <th>DNI</th>
+                        <th>Especialidad</th>
+                        <th>M&eacute;dico</th>
+                        <th>Fecha</th>
+                        <th>Hora</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="c, iter : ${citas}">
+                        <td th:text="${iter.count}"></td>
+                        <td><strong th:text="${c.nombrePaciente}"></strong></td>
+                        <td th:text="${c.dniPaciente}"></td>
+                        <td th:text="${c.nombreEspecialidad}"></td>
+                        <td th:text="${c.nombreMedico}"></td>
+                        <td th:text="${#temporals.format(c.fechaCita, 'dd/MM/yyyy')}"></td>
+                        <td th:text="${c.horaInicio}"></td>
+                        <td>
+                            <span th:if="${c.estado == 'PROGRAMADA'}" class="badge-estado badge-info">Programada</span>
+                            <span th:if="${c.estado == 'CONFIRMADA'}" class="badge-estado badge-primary">Confirmada</span>
+                            <span th:if="${c.estado == 'EN_TRIAGE'}" class="badge-estado badge-info">En Triage</span>
+                            <span th:if="${c.estado == 'EN_ATENCION'}" class="badge-estado badge-info">En Atenci&oacute;n</span>
+                            <span th:if="${c.estado == 'ATENDIDA'}" class="badge-estado badge-completado">Atendida</span>
+                            <span th:if="${c.estado == 'CANCELADA'}" class="badge-estado badge-cancelado">Cancelada</span>
+                            <span th:if="${c.estado == 'NO_ASISTIO'}" class="badge-estado badge-warning">No Asisti&oacute;</span>
+                            <span th:if="${c.estado == 'REPROGRAMADA'}" class="badge-estado badge-primary">Reprogramada</span>
+                        </td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(citas)}">
+                        <td colspan="8" class="table-empty">
+                            <i class="bi bi-inbox"></i>
+                            <p>No se encontraron citas en el rango seleccionado</p>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
     </main>
     <footer th:replace="~{fragments/header :: footer}"></footer>

@@ -1,8 +1,14 @@
 package com.trinidad.citas.service;
 
+import java.time.LocalDate;
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.trinidad.citas.audit.Auditable;
 import com.trinidad.citas.dto.AdmisionPacienteDTO;
 import com.trinidad.citas.dto.PagoDTO;
-import com.trinidad.citas.exception.BusinessException;
 import com.trinidad.citas.exception.ResourceNotFoundException;
 import com.trinidad.citas.model.Cita;
 import com.trinidad.citas.model.EstadoCita;
@@ -11,16 +17,14 @@ import com.trinidad.citas.repository.CitaRepository;
 import com.trinidad.citas.repository.PacienteRepository;
 import com.trinidad.citas.repository.PagoRepository;
 import com.trinidad.citas.repository.TriajeRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
-import java.util.List;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Slf4j
 public class AdmisionService {
 
     private final PacienteRepository pacienteRepository;
@@ -40,12 +44,14 @@ public class AdmisionService {
                 paciente.getIdPaciente(), LocalDate.now());
     }
 
+    @Auditable(entidad = "ADMISION", accion = "PROCESAR")
     @Transactional
     public Cita procesarAdmision(Long idCita, String metodoPago, String tipoComprobante) {
         Cita cita = citaRepository.findById(idCita)
                 .orElseThrow(() -> new ResourceNotFoundException("Cita", idCita));
 
         if (cita.getEstado() == EstadoCita.EN_TRIAGE || cita.getEstado() == EstadoCita.EN_ATENCION) {
+            log.info("[ADMISION] Cita ID={} ya procesada, estado actual={}", idCita, cita.getEstado());
             return cita;
         }
 

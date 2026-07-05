@@ -89,11 +89,11 @@
                 </div>
 
                 <div class="detail-actions">
-                    <a th:href="@{/pagos/editar/{id}(id=${pago.idPago})}" class="btn-editar w-100 text-center mb-2" style="padding:12px;">
+                    <a th:href="@{/pagos/editar/{id}(id=${pago.idPago})}" class="action-btn w-100 text-center mb-2">
                         <i class="bi bi-pencil"></i>Editar Pago
                     </a>
                     <form th:action="@{/pagos/eliminar/{id}(id=${pago.idPago})}" method="post" onsubmit="return confirm('¿Eliminar este pago?')">
-                        <button type="submit" class="btn-eliminar w-100 mb-2" style="padding:12px;">
+                        <button type="submit" class="action-btn action-delete w-100 mb-2">
                             <i class="bi bi-trash3"></i>Eliminar
                         </button>
                     </form>

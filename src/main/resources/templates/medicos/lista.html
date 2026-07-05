@@ -33,31 +33,31 @@
                         <th>Consultorio</th>
                         <th>Teléfono</th>
                         <th>Estado</th>
-                        <th class="text-end">Acciones</th>
+                        <th style="text-align:center;">Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr th:each="m : ${medicos}">
                         <td>
-                            <span class="badge-estado badge-estado-primary" th:text="${m.cmp}"></span>
+                            <span class="badge-estado badge-primary" th:text="${m.cmp}"></span>
                         </td>
                         <td>
                             <strong th:text="${m.apellidoPaterno + ' ' + m.nombres}"></strong>
                         </td>
                         <td>
-                            <span class="badge-estado badge-estado-primary" th:text="${m.especialidadNombre ?: '-'}"></span>
+                            <span class="badge-estado badge-primary" th:text="${m.especialidadNombre ?: '-'}"></span>
                         </td>
                         <td th:text="${m.consultorio ?: '-'}"></td>
                         <td th:text="${m.telefono ?: '-'}"></td>
                         <td>
-                            <span th:if="${m.activo == 1}" class="badge-estado badge-estado-success">Activo</span>
-                            <span th:unless="${m.activo == 1}" class="badge-estado badge-estado-danger">Inactivo</span>
+                            <span th:if="${m.activo == 1}" class="badge-estado badge-success">Activo</span>
+                            <span th:unless="${m.activo == 1}" class="badge-estado badge-danger">Inactivo</span>
                         </td>
-                        <td><div class="acciones-tabla" style="justify-content:flex-end;">
-                            <a th:href="@{/medicos/{id}(id=${m.idMedico})}" class="btn-ver" title="Ver"><i class="bi bi-eye"></i></a>
-                            <a th:href="@{/medicos/editar/{id}(id=${m.idMedico})}" class="btn-editar" title="Editar"><i class="bi bi-pencil"></i></a>
+                        <td><div class="action-group">
+                            <a th:href="@{/medicos/{id}(id=${m.idMedico})}" class="action-btn action-view" title="Ver"><i class="bi bi-eye"></i></a>
+                            <a th:href="@{/medicos/editar/{id}(id=${m.idMedico})}" class="action-btn action-edit" title="Editar"><i class="bi bi-pencil"></i></a>
                             <form th:action="@{/medicos/eliminar/{id}(id=${m.idMedico})}" method="post" class="d-inline">
-                                <button type="submit" class="btn-eliminar" title="Eliminar"
+                                <button type="submit" class="action-btn action-delete" title="Eliminar"
                                         onclick="return confirm('¿Eliminar este Médico?')">
                                     <i class="bi bi-trash"></i>
                                 </button>

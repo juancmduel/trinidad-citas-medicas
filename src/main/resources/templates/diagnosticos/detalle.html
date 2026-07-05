@@ -12,12 +12,12 @@
                 <p>Información completa del diagnóstico CIE-10</p>
             </div>
             <div class="d-flex gap-2">
-                <a th:href="@{/diagnosticos/editar/{id}(id=${diagnostico.codigo})}" class="btn-editar">
-                    <i class="bi bi-pencil"></i> Editar
+                <a th:href="@{/diagnosticos/editar/{id}(id=${diagnostico.codigo})}" class="action-btn action-edit" title="Editar">
+                    <i class="bi bi-pencil"></i>
                 </a>
                 <form th:action="@{/diagnosticos/eliminar/{id}(id=${diagnostico.codigo})}" method="post" style="display:inline;">
-                    <button type="submit" class="btn-eliminar" onclick="return confirm('¿Eliminar este Diagnóstico?')">
-                        <i class="bi bi-trash"></i> Eliminar
+                    <button type="submit" class="action-btn action-delete" title="Eliminar" onclick="return confirm('¿Eliminar este Diagnóstico?')">
+                        <i class="bi bi-trash"></i>
                     </button>
                 </form>
             </div>

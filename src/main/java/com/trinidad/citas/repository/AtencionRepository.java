@@ -3,12 +3,10 @@ package com.trinidad.citas.repository;
 import com.trinidad.citas.model.Atencion;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
 
-@Repository
 public interface AtencionRepository extends JpaRepository<Atencion, Long> {
     Optional<Atencion> findByCita_IdCita(Long idCita);
     List<Atencion> findByHistoria_IdHistoriaOrderByFechaAtencionDesc(Long idHistoria);

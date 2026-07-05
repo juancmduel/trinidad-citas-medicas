@@ -1,17 +1,18 @@
 package com.trinidad.citas.exception;
 
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-
-import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Map;
 
 @RestControllerAdvice(basePackages = "com.trinidad.citas.controller.api")
 public class GlobalExceptionHandler {
@@ -45,9 +46,31 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(body);
     }
 
+    /**
+     * ⚠ Manejo genérico de errores de autenticación.
+     * NO revelar si el usuario existe, está bloqueado o la contraseña es incorrecta
+     * para evitar enumeración de usuarios (AL-09).
+     */
     @ExceptionHandler(AuthenticationException.class)
+    @SuppressWarnings("unused")
     public ResponseEntity<Map<String, Object>> handleAuth(AuthenticationException ex) {
-        return build(HttpStatus.UNAUTHORIZED, "Autenticación fallida: " + ex.getMessage());
+        return build(HttpStatus.UNAUTHORIZED, "Credenciales inválidas");
+    }
+
+    /**
+     * Maneja JSON malformado en el cuerpo de la peticion.
+     */
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    @SuppressWarnings("unused")
+    public ResponseEntity<Map<String, Object>> handleHttpMessageNotReadable(HttpMessageNotReadableException ex) {
+        return build(HttpStatus.BAD_REQUEST,
+            "El cuerpo de la solicitud contiene JSON invalido o datos mal formateados. " +
+            "Verifique el formato de los campos numericos, fechas y horas.");
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<Map<String, Object>> handleAccessDenied(AccessDeniedException ex) {
+        return build(HttpStatus.FORBIDDEN, "Acceso denegado: " + ex.getMessage());
     }
 
     @ExceptionHandler(Exception.class)

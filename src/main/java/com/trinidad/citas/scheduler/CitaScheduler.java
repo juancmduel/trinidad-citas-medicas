@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
@@ -23,13 +24,15 @@ public class CitaScheduler {
     private final CitaRepository citaRepository;
     private final EmailService emailService;
 
+    /** Zona horaria del sistema (Lima, Perú) */
+    private static final ZoneId ZONA = ZoneId.of("America/Lima");
     private static final DateTimeFormatter HORA_FMT = DateTimeFormatter.ofPattern("HH:mm");
 
-    @Scheduled(fixedRate = 60_000)
+    @Scheduled(fixedDelay = 60_000)
     @Transactional
     public void marcarNoAsistidas() {
-        LocalDate hoy = LocalDate.now();
-        String limiteHora = LocalTime.now().minusMinutes(30).format(HORA_FMT);
+        LocalDate hoy = LocalDate.now(ZONA);
+        String limiteHora = LocalTime.now(ZONA).minusMinutes(30).format(HORA_FMT);
 
         List<Cita> pendientes = citaRepository.findCitasParaMarcarNoShow(hoy, limiteHora);
 
@@ -45,10 +48,10 @@ public class CitaScheduler {
         }
     }
 
-    @Scheduled(cron = "0 0 8 * * *")
+    @Scheduled(cron = "0 0 8 * * *", zone = "America/Lima")
     @Transactional(readOnly = true)
     public void registrarRecordatoriosPendientes() {
-        LocalDate manana = LocalDate.now().plusDays(1);
+        LocalDate manana = LocalDate.now(ZONA).plusDays(1);
         List<Cita> citasManana = citaRepository.findByFechaCitaAndEstado(manana, EstadoCita.CONFIRMADA);
 
         log.info("[SCHEDULER] recordatorios 24h: {} citas CONFIRMADAS para mañana {}", citasManana.size(), manana);

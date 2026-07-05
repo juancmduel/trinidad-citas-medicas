@@ -1,5 +1,6 @@
 package com.trinidad.citas.service;
 
+import com.trinidad.citas.audit.Auditable;
 import com.trinidad.citas.dto.DiagnosticoCie10DTO;
 import com.trinidad.citas.exception.ResourceNotFoundException;
 import com.trinidad.citas.model.DiagnosticoCie10;
@@ -33,6 +34,7 @@ public class DiagnosticoCie10Service {
                 .orElseThrow(() -> new ResourceNotFoundException("DiagnosticoCie10", 0L)));
     }
 
+    @Auditable(entidad = "DIAGNOSTICO_CIE10", accion = "CREAR")
     public DiagnosticoCie10DTO crear(DiagnosticoCie10DTO dto) {
         DiagnosticoCie10 d = new DiagnosticoCie10();
         d.setCodigo(dto.getCodigo());
@@ -53,6 +55,7 @@ public class DiagnosticoCie10Service {
         return diagnosticoCie10Repository.findAll();
     }
 
+    @Auditable(entidad = "DIAGNOSTICO_CIE10", accion = "ACTUALIZAR")
     public DiagnosticoCie10DTO actualizar(String codigo, DiagnosticoCie10DTO dto) {
         DiagnosticoCie10 d = obtenerEntidadPorCodigo(codigo);
         d.setDescripcion(dto.getDescripcion());
@@ -61,6 +64,7 @@ public class DiagnosticoCie10Service {
         return toDTO(diagnosticoCie10Repository.save(d));
     }
 
+    @Auditable(entidad = "DIAGNOSTICO_CIE10", accion = "ELIMINAR")
     public void eliminar(String codigo) {
         diagnosticoCie10Repository.deleteById(codigo);
     }

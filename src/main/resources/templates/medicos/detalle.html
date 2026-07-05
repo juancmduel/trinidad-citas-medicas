@@ -24,13 +24,13 @@
                 <span class="dch-icon"><i class="bi bi-person-badge"></i></span>
                 <span style="font-weight:700;font-size:1rem;color:var(--text-primary);">Datos del Médico</span>
                 <div class="ms-auto d-flex gap-2">
-                    <a th:href="@{/medicos/editar/{id}(id=${medico.idMedico})}" class="btn-editar">
-                        <i class="bi bi-pencil"></i> Editar
+                    <a th:href="@{/medicos/editar/{id}(id=${medico.idMedico})}" class="action-btn action-edit" title="Editar">
+                        <i class="bi bi-pencil"></i>
                     </a>
                     <form th:action="@{/medicos/eliminar/{id}(id=${medico.idMedico})}" method="post" class="d-inline">
-                        <button type="submit" class="btn-eliminar"
+                        <button type="submit" class="action-btn action-delete" title="Eliminar"
                                 onclick="return confirm('¿Eliminar este Médico?')">
-                            <i class="bi bi-trash"></i> Eliminar
+                            <i class="bi bi-trash"></i>
                         </button>
                     </form>
                 </div>

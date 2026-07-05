@@ -1,6 +1,7 @@
 package com.trinidad.citas.dto;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -8,9 +9,9 @@ import lombok.NoArgsConstructor;
 @Data @NoArgsConstructor @AllArgsConstructor
 public class LoginRequest {
 
-    @NotBlank
+    @NotBlank @Size(max = 50)
     private String username;
 
-    @NotBlank
+    @NotBlank @Size(min = 8, max = 100)
     private String password;
 }

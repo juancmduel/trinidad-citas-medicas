@@ -21,17 +21,17 @@ public class ConfiguracionWebController {
     }
 
     @GetMapping("/general")
-    public String general(Model model) {
+    public String general() {
         return "configuracion/general";
     }
 
     @GetMapping("/seguridad")
-    public String seguridad(Model model) {
+    public String seguridad() {
         return "configuracion/seguridad";
     }
 
     @GetMapping("/email")
-    public String email(Model model) {
+    public String email() {
         return "configuracion/email";
     }
 }

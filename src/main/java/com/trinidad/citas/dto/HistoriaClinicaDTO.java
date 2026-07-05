@@ -25,6 +25,6 @@ public class HistoriaClinicaDTO {
 
     private Integer activo;
 
-    // Solo respuesta
+    // Solo lectura: se completa desde la entidad Paciente
     private String pacienteNombreCompleto;
 }

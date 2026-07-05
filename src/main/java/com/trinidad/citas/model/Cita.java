@@ -40,10 +40,12 @@ public class Cita {
     private LocalDate fechaCita;
 
     @NotBlank
+    @Pattern(regexp = "^([01]\\d|2[0-3]):[0-5]\\d$", message = "La hora debe tener formato HH:mm (ej: 14:30)")
     @Column(name = "HORA_INICIO", nullable = false, length = 5)
     private String horaInicio;
 
     @NotBlank
+    @Pattern(regexp = "^([01]\\d|2[0-3]):[0-5]\\d$", message = "La hora debe tener formato HH:mm (ej: 14:30)")
     @Column(name = "HORA_FIN", nullable = false, length = 5)
     private String horaFin;
 

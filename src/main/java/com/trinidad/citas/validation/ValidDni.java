@@ -7,7 +7,6 @@ import java.lang.annotation.*;
 
 /**
  * Valida que el campo contenga exactamente 8 dígitos numéricos (DNI peruano).
- * Semana 11–12: validadores customizados.
  */
 @Documented
 @Constraint(validatedBy = DniValidator.class)

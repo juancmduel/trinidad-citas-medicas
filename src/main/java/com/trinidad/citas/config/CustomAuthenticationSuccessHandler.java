@@ -6,16 +6,22 @@ import com.trinidad.citas.service.IntentoLoginService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 
+import jakarta.servlet.ServletException;
+import java.io.IOException;
 import java.time.LocalDateTime;
 
 @Component
 @RequiredArgsConstructor
 public class CustomAuthenticationSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
+
+    private static final Logger log = LoggerFactory.getLogger(CustomAuthenticationSuccessHandler.class);
 
     private final UsuarioRepository usuarioRepository;
     private final IntentoLoginService intentoLoginService;
@@ -41,8 +47,15 @@ public class CustomAuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         setDefaultTargetUrl(determinarUrl(authentication));
         try {
             super.onAuthenticationSuccess(request, response, authentication);
-        } catch (Exception e) {
-            throw new RuntimeException("Error en post-login exitoso", e);
+        } catch (IOException | ServletException e) {
+            // Si falla la redireccion post-login, registrar error pero no interrumpir
+            log.error("Error al redireccionar despues de login exitoso para '{}': {}",
+                username, e.getMessage());
+            try {
+                response.sendRedirect(determinarUrl(authentication));
+            } catch (IOException ex) {
+                log.error("Error en redireccion de fallback para '{}': {}", username, ex.getMessage());
+            }
         }
     }
 

@@ -33,7 +33,7 @@
                         <th>Médico</th>
                         <th>Fecha Emisión</th>
                         <th>Medicamentos</th>
-                        <th class="text-end">Acciones</th>
+                        <th style="text-align:center;">Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -44,10 +44,10 @@
                         <td th:text="${receta.atencion.medico.apellidoPaterno + ' ' + receta.atencion.medico.nombres}"></td>
                         <td th:text="${#temporals.format(receta.fechaEmision, 'dd/MM/yyyy')}"></td>
                         <td>
-                            <span class="badge-estado badge-estado-info" th:text="${receta.detalles.size()} + ' medicamento(s)'"></span>
+                            <span class="badge-estado badge-info" th:text="${receta.detalles.size()} + ' medicamento(s)'"></span>
                         </td>
-                        <td><div class="acciones-tabla">
-                            <a th:href="@{/recetas/{id}(id=${receta.idReceta})}" class="btn-ver">
+                        <td><div class="action-group">
+                            <a th:href="@{/recetas/{id}(id=${receta.idReceta})}" class="action-btn action-view">
                                 <i class="bi bi-eye"></i>
                             </a>
                         </div></td></tr>

@@ -7,6 +7,7 @@ import com.trinidad.citas.repository.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -26,11 +27,23 @@ public class DataInitializer implements CommandLineRunner {
     private final UsuarioRepository usuarioRepository;
     private final PasswordEncoder passwordEncoder;
 
+    /**
+     * Contrasena para usuarios semilla.
+     * Se lee desde variable de entorno SEED_USER_PASSWORD.
+     * En desarrollo se usa el valor por defecto 'Trinidad2026'.
+     * Jamas hardcodear la contrasena real en el codigo fuente.
+     */
+    @Value("${trinidad.seed.user-password:Trinidad2026}")
+    private String seedPassword;
+
     @Override
     @Transactional
     public void run(String... args) {
-        String passwordHash = passwordEncoder.encode("Trinidad2026");
-        log.info("Password hash generated for seed users");
+        String passwordHash = passwordEncoder.encode(seedPassword);
+        log.info("Password hash generated for seed users (contrasena desde variable de entorno/envío)");
+
+        // Limpiar referencia por seguridad
+        seedPassword = null;
 
         List<Rol> roles = rolRepository.findAll();
         if (roles.isEmpty()) {
@@ -55,10 +68,10 @@ public class DataInitializer implements CommandLineRunner {
                     u.setBloqueado(0);
                     u.setIntentosFallidos(0);
                     usuarioRepository.save(u);
-                    log.info("Updated password for user '{}'", username);
+                    log.info("Updated password for user '{}' (contrasena desde variable de entorno)", username);
                 });
             }
-            log.info("All user passwords updated to: Trinidad2026");
+            log.info("All seed user passwords synchronized from environment variable");
             return;
         }
 
@@ -74,7 +87,7 @@ public class DataInitializer implements CommandLineRunner {
             crearUsuario("paciente1", passwordHash, "paciente1@example.com",          "PACIENTE", roles)
         );
         usuarioRepository.saveAll(usuarios);
-        log.info("Created {} users with password: Trinidad2026", usuarios.size());
+        log.info("Created {} users with seed password from environment variable", usuarios.size());
     }
 
     private Rol crearRol(String nombre, String descripcion) {

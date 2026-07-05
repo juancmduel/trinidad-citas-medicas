@@ -1,5 +1,6 @@
 package com.trinidad.citas.service;
 
+import com.trinidad.citas.audit.Auditable;
 import com.trinidad.citas.dto.MedicoDTO;
 import com.trinidad.citas.exception.ResourceNotFoundException;
 import com.trinidad.citas.model.Medico;
@@ -70,6 +71,7 @@ public class MedicoService {
                 .orElseThrow(() -> new ResourceNotFoundException("Medico", id));
     }
 
+    @Auditable(entidad = "MEDICO", accion = "CREAR")
     public MedicoDTO crear(MedicoDTO dto) {
         Medico m = new Medico();
         m.setCmp(dto.getCmp());
@@ -88,6 +90,7 @@ public class MedicoService {
         return toDTO(medicoRepository.save(m));
     }
 
+    @Auditable(entidad = "MEDICO", accion = "ACTUALIZAR")
     public MedicoDTO actualizar(Long id, MedicoDTO dto) {
         Medico m = obtenerEntidad(id);
         m.setCmp(dto.getCmp());
@@ -105,6 +108,7 @@ public class MedicoService {
         return toDTO(medicoRepository.save(m));
     }
 
+    @Auditable(entidad = "MEDICO", accion = "ELIMINAR")
     public void eliminar(Long id) {
         Medico m = obtenerEntidad(id);
         m.setActivo(0);

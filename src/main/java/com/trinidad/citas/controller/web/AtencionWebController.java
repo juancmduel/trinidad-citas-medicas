@@ -1,26 +1,32 @@
 package com.trinidad.citas.controller.web;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
 import org.springframework.context.annotation.Profile;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
 import com.trinidad.citas.dto.AtencionDTO;
 import com.trinidad.citas.dto.OrdenExamenDTO;
 import com.trinidad.citas.dto.RecetaDTO;
 import com.trinidad.citas.model.Atencion;
 import com.trinidad.citas.model.EstadoCita;
-import com.trinidad.citas.service.HistoriaClinicaService;
 import com.trinidad.citas.service.AtencionService;
 import com.trinidad.citas.service.CitaService;
+import com.trinidad.citas.service.HistoriaClinicaService;
 import com.trinidad.citas.service.OrdenExamenService;
 import com.trinidad.citas.service.RecetaService;
 import com.trinidad.citas.service.TriajeService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import lombok.RequiredArgsConstructor;
 
 @Profile({"web", "default"})
 @Controller

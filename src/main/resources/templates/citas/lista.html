@@ -35,7 +35,7 @@
                         <th>Fecha</th>
                         <th>Hora</th>
                         <th>Estado</th>
-                        <th class="text-end">Acciones</th>
+                        <th style="text-align:center;">Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -59,8 +59,8 @@
                             <span th:if="${c.estado == 'CANCELADA'}" class="badge-estado badge-danger">Cancelada</span>
                             <span th:if="${c.estado == 'NO_ASISTIO'}" class="badge-estado badge-warning">No Asistió</span>
                         </td>
-                        <td><div class="acciones-tabla">
-                            <a th:href="@{/citas/{id}(id=${c.idCita})}" class="btn-ver" title="Ver detalle">
+                        <td><div class="action-group">
+                            <a th:href="@{/citas/{id}(id=${c.idCita})}" class="action-btn action-view" title="Ver detalle">
                                 <i class="bi bi-eye"></i>
                             </a>
                         </div></td></tr>

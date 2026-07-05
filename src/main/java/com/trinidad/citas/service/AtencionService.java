@@ -1,5 +1,6 @@
 package com.trinidad.citas.service;
 
+import com.trinidad.citas.audit.Auditable;
 import com.trinidad.citas.dto.AtencionDTO;
 import com.trinidad.citas.exception.BusinessException;
 import com.trinidad.citas.exception.ResourceNotFoundException;
@@ -89,16 +90,17 @@ public class AtencionService {
                 .orElseThrow(() -> new ResourceNotFoundException("Atencion para cita", idCita));
     }
 
+    @Auditable(entidad = "ATENCION", accion = "CREAR")
     public AtencionDTO crear(AtencionDTO dto) {
         com.trinidad.citas.model.Cita cita = citaRepository.findById(dto.getIdCita())
                 .orElseThrow(() -> new ResourceNotFoundException("Cita", dto.getIdCita()));
         if (cita.getEstado() != EstadoCita.EN_ATENCION) {
-            throw new BusinessException("La cita debe estar en estado EN_ATENCION para registrar una atencion");
+            throw new BusinessException("La atención solo puede registrarse cuando la cita está EN_ATENCION");
         }
         com.trinidad.citas.model.Pago pago = pagoRepository.findByCita_IdCita(dto.getIdCita())
-                .orElseThrow(() -> new BusinessException("La cita no tiene un pago registrado"));
+                .orElseThrow(() -> new BusinessException("No se encontró un pago registrado para esta cita"));
         if (!"PAGADO".equals(pago.getEstado())) {
-            throw new BusinessException("El pago de la cita no esta confirmado (estado: " + pago.getEstado() + ")");
+            throw new BusinessException("El pago de esta cita aún no está confirmado (estado actual: " + pago.getEstado() + ")");
         }
         Atencion a = new Atencion();
         a.setCita(cita);
@@ -126,7 +128,15 @@ public class AtencionService {
         return saved;
     }
 
+    /**
+     * Eliminación lógica: desactiva la atención (activo=0) en lugar de borrarla.
+     * Preserva la integridad de históricos clínicos y auditoría.
+     */
+    @Auditable(entidad = "ATENCION", accion = "ELIMINAR")
     public void eliminar(Long id) {
-        atencionRepository.deleteById(id);
+        Atencion a = atencionRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Atencion", id));
+        a.setActivo(0);
+        atencionRepository.save(a);
     }
 }

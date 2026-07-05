@@ -20,14 +20,17 @@ public class Atencion {
 
     @OneToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "ID_CITA", nullable = false, unique = true)
+    @ToString.Exclude
     private Cita cita;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "ID_HISTORIA", nullable = false)
+    @ToString.Exclude
     private HistoriaClinica historia;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "ID_MEDICO", nullable = false)
+    @ToString.Exclude
     private Medico medico;
 
     @Column(name = "FECHA_ATENCION", nullable = false)
@@ -47,6 +50,7 @@ public class Atencion {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "DIAGNOSTICO_CIE10")
+    @ToString.Exclude
     private DiagnosticoCie10 diagnosticoCie10;
 
     @Size(max = 500)
@@ -61,7 +65,7 @@ public class Atencion {
     @Column(name = "OBSERVACIONES", length = 1000)
     private String observaciones;
 
-    // Signos vitales
+    // Signos vitales registrados durante la atenciÃ³n
     @Size(max = 15)
     @Column(name = "PRESION_ARTERIAL", length = 15)
     private String presionArterial;
@@ -86,6 +90,10 @@ public class Atencion {
 
     @Column(name = "FECHA_FIRMA")
     private LocalDateTime fechaFirma;
+
+    @Column(name = "ACTIVO", nullable = false)
+    @Builder.Default
+    private Integer activo = 1;
 
     @PrePersist
     public void prePersist() {

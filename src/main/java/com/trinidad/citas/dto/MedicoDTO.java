@@ -17,15 +17,19 @@ public class MedicoDTO {
     private Long idUsuario;
 
     @NotBlank @Size(max = 15)
+    @Pattern(regexp = "^[0-9]{4,15}$", message = "CMP debe contener solo números")
     private String cmp;
 
     @NotBlank @Size(max = 80)
+    @Pattern(regexp = "^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\\s]+$", message = "Nombres: solo se permiten letras y espacios")
     private String nombres;
 
     @NotBlank @Size(max = 50)
+    @Pattern(regexp = "^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\\s]+$", message = "Apellido paterno: solo se permiten letras y espacios")
     private String apellidoPaterno;
 
     @Size(max = 50)
+    @Pattern(regexp = "^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\\s]*$", message = "Apellido materno: solo se permiten letras y espacios")
     private String apellidoMaterno;
 
     @NotBlank
@@ -33,6 +37,7 @@ public class MedicoDTO {
     private String dni;
 
     @Size(max = 15)
+    @Pattern(regexp = "^[0-9]{7,9}$", message = "Teléfono: debe tener 7 (fijo) o 9 (celular) dígitos")
     private String telefono;
 
     @Email @Size(max = 120)
@@ -43,7 +48,7 @@ public class MedicoDTO {
 
     private Integer activo;
 
-    // Solo respuesta
+    // Solo lectura: se completa desde las entidades relacionadas
     private String nombreCompleto;
     private String especialidadNombre;
 }

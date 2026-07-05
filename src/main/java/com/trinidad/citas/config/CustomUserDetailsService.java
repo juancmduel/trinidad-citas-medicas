@@ -2,10 +2,10 @@ package com.trinidad.citas.config;
 
 import com.trinidad.citas.model.Usuario;
 import com.trinidad.citas.repository.UsuarioRepository;
+import com.trinidad.citas.security.UserPrincipal;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -29,12 +29,13 @@ public class CustomUserDetailsService implements UserDetailsService {
             .map(rol -> new SimpleGrantedAuthority("ROLE_" + rol.getNombre()))
             .collect(Collectors.toList());
 
-        return User.builder()
-            .username(usuario.getUsername())
-            .password(usuario.getPasswordHash())
-            .authorities(authorities)
-            .accountLocked(usuario.isBloqueado())
-            .disabled(!usuario.isActivo())
-            .build();
+        return new UserPrincipal(
+            usuario.getIdUsuario(),
+            usuario.getUsername(),
+            usuario.getPasswordHash(),
+            usuario.isActivo(),
+            !usuario.isBloqueado(), // isBloqueado()=true → cuenta bloqueada, Spring espera "not locked"
+            authorities
+        );
     }
 }

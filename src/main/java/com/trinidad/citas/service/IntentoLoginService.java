@@ -1,5 +1,6 @@
 package com.trinidad.citas.service;
 
+import com.trinidad.citas.config.AppConstants;
 import com.trinidad.citas.model.IntentoLogin;
 import com.trinidad.citas.repository.IntentoLoginRepository;
 import lombok.RequiredArgsConstructor;
@@ -16,10 +17,9 @@ import java.util.List;
 @Transactional
 public class IntentoLoginService {
 
-    private static final Logger log = LoggerFactory.getLogger(IntentoLoginService.class);
-
-    private static final int MAX_INTENTOS_FALLIDOS = 5;
-    private static final int VENTANA_MINUTOS = 30;
+    // Constantes centralizadas en AppConstants
+    private static final int MAX_INTENTOS_FALLIDOS = AppConstants.MAX_INTENTOS_FALLIDOS;
+    private static final int VENTANA_MINUTOS = AppConstants.VENTANA_INTENTOS_MINUTOS;
 
     private final IntentoLoginRepository intentoLoginRepository;
 

@@ -1,5 +1,6 @@
 package com.trinidad.citas.service;
 
+import com.trinidad.citas.audit.Auditable;
 import com.trinidad.citas.dto.AntecedenteDTO;
 import com.trinidad.citas.exception.ResourceNotFoundException;
 import com.trinidad.citas.model.Antecedente;
@@ -44,6 +45,7 @@ public class AntecedenteService {
                 .stream().map(this::toDTO).toList();
     }
 
+    @Auditable(entidad = "ANTECEDENTE", accion = "CREAR")
     public AntecedenteDTO crear(AntecedenteDTO dto) {
         Antecedente a = new Antecedente();
         a.setHistoria(historiaClinicaRepository.findById(dto.getIdHistoria())
@@ -55,6 +57,7 @@ public class AntecedenteService {
         return toDTO(antecedenteRepository.save(a));
     }
 
+    @Auditable(entidad = "ANTECEDENTE", accion = "ELIMINAR")
     public void eliminar(Long id) {
         antecedenteRepository.deleteById(id);
     }

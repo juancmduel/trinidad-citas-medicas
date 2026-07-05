@@ -1,5 +1,6 @@
 package com.trinidad.citas.service;
 
+import com.trinidad.citas.audit.Auditable;
 import com.trinidad.citas.dto.DetalleRecetaDTO;
 import com.trinidad.citas.exception.ResourceNotFoundException;
 import com.trinidad.citas.model.DetalleReceta;
@@ -65,6 +66,7 @@ public class DetalleRecetaService {
                 .orElseThrow(() -> new ResourceNotFoundException("DetalleReceta", id));
     }
 
+    @Auditable(entidad = "DETALLE_RECETA", accion = "CREAR")
     public DetalleRecetaDTO crear(DetalleRecetaDTO dto) {
         Receta receta = recetaRepository.findById(dto.getIdReceta())
                 .orElseThrow(() -> new ResourceNotFoundException("Receta", dto.getIdReceta()));
@@ -82,6 +84,7 @@ public class DetalleRecetaService {
         return toDTO(detalleRecetaRepository.save(detalle));
     }
 
+    @Auditable(entidad = "DETALLE_RECETA", accion = "ELIMINAR")
     public void eliminar(Long id) {
         detalleRecetaRepository.deleteById(id);
     }
