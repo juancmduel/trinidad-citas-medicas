@@ -4,6 +4,8 @@ import com.trinidad.citas.config.AppConstants;
 import com.trinidad.citas.model.IntentoLogin;
 import com.trinidad.citas.repository.IntentoLoginRepository;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,13 +24,18 @@ public class IntentoLoginService {
     private final IntentoLoginRepository intentoLoginRepository;
 
     public void registrarIntento(String username, boolean exitoso, String ipOrigen, String mensajeError) {
-        IntentoLogin intento = IntentoLogin.builder()
-                .username(username)
-                .exitoso(exitoso ? 1 : 0)
-                .ipOrigen(ipOrigen)
-                .mensajeError(mensajeError)
-                .build();
-        intentoLoginRepository.save(intento);
+        try {
+            IntentoLogin intento = IntentoLogin.builder()
+                    .username(username)
+                    .exitoso(exitoso ? 1 : 0)
+                    .ipOrigen(ipOrigen)
+                    .mensajeError(mensajeError)
+                    .build();
+            intentoLoginRepository.save(intento);
+        } catch (Exception e) {
+            // Si falla la auditoria de intentos, no debe bloquear el flujo de login.
+            log.warn("No se pudo registrar intento de login para '{}': {}", username, e.getMessage());
+        }
     }
 
     @Transactional(readOnly = true)
