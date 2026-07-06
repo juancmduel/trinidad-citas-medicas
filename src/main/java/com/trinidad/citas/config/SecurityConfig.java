@@ -25,11 +25,25 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.List;
 
+/**
+ * Configuración de seguridad del sistema.
+ *
+ * Aquí definimos quién puede entrar, por dónde, y qué ve cada quien.
+ * Básicamente es el "portero" de la aplicación.
+ *
+ * La idea es:
+ *  - Las rutas públicas (login, registro, css, etc.) no piden autenticación
+ *  - La API REST usa JWT (los tokens esos que caducan cada hora)
+ *  - Las páginas web (Thymeleaf) usan sesión tradicional con cookies
+ *  - Cada rol ve solo lo que le corresponde (un paciente no ve el panel de admin)
+ *  - Si alguien mete mal la contraseña 5 veces, se bloquea solito
+ */
 @Configuration
 @EnableMethodSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
 
+    /** Orígenes permitidos para CORS. Se configura desde application.properties */
     @Value("${trinidad.cors.allowed-origins:}")
     private String allowedOrigins;
 
@@ -39,11 +53,20 @@ public class SecurityConfig {
     private final CustomAuthenticationSuccessHandler successHandler;
     private final CustomAuthenticationFailureHandler failureHandler;
 
+    /**
+     * Cómo encriptamos las contraseñas: BCrypt con fuerza 10.
+     * Es más lento pero más seguro. Así si alguien roba la base de datos,
+     * no puede revertir las contraseñas fácilmente.
+     */
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder(10);
     }
 
+    /**
+     * Le decimos a Spring Security: "oye, los usuarios están en la base de datos,
+     * no en memoria ni en un archivo". Y usamos BCrypt para las contraseñas.
+     */
     @Bean
     public DaoAuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
@@ -57,6 +80,12 @@ public class SecurityConfig {
         return config.getAuthenticationManager();
     }
 
+    /**
+     * Configuración CORS: ¿qué dominios pueden llamar a la API?
+     * Si está vacío, solo el mismo origen (la web en el mismo servidor).
+     * Si en producción necesitas que una app React en otro dominio consuma
+     * la API, lo configuras en application.properties.
+     */
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
@@ -79,6 +108,12 @@ public class SecurityConfig {
         return source;
     }
 
+    /**
+     * La cadena de filtros de seguridad.
+     * Esto es lo que Spring Security revisa en cada petición.
+     * Primero ve si la ruta es pública, luego revisa el JWT (si es API)
+     * o la sesión (si es web), y finalmente verifica que el rol tenga permiso.
+     */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, AuthenticationManager authenticationManager) throws Exception {
         http
@@ -239,16 +274,18 @@ public class SecurityConfig {
                 .requestMatchers(
                     "/atenciones/**", "/recetas/**",
                     "/diagnosticos/**", "/historia-clinica/**",
-                    "/ordenes-examen/**"
+                    "/ordenes-examen/**", "/antecedentes/**"
                 ).hasAnyRole("ADMINISTRADOR", "GERENTE", "MEDICO")
 
                 .requestMatchers("/medico/**").hasRole("MEDICO")
 
                 // ════════════════════════════════════════════════════════════
-                //  CUALQUIER OTRA RUTA — autenticado
+                //  CUALQUIER OTRA RUTA — si no está arriba, pide login
                 // ════════════════════════════════════════════════════════════
                 .anyRequest().authenticated()
             )
+            // Si alguien no autenticado intenta acceder a la API,
+            // le devolvemos un JSON bonito en vez de un HTML feo
             .exceptionHandling(ex -> ex
                 .defaultAuthenticationEntryPointFor(
                     (request, response, authException) -> {
@@ -259,13 +296,15 @@ public class SecurityConfig {
                     new AntPathRequestMatcher("/api/**")
                 )
             )
+            // Login por formulario web (Thymeleaf)
             .formLogin(form -> form
-                .loginPage("/login")
-                .loginProcessingUrl("/login")
-                .successHandler(successHandler)
-                .failureHandler(failureHandler)
+                .loginPage("/login")           // nuestra propia página de login
+                .loginProcessingUrl("/login")   // donde se envía el formulario
+                .successHandler(successHandler) // cuando entra bien
+                .failureHandler(failureHandler) // cuando se equivoca
                 .permitAll()
             )
+            // Cerrar sesión: mata la cookie y la sesión del lado del servidor
             .logout(logout -> logout
                 .logoutUrl("/logout")
                 .logoutSuccessUrl("/login?logout=true")
@@ -278,7 +317,9 @@ public class SecurityConfig {
             )
             .authenticationManager(authenticationManager)
             .authenticationProvider(authenticationProvider())
+            // El filtro JWT va antes que el de login por formulario
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+            // El rate limiting va justo después de JWT, para limitar peticiones
             .addFilterAfter(rateLimitingFilter, JwtAuthFilter.class);
 
         return http.build();

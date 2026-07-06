@@ -1,0 +1,58 @@
+@startuml
+skinparam usecaseFontSize 12
+skinparam actorFontSize 12
+skinparam packageFontSize 13
+skinparam packageFontStyle bold
+
+left to right direction
+skinparam packageBorderColor #2E86C1
+skinparam packageBackgroundColor #EBF5FB
+
+actor "Administrador\ndel Sistema" as Admin
+actor "Gerente de\nOperaciones" as Gerente
+actor "Recepcionista" as Recep
+actor "Usuario Final\n(Cliente)" as Cliente
+actor "Médico\nEspecialista" as Medico
+
+rectangle "Sistema de Gestión de Citas Médicas\nClínica Trinidad & Especialidades Médicas S.A.C." {
+  usecase "CU-01\nGestionar Usuarios\ny Roles" as UC01
+  usecase "CU-02\nConfigurar Espacios\ny Ubicaciones" as UC02
+  usecase "CU-03\nGestionar Precios\ny Tarifas" as UC03
+  usecase "CU-04\nAgendar Cita\nMédica" as UC04
+  usecase "CU-05\nRegistrar Paciente\n(Admisión)" as UC05
+  usecase "CU-06\nRegistrar Triaje\n(Signos Vitales)" as UC06
+  usecase "CU-07\nGestionar Historia\nClínica Electrónica" as UC07
+  usecase "CU-08\nGenerar Receta\nDigital" as UC08
+  usecase "CU-09\nSolicitar Examen\nAuxiliar" as UC09
+  usecase "CU-10\nProcesar Pago\ny Facturación" as UC10
+  usecase "CU-11\nGenerar Reportes\nGerenciales" as UC11
+  usecase "CU-12\nConsultar Registros\nde Auditoría" as UC12
+}
+
+Admin --> UC01
+Admin --> UC02
+Admin --> UC12
+
+Gerente --> UC02
+Gerente --> UC03
+Gerente --> UC11
+
+Recep --> UC04
+Recep --> UC05
+Recep --> UC10
+
+Medico --> UC06
+Medico --> UC07
+Medico --> UC08
+Medico --> UC09
+
+Cliente --> UC04
+Cliente --> UC10
+
+UC04 .> UC05 : <<include>>
+UC07 .> UC06 : <<include>>
+UC07 .> UC08 : <<include>>
+UC07 .> UC09 : <<include>>
+UC10 .> UC04 : <<extend>>
+UC12 .> UC01 : <<extend>>
+@enduml

@@ -17,6 +17,18 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * Cada vez que arranca la aplicación, esto se ejecuta para asegurarse
+ * de que los roles y usuarios básicos existan.
+ *
+ * Si no hay roles, los crea (ADMINISTRADOR, MEDICO, etc.).
+ * Si no hay usuarios, crea los de prueba (admin, gerente, dr.garcia, etc.).
+ * Si ya hay usuarios, solo actualiza sus contraseñas por si cambió la variable
+ * de entorno TRINIDAD_SEED_USER_PASSWORD.
+ *
+ * La contraseña de los usuarios semilla se toma de una variable de entorno,
+ * NUNCA está hardcodeada en el código. En desarrollo se usa "Trinidad2026".
+ */
 @Component
 @RequiredArgsConstructor
 public class DataInitializer implements CommandLineRunner {
@@ -28,23 +40,31 @@ public class DataInitializer implements CommandLineRunner {
     private final PasswordEncoder passwordEncoder;
 
     /**
-     * Contrasena para usuarios semilla.
-     * Se lee desde variable de entorno SEED_USER_PASSWORD.
+     * Contraseña para los usuarios semilla (admin, gerente, etc.).
+     * Se lee desde variable de entorno TRINIDAD_SEED_USER_PASSWORD.
      * En desarrollo se usa el valor por defecto 'Trinidad2026'.
-     * Jamas hardcodear la contrasena real en el codigo fuente.
+     * Jamás hardcodear la contraseña real en el código fuente.
      */
     @Value("${trinidad.seed.user-password:Trinidad2026}")
     private String seedPassword;
 
+    /**
+     * Al arrancar:
+     *  1. Genera el hash BCrypt de la contraseña semilla
+     *  2. Limpia la variable en memoria (por seguridad)
+     *  3. Crea roles si no existen
+     *  4. Crea o actualiza usuarios semilla
+     */
     @Override
     @Transactional
     public void run(String... args) {
         String passwordHash = passwordEncoder.encode(seedPassword);
-        log.info("Password hash generated for seed users (contrasena desde variable de entorno/envío)");
+        log.info("🔐 Hash BCrypt generado para usuarios semilla");
 
-        // Limpiar referencia por seguridad
+        // Limpiamos la contraseña en texto plano de la memoria apenas la usamos
         seedPassword = null;
 
+        // ── Roles ─────────────────────────────────────────────────
         List<Rol> roles = rolRepository.findAll();
         if (roles.isEmpty()) {
             roles = List.of(
@@ -56,11 +76,14 @@ public class DataInitializer implements CommandLineRunner {
                 crearRol("PACIENTE", "Paciente del centro medico")
             );
             roles = rolRepository.saveAll(roles);
-            log.info("Created {} roles", roles.size());
+            log.info("✅ Creados {} roles", roles.size());
         }
 
+        // ── Usuarios ──────────────────────────────────────────────
         if (usuarioRepository.count() > 0) {
-            log.info("Users exist, updating passwords to ensure they match...");
+            // Si ya hay usuarios, solo actualizamos sus contraseñas
+            // (por si el admin cambió la variable de entorno)
+            log.info("🔄 Usuarios existentes, sincronizando contraseñas...");
             for (String username : List.of("admin", "gerente", "recepcion", "enfermera", "dr.garcia", "dra.lopez", "paciente1")) {
                 usuarioRepository.findByUsername(username).ifPresent(u -> {
                     u.setPasswordHash(passwordHash);
@@ -68,14 +91,15 @@ public class DataInitializer implements CommandLineRunner {
                     u.setBloqueado(0);
                     u.setIntentosFallidos(0);
                     usuarioRepository.save(u);
-                    log.info("Updated password for user '{}' (contrasena desde variable de entorno)", username);
+                    log.info("  ✓ Contraseña actualizada para '{}'", username);
                 });
             }
-            log.info("All seed user passwords synchronized from environment variable");
+            log.info("✅ Contraseñas sincronizadas desde variable de entorno");
             return;
         }
 
-        log.info("No users found, seeding initial data...");
+        // Primera ejecución: creamos todos los usuarios semilla
+        log.info("🆕 No hay usuarios, creando datos iniciales...");
 
         List<Usuario> usuarios = List.of(
             crearUsuario("admin",     passwordHash, "admin@trinidadtarapoto.com",     "ADMINISTRADOR", roles),
@@ -87,17 +111,19 @@ public class DataInitializer implements CommandLineRunner {
             crearUsuario("paciente1", passwordHash, "paciente1@example.com",          "PACIENTE", roles)
         );
         usuarioRepository.saveAll(usuarios);
-        log.info("Created {} users with seed password from environment variable", usuarios.size());
+        log.info("✅ Creados {} usuarios con contraseña desde variable de entorno", usuarios.size());
     }
 
+    /** Helper para crear un rol rápido */
     private Rol crearRol(String nombre, String descripcion) {
         return Rol.builder().nombre(nombre).descripcion(descripcion).activo(1).build();
     }
 
+    /** Helper para crear un usuario con su rol asignado */
     private Usuario crearUsuario(String username, String passwordHash, String email, String rolNombre, List<Rol> roles) {
         Rol rol = roles.stream()
             .filter(r -> r.getNombre().equals(rolNombre))
-            .findFirst().orElseThrow(() -> new RuntimeException("Rol not found: " + rolNombre));
+            .findFirst().orElseThrow(() -> new RuntimeException("Rol no encontrado: " + rolNombre));
         return Usuario.builder()
             .username(username)
             .passwordHash(passwordHash)

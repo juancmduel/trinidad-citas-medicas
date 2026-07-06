@@ -1,5 +1,6 @@
 package com.trinidad.citas.controller.web;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -66,72 +67,116 @@ public class HistoriaClinicaWebController {
     @GetMapping("/{id}")
     @SuppressWarnings({"rawtypes", "unchecked"})
     public String detalle(@PathVariable Long id, Model model) {
-        var historia = historiaClinicaService.obtenerEntidad(id);
-        var atenciones = atencionService.listarPorHistoria(id);
+        try {
+            var historia = historiaClinicaService.obtenerEntidad(id);
+            var atenciones = atencionService.listarPorHistoria(id);
 
-        Map<Long, TriajeDTO> triajesPorCita = new HashMap<>();
-        Map<Long, List<OrdenExamenDTO>> ordenesPorAtencion = new HashMap<>();
-        Map<Long, List<RecetaDTO>> recetasPorAtencion = new HashMap<>();
+            Map<Long, TriajeDTO> triajesPorCita = new HashMap<>();
+            Map<Long, List<OrdenExamenDTO>> ordenesPorAtencion = new HashMap<>();
+            Map<Long, List<RecetaDTO>> recetasPorAtencion = new HashMap<>();
 
-        for (AtencionDTO a : atenciones) {
-            try {
-                ordenesPorAtencion.put(a.getIdAtencion(), ordenExamenService.listarPorAtencion(a.getIdAtencion()));
-            } catch (Exception e) {
-                ordenesPorAtencion.put(a.getIdAtencion(), List.of());
-            }
-            try {
-                recetasPorAtencion.put(a.getIdAtencion(), recetaService.listarPorAtencion(a.getIdAtencion()));
-            } catch (Exception e) {
-                recetasPorAtencion.put(a.getIdAtencion(), List.of());
-            }
-        }
-
-        List<Map<String, Object>> timeline = new ArrayList<>();
-        Long idPaciente = historia.getPaciente().getIdPaciente();
-        var citas = citaRepository.findByPaciente_IdPacienteOrderByFechaCitaDescHoraInicioDesc(idPaciente);
-        for (var c : citas) {
-            timeline.add(evento("CITA", c.getFechaCita().atStartOfDay(), "Cita " + c.getEstado(),
-                    c.getFechaCita() + " " + c.getHoraInicio() + " - " + c.getEspecialidad().getNombre(),
-                    "bi-calendar-event", "var(--accent)"));
-            try {
-                var t = triajeService.obtenerPorCita(c.getIdCita());
-                if (t != null) {
-                    triajesPorCita.put(c.getIdCita(), t);
-                    timeline.add(evento("TRIAJE", t.getFechaTriaje(), "Triaje",
-                            "PA: " + t.getPresionArterial() + " | FC: " + t.getFrecuenciaCardiaca() + " | Temp: " + t.getTemperatura(),
-                            "bi-activity", "var(--warning)"));
+            // Limitar a las últimas 50 atenciones para evitar sobrecarga
+            int maxAtenciones = Math.min(atenciones.size(), 50);
+            for (int i = 0; i < maxAtenciones; i++) {
+                AtencionDTO a = atenciones.get(i);
+                try {
+                    ordenesPorAtencion.put(a.getIdAtencion(), ordenExamenService.listarPorAtencion(a.getIdAtencion()));
+                } catch (Exception e) {
+                    ordenesPorAtencion.put(a.getIdAtencion(), List.of());
                 }
-            } catch (Exception e) {
-                log.warn("No se pudo obtener triaje para cita {}: {}", c.getIdCita(), e.getMessage());
+                try {
+                    recetasPorAtencion.put(a.getIdAtencion(), recetaService.listarPorAtencion(a.getIdAtencion()));
+                } catch (Exception e) {
+                    recetasPorAtencion.put(a.getIdAtencion(), List.of());
+                }
             }
-        }
-        for (AtencionDTO a : atenciones) {
-            timeline.add(evento("ATENCION", a.getFechaAtencion(), "Atención Médica",
-                    a.getDiagnosticoDesc() != null ? a.getDiagnosticoDesc() : "Sin diagnóstico",
-                    "bi-clipboard2-pulse", "var(--success)"));
-            var ords = ordenesPorAtencion.getOrDefault(a.getIdAtencion(), List.of());
-            for (OrdenExamenDTO o : ords) {
-                timeline.add(evento("ORDEN", o.getFechaSolicitud(), "Orden: " + o.getTipoExamen(),
-                        o.getNombreExamen(), "bi-clipboard-check", "var(--accent-green)"));
-            }
-            var recs = recetasPorAtencion.getOrDefault(a.getIdAtencion(), List.of());
-            for (RecetaDTO r : recs) {
-                timeline.add(evento("RECETA", r.getFechaEmision(), "Receta #" + r.getNroReceta(),
-                        r.getObservaciones() != null ? r.getObservaciones() : "",
-                        "bi-file-earmark-text", "#8b5cf6"));
-            }
-        }
-        timeline.sort((e1, e2) -> ((Comparable) e2.get("fecha")).compareTo(e1.get("fecha")));
 
-        model.addAttribute("historia", historia);
-        model.addAttribute("antecedentes", antecedenteService.listarPorHistoria(id));
-        model.addAttribute("medicacionActiva", medicacionActualService.listarActivasPorHistoria(id));
-        model.addAttribute("atenciones", atenciones);
-        model.addAttribute("triajesPorCita", triajesPorCita);
-        model.addAttribute("ordenesPorAtencion", ordenesPorAtencion);
-        model.addAttribute("recetasPorAtencion", recetasPorAtencion);
-        model.addAttribute("timeline", timeline);
-        return "historia-clinica/detalle";
+            List<Map<String, Object>> timeline = new ArrayList<>();
+            Long idPaciente = historia.getPaciente().getIdPaciente();
+
+            // Limitar a últimas 50 citas para la línea de tiempo
+            var citas = citaRepository.findTop50ByPaciente_IdPacienteOrderByFechaCitaDescHoraInicioDesc(idPaciente);
+            for (var c : citas) {
+                try {
+                    String especialidad = c.getEspecialidad() != null ? c.getEspecialidad().getNombre() : "Sin especialidad";
+                    timeline.add(evento("CITA", c.getFechaCita() != null ? c.getFechaCita().atStartOfDay() : LocalDateTime.now(),
+                            "Cita " + (c.getEstado() != null ? c.getEstado() : ""),
+                            (c.getFechaCita() != null ? c.getFechaCita().toString() : "") + " "
+                            + (c.getHoraInicio() != null ? c.getHoraInicio().toString() : "") + " - " + especialidad,
+                            "bi-calendar-event", "var(--accent)"));
+                } catch (Exception ec) {
+                    log.warn("Error al procesar cita {}: {}", c.getIdCita(), ec.getMessage());
+                }
+                try {
+                    var t = triajeService.obtenerPorCita(c.getIdCita());
+                    if (t != null) {
+                        triajesPorCita.put(c.getIdCita(), t);
+                        timeline.add(evento("TRIAJE", t.getFechaTriaje() != null ? t.getFechaTriaje() : LocalDateTime.now(),
+                                "Triaje",
+                                "PA: " + (t.getPresionArterial() != null ? t.getPresionArterial() : "-")
+                                + " | FC: " + (t.getFrecuenciaCardiaca() != null ? t.getFrecuenciaCardiaca() : "-")
+                                + " | Temp: " + (t.getTemperatura() != null ? t.getTemperatura() : "-"),
+                                "bi-activity", "var(--warning)"));
+                    }
+                } catch (Exception e) {
+                    log.warn("No se pudo obtener triaje para cita {}: {}", c.getIdCita(), e.getMessage());
+                }
+            }
+            for (AtencionDTO a : atenciones) {
+                try {
+                    timeline.add(evento("ATENCION", a.getFechaAtencion() != null ? a.getFechaAtencion() : LocalDateTime.now(),
+                            "Atención Médica",
+                            a.getDiagnosticoDesc() != null ? a.getDiagnosticoDesc() : "Sin diagnóstico",
+                            "bi-clipboard2-pulse", "var(--success)"));
+                    var ords = ordenesPorAtencion.getOrDefault(a.getIdAtencion(), List.of());
+                    for (OrdenExamenDTO o : ords) {
+                        timeline.add(evento("ORDEN", o.getFechaSolicitud() != null ? o.getFechaSolicitud() : LocalDateTime.now(),
+                                "Orden: " + (o.getTipoExamen() != null ? o.getTipoExamen() : ""),
+                                o.getNombreExamen() != null ? o.getNombreExamen() : "",
+                                "bi-clipboard-check", "var(--accent-green)"));
+                    }
+                    var recs = recetasPorAtencion.getOrDefault(a.getIdAtencion(), List.of());
+                    for (RecetaDTO r : recs) {
+                        timeline.add(evento("RECETA", r.getFechaEmision() != null ? r.getFechaEmision() : LocalDateTime.now(),
+                                "Receta #" + (r.getNroReceta() != null ? r.getNroReceta() : ""),
+                                r.getObservaciones() != null ? r.getObservaciones() : "",
+                                "bi-file-earmark-text", "#8b5cf6"));
+                    }
+                } catch (Exception ea) {
+                    log.warn("Error al procesar atención {}: {}", a.getIdAtencion(), ea.getMessage());
+                }
+            }
+            timeline.sort((e1, e2) -> {
+                try { return ((Comparable) e2.get("fecha")).compareTo(e1.get("fecha")); }
+                catch (Exception es) { return 0; }
+            });
+
+            // Limitar timeline a 100 eventos
+            if (timeline.size() > 100) {
+                timeline = timeline.subList(0, 100);
+            }
+
+            model.addAttribute("historia", historia);
+            model.addAttribute("antecedentes", antecedenteService.listarPorHistoria(id));
+            model.addAttribute("medicacionActiva", medicacionActualService.listarActivasPorHistoria(id));
+            // Filtrar nulos y limitar a 50 atenciones
+            List<AtencionDTO> atencionesFiltradas = atenciones.stream()
+                .filter(a -> a != null)
+                .limit(50)
+                .collect(java.util.stream.Collectors.toList());
+            model.addAttribute("atenciones", atencionesFiltradas);
+            model.addAttribute("triajesPorCita", triajesPorCita);
+            model.addAttribute("ordenesPorAtencion", ordenesPorAtencion);
+            model.addAttribute("recetasPorAtencion", recetasPorAtencion);
+            model.addAttribute("timeline", timeline);
+            return "historia-clinica/detalle";
+
+        } catch (Exception e) {
+            log.error("Error al cargar detalle de historia clínica {}: {}", id, e.getMessage(), e);
+            model.addAttribute("error", "Error al cargar la historia clínica: " + e.getMessage());
+            model.addAttribute("historias", historiaClinicaService.listarEntidadesConRelaciones());
+            return "historia-clinica/lista";
+        }
     }
 
     private Map<String, Object> evento(String tipo, Object fecha, String titulo, String desc, String icono, String color) {
@@ -143,6 +188,15 @@ public class HistoriaClinicaWebController {
         e.put("icono", icono);
         e.put("color", color);
         return e;
+    }
+
+    @GetMapping("/paciente/{idPaciente}")
+    public String redirigirPorPaciente(@PathVariable Long idPaciente) {
+        var historiaOpt = historiaClinicaService.buscarIdHistoriaPorPaciente(idPaciente);
+        if (historiaOpt.isPresent()) {
+            return "redirect:/historia-clinica/" + historiaOpt.get();
+        }
+        return "redirect:/historia-clinica/nueva?pacienteId=" + idPaciente;
     }
 
     @GetMapping("/nueva")

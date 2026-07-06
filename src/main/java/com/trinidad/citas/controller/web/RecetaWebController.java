@@ -36,7 +36,7 @@ public class RecetaWebController {
     @GetMapping("/nueva")
     public String nueva(Model model) {
         model.addAttribute("receta", new RecetaDTO());
-        model.addAttribute("atenciones", atencionRepository.findAll());
+        model.addAttribute("atenciones", atencionRepository.findAllWithRelations());
         model.addAttribute("titulo", "Nueva Receta");
         return "recetas/form";
     }

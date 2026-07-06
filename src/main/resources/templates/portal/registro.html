@@ -10,6 +10,66 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" th:href="@{/css/trinidad.css}">
     <link rel="stylesheet" th:href="@{/css/login.css}">
+    <style>
+        /* Hacemos scrollable solo el lado del formulario en registro */
+        .registro-split { display: flex; min-height: 100vh; }
+        .registro-form-side {
+            flex: 1; display: flex; align-items: flex-start; justify-content: center;
+            padding: 40px; overflow-y: auto;
+            background: var(--bg-card);
+            transition: background 0.4s ease;
+        }
+        [data-theme="dark"] .registro-form-side { background: #0a1628; }
+        .registro-form-side .login-card { max-width: 580px; padding-top: 20px; }
+        /* Ajustamos labels del formulario al estilo login */
+        .registro-form-side .form-label {
+            color: var(--text-secondary); font-weight: 600; font-size: 0.82rem;
+            margin-bottom: 4px; display: flex; align-items: center; gap: 4px;
+        }
+        .registro-form-side .form-control,
+        .registro-form-side .form-select {
+            background: var(--bg-body);
+            border: 1px solid var(--border);
+            border-radius: 10px; color: var(--text-primary);
+            padding: 0.65rem 0.85rem; font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+        .registro-form-side .form-control:focus,
+        .registro-form-side .form-select:focus {
+            background: var(--bg-card);
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--border-accent);
+        }
+        .registro-form-side .form-control::placeholder {
+            color: var(--text-muted); opacity: 0.6;
+        }
+        .registro-form-side .btn-registro {
+            width: 100%; padding: 13px; border-radius: 10px; border: none;
+            background: linear-gradient(135deg, var(--accent), var(--accent-green));
+            color: #fff; font-weight: 700; font-size: 0.95rem;
+            transition: all 0.3s; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+        }
+        .registro-form-side .btn-registro:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px var(--border-accent);
+        }
+        .registro-form-side .password-wrapper { position: relative; }
+        .registro-form-side .password-wrapper .password-toggle {
+            position: absolute; top: 50%; right: 10px;
+            transform: translateY(-50%); background: none; border: none;
+            color: var(--text-muted); cursor: pointer; padding: 6px; z-index: 5;
+            font-size: 1.1rem; transition: color 0.2s;
+        }
+        .registro-form-side .password-wrapper .password-toggle:hover { color: var(--accent); }
+        .registro-form-side .password-wrapper .form-control { padding-right: 2.5rem !important; }
+        .registro-divider { height: 1px; background: var(--border); margin: 20px 0; }
+        @media (min-width: 992px) { .login-image-side { display: block; } }
+        @media (max-width: 575.98px) {
+            .login-form-side { padding: 24px; }
+            .registro-form-side { padding: 24px; }
+        }
+    </style>
     <script>
         (function() {
             var t = localStorage.getItem('trinidad-theme');
@@ -19,138 +79,159 @@
 </head>
 <body>
 
-<div class="registro-page">
-<div class="registro-card" style="position:relative;">
+<div class="registro-split">
 
-    <button onclick="toggleTheme()" class="btn-theme-landing" title="Cambiar tema"
-            style="position:absolute;top:16px;right:16px;z-index:10;">
-        <i id="themeIconRegistro" class="bi bi-moon-fill"></i>
-    </button>
-
-    <div class="login-logo">
-        <div class="logo-icon" style="margin:0 auto 14px;width:56px;height:56px;border-radius:14px;background:linear-gradient(135deg,var(--accent),var(--accent-green));display:flex;align-items:center;justify-content:center;font-size:1.4rem;box-shadow:0 8px 24px var(--border-accent);">
-            <i class="bi bi-person-plus-fill" style="color:#fff;"></i>
+    <!-- Left: Image (misma clase que login, reutiliza estilos) -->
+    <div class="login-image-side">
+        <img src="https://images.unsplash.com/photo-1579684385127-1ef15d508118?w=1200&q=80"
+             alt="Registro paciente"
+             loading="lazy">
+        <div class="login-image-overlay"></div>
+        <div class="login-image-content">
+            <div class="login-image-badge">
+                <i class="bi bi-person-plus-fill"></i> Registro de Pacientes
+            </div>
+            <h2>Bienvenido a Trinidad</h2>
+            <p>Completa tus datos para crear tu cuenta de paciente y acceder a todos los servicios médicos desde cualquier lugar.</p>
         </div>
-        <h3>Crear Cuenta</h3>
-        <p>Regístrate como paciente en Trinidad</p>
     </div>
 
-        <!-- Alertas -->
-        <div th:if="${ok}" class="alert-custom alert-success" style="margin-bottom:20px;">
-            <i class="bi bi-check-circle-fill me-2"></i> <span th:text="${ok}"></span>
-        </div>
-        <div th:if="${error}" class="alert-custom alert-danger" style="margin-bottom:20px;">
-            <i class="bi bi-exclamation-circle-fill me-2"></i> <span th:text="${error}"></span>
-        </div>
+    <!-- Right: Form scrolleable -->
+    <div class="registro-form-side">
+        <div class="login-card" style="position:relative;">
 
-        <form th:action="@{/registro}" method="post" th:object="${registro}">
-            <div class="row g-3">
+            <button onclick="toggleTheme()" class="btn-theme-landing" title="Cambiar tema"
+                    style="position:absolute;top:0;right:0;z-index:10;">
+                <i id="themeIconRegistro" class="bi bi-moon-fill"></i>
+            </button>
 
-                <!-- Usuario -->
-                <div class="col-md-6">
-                    <label class="form-label"><i class="bi bi-person-fill me-1" style="color:var(--accent);"></i>Usuario *</label>
-                    <input type="text" th:field="*{username}" class="form-control" placeholder="Elige un usuario" required>
-                    <small class="text-danger" th:if="${#fields.hasErrors('username')}" th:errors="*{username}"></small>
+            <div class="login-logo">
+                <div class="logo-icon" style="margin:0 auto 14px;width:56px;height:56px;border-radius:14px;background:linear-gradient(135deg,var(--accent),var(--accent-green));display:flex;align-items:center;justify-content:center;font-size:1.4rem;box-shadow:0 8px 24px var(--border-accent);">
+                    <i class="bi bi-person-plus-fill" style="color:#fff;"></i>
                 </div>
-
-                <!-- Contraseña -->
-                <div class="col-md-6">
-                    <label class="form-label"><i class="bi bi-lock-fill me-1" style="color:var(--accent);"></i>Contraseña *</label>
-                    <div class="password-wrapper">
-                        <input type="password" th:field="*{password}" class="form-control" placeholder="Mín. 8 caracteres" required>
-                        <button type="button" class="password-toggle" onclick="togglePasswordRegistro()" tabindex="-1" title="Mostrar contraseña">
-                            <i id="passwordIconRegistro" class="bi bi-eye-slash-fill"></i>
-                        </button>
-                    </div>
-                    <small class="text-danger" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></small>
-                </div>
-
-                <!-- DNI -->
-                <div class="col-md-4">
-                    <label class="form-label"><i class="bi bi-card-text me-1" style="color:var(--accent);"></i>DNI *</label>
-                    <input type="text" th:field="*{dni}" class="form-control" placeholder="8 dígitos" maxlength="8" required>
-                    <small class="text-danger" th:if="${#fields.hasErrors('dni')}" th:errors="*{dni}"></small>
-                </div>
-
-                <!-- Email -->
-                <div class="col-md-4">
-                    <label class="form-label"><i class="bi bi-envelope-fill me-1" style="color:var(--accent);"></i>Email *</label>
-                    <input type="email" th:field="*{email}" class="form-control" placeholder="correo@ejemplo.com" required>
-                    <small class="text-danger" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></small>
-                </div>
-
-                <!-- Teléfono -->
-                <div class="col-md-4">
-                    <label class="form-label"><i class="bi bi-telephone-fill me-1" style="color:var(--accent);"></i>Teléfono</label>
-                    <input type="text" th:field="*{telefono}" class="form-control" placeholder="999 888 777">
-                </div>
-
-                <!-- Nombres -->
-                <div class="col-md-4">
-                    <label class="form-label"><i class="bi bi-person me-1" style="color:var(--accent);"></i>Nombres *</label>
-                    <input type="text" th:field="*{nombres}" class="form-control" placeholder="Nombres" required>
-                    <small class="text-danger" th:if="${#fields.hasErrors('nombres')}" th:errors="*{nombres}"></small>
-                </div>
-
-                <!-- Ap. Paterno -->
-                <div class="col-md-4">
-                    <label class="form-label">Ap. Paterno *</label>
-                    <input type="text" th:field="*{apellidoPaterno}" class="form-control" placeholder="Apellido paterno" required>
-                    <small class="text-danger" th:if="${#fields.hasErrors('apellidoPaterno')}" th:errors="*{apellidoPaterno}"></small>
-                </div>
-
-                <!-- Ap. Materno -->
-                <div class="col-md-4">
-                    <label class="form-label">Ap. Materno</label>
-                    <input type="text" th:field="*{apellidoMaterno}" class="form-control" placeholder="Apellido materno">
-                </div>
-
-                <!-- Fecha Nacimiento -->
-                <div class="col-md-4">
-                    <label class="form-label"><i class="bi bi-calendar me-1" style="color:var(--accent);"></i>Fecha de Nacimiento *</label>
-                    <input type="date" th:field="*{fechaNacimiento}" class="form-control" required>
-                    <small class="text-danger" th:if="${#fields.hasErrors('fechaNacimiento')}" th:errors="*{fechaNacimiento}"></small>
-                </div>
-
-                <!-- Sexo -->
-                <div class="col-md-4">
-                    <label class="form-label"><i class="bi bi-gender-ambiguous me-1" style="color:var(--accent);"></i>Sexo *</label>
-                    <select th:field="*{sexo}" class="form-select" required>
-                        <option value="">Seleccionar</option>
-                        <option value="M">Masculino</option>
-                        <option value="F">Femenino</option>
-                    </select>
-                    <small class="text-danger" th:if="${#fields.hasErrors('sexo')}" th:errors="*{sexo}"></small>
-                </div>
-
-                <!-- Distrito -->
-                <div class="col-md-4">
-                    <label class="form-label"><i class="bi bi-geo-alt me-1" style="color:var(--accent);"></i>Distrito</label>
-                    <input type="text" th:field="*{distrito}" class="form-control" placeholder="Distrito">
-                </div>
-
-                <!-- Dirección -->
-                <div class="col-12">
-                    <label class="form-label"><i class="bi bi-house me-1" style="color:var(--accent);"></i>Dirección</label>
-                    <input type="text" th:field="*{direccion}" class="form-control" placeholder="Dirección completa">
-                </div>
-
+                <h3>Crear Cuenta</h3>
+                <p>Regístrate como paciente en Trinidad</p>
             </div>
 
-            <div class="registro-divider"></div>
+            <!-- Alertas -->
+            <div th:if="${ok}" class="alert-custom alert-success" style="margin-bottom:20px;">
+                <i class="bi bi-check-circle-fill me-2"></i> <span th:text="${ok}"></span>
+            </div>
+            <div th:if="${error}" class="alert-custom alert-danger" style="margin-bottom:20px;">
+                <i class="bi bi-exclamation-circle-fill me-2"></i> <span th:text="${error}"></span>
+            </div>
 
-            <button type="submit" class="btn-registro">
-                <i class="bi bi-person-plus-fill"></i> Crear Cuenta
-            </button>
-        </form>
+            <form th:action="@{/registro}" method="post" th:object="${registro}">
+                <div class="row g-3">
 
-        <div class="login-footer">
-            <a th:href="@{/login}"><i class="bi bi-arrow-left"></i> Ya tengo cuenta, iniciar sesión</a>
-            <span style="color:var(--text-muted);font-size:0.85rem;margin:0 8px;">|</span>
-            <a th:href="@{/}"><i class="bi bi-house"></i> Volver al inicio</a>
+                    <!-- Usuario -->
+                    <div class="col-md-6">
+                        <label class="form-label"><i class="bi bi-person-fill" style="color:var(--accent);"></i> Usuario *</label>
+                        <input type="text" th:field="*{username}" class="form-control" placeholder="Elige un usuario" required>
+                        <small class="text-danger" th:if="${#fields.hasErrors('username')}" th:errors="*{username}"></small>
+                    </div>
+
+                    <!-- Contraseña -->
+                    <div class="col-md-6">
+                        <label class="form-label"><i class="bi bi-lock-fill" style="color:var(--accent);"></i> Contraseña *</label>
+                        <div class="password-wrapper">
+                            <input type="password" th:field="*{password}" class="form-control" placeholder="Mín. 8 caracteres" required>
+                            <button type="button" class="password-toggle" onclick="togglePasswordRegistro()" tabindex="-1" title="Mostrar contraseña">
+                                <i id="passwordIconRegistro" class="bi bi-eye-slash-fill"></i>
+                            </button>
+                        </div>
+                        <small class="text-danger" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></small>
+                    </div>
+
+                    <!-- DNI -->
+                    <div class="col-md-4">
+                        <label class="form-label"><i class="bi bi-card-text" style="color:var(--accent);"></i> DNI *</label>
+                        <input type="text" th:field="*{dni}" class="form-control" placeholder="8 dígitos" maxlength="8" required>
+                        <small class="text-danger" th:if="${#fields.hasErrors('dni')}" th:errors="*{dni}"></small>
+                    </div>
+
+                    <!-- Email -->
+                    <div class="col-md-4">
+                        <label class="form-label"><i class="bi bi-envelope-fill" style="color:var(--accent);"></i> Email *</label>
+                        <input type="email" th:field="*{email}" class="form-control" placeholder="correo@ejemplo.com" required>
+                        <small class="text-danger" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></small>
+                    </div>
+
+                    <!-- Teléfono -->
+                    <div class="col-md-4">
+                        <label class="form-label"><i class="bi bi-telephone-fill" style="color:var(--accent);"></i> Teléfono</label>
+                        <input type="text" th:field="*{telefono}" class="form-control" placeholder="999 888 777">
+                    </div>
+
+                    <!-- Nombres -->
+                    <div class="col-md-4">
+                        <label class="form-label"><i class="bi bi-person" style="color:var(--accent);"></i> Nombres *</label>
+                        <input type="text" th:field="*{nombres}" class="form-control" placeholder="Nombres" required>
+                        <small class="text-danger" th:if="${#fields.hasErrors('nombres')}" th:errors="*{nombres}"></small>
+                    </div>
+
+                    <!-- Ap. Paterno -->
+                    <div class="col-md-4">
+                        <label class="form-label">Ap. Paterno *</label>
+                        <input type="text" th:field="*{apellidoPaterno}" class="form-control" placeholder="Apellido paterno" required>
+                        <small class="text-danger" th:if="${#fields.hasErrors('apellidoPaterno')}" th:errors="*{apellidoPaterno}"></small>
+                    </div>
+
+                    <!-- Ap. Materno -->
+                    <div class="col-md-4">
+                        <label class="form-label">Ap. Materno</label>
+                        <input type="text" th:field="*{apellidoMaterno}" class="form-control" placeholder="Apellido materno">
+                    </div>
+
+                    <!-- Fecha Nacimiento -->
+                    <div class="col-md-4">
+                        <label class="form-label"><i class="bi bi-calendar" style="color:var(--accent);"></i> F. Nacimiento *</label>
+                        <input type="date" th:field="*{fechaNacimiento}" class="form-control" required>
+                        <small class="text-danger" th:if="${#fields.hasErrors('fechaNacimiento')}" th:errors="*{fechaNacimiento}"></small>
+                    </div>
+
+                    <!-- Sexo -->
+                    <div class="col-md-4">
+                        <label class="form-label"><i class="bi bi-gender-ambiguous" style="color:var(--accent);"></i> Sexo *</label>
+                        <select th:field="*{sexo}" class="form-select" required>
+                            <option value="">Seleccionar</option>
+                            <option value="M">Masculino</option>
+                            <option value="F">Femenino</option>
+                        </select>
+                        <small class="text-danger" th:if="${#fields.hasErrors('sexo')}" th:errors="*{sexo}"></small>
+                    </div>
+
+                    <!-- Distrito -->
+                    <div class="col-md-4">
+                        <label class="form-label"><i class="bi bi-geo-alt" style="color:var(--accent);"></i> Distrito</label>
+                        <input type="text" th:field="*{distrito}" class="form-control" placeholder="Distrito">
+                    </div>
+
+                    <!-- Dirección -->
+                    <div class="col-12">
+                        <label class="form-label"><i class="bi bi-house" style="color:var(--accent);"></i> Dirección</label>
+                        <input type="text" th:field="*{direccion}" class="form-control" placeholder="Dirección completa">
+                    </div>
+
+                </div>
+
+                <div class="registro-divider"></div>
+
+                <button type="submit" class="btn-registro">
+                    <i class="bi bi-person-plus-fill"></i> Crear Cuenta
+                </button>
+            </form>
+
+            <div class="login-divider" style="margin:18px 0 14px;"><span>— Ya tengo cuenta —</span></div>
+
+            <div class="login-links">
+                <a th:href="@{/login}"><i class="bi bi-box-arrow-in-right"></i> Iniciar sesión</a>
+                <a th:href="@{/}"><i class="bi bi-house"></i> Volver al inicio</a>
+            </div>
+
         </div>
-
     </div>
+
 </div>
 
 <script th:src="@{/webjars/bootstrap/5.3.3/js/bootstrap.bundle.min.js}"></script>
@@ -184,15 +265,11 @@ function toggleTheme() {
     if (isDark) {
         html.removeAttribute('data-theme');
         localStorage.setItem('trinidad-theme', 'light');
-        if (icon) {
-            icon.className = 'bi bi-moon-fill';
-        }
+        if (icon) icon.className = 'bi bi-moon-fill';
     } else {
         html.setAttribute('data-theme', 'dark');
         localStorage.setItem('trinidad-theme', 'dark');
-        if (icon) {
-            icon.className = 'bi bi-sun-fill';
-        }
+        if (icon) icon.className = 'bi bi-sun-fill';
     }
     setTimeout(function() { html.classList.remove('theme-transitioning'); }, 500);
 }

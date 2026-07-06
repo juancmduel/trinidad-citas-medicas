@@ -1,0 +1,26 @@
+@startuml
+title "Diagrama de Comunicación\nFlujo: Agendar Cita Médica"
+
+skinparam backgroundColor #FEFEFE
+skinparam participant {
+  BorderColor #2E86C1
+  BackgroundColor #EBF5FB
+}
+skinparam actor {
+  BorderColor #1B4F72
+  BackgroundColor #AED6F1
+}
+
+actor Recepcionista as Recep
+participant ":IU_Agendamiento" as UI
+participant ":ControladorCitas" as Ctrl
+participant ":Paciente" as Pac
+participant ":AgendaMedico" as Agenda
+participant ":Cita" as Cita
+
+Recep -> UI : **1:** solicitarCita(DNI)
+UI -> Ctrl : **2:** buscarPaciente(DNI)
+Ctrl -> Pac : **2.1:** consultarDatos(dni)
+Ctrl -> Agenda : **3:** obtenerDisponibilidad(fecha, CMP)
+Ctrl -> Cita : **4:** crearCita(datosCita)
+@enduml

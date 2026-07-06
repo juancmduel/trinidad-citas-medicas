@@ -69,8 +69,17 @@ public class AtencionWebController {
 
     @GetMapping("/cita/{citaId}/nuevo")
     public String nueva(@PathVariable Long citaId, Model model) {
-        model.addAttribute("cita", citaService.obtenerEntidad(citaId));
+        var cita = citaService.obtenerEntidad(citaId);
+        model.addAttribute("cita", cita);
         model.addAttribute("citas", citaService.listarEntidadesPorEstado(EstadoCita.EN_ATENCION));
+        // Calcular el ID real de la Historia Clínica a partir del paciente
+        Long historiaId = null;
+        if (cita != null && cita.getPaciente() != null) {
+            historiaId = historiaClinicaService
+                .buscarIdHistoriaPorPaciente(cita.getPaciente().getIdPaciente())
+                .orElse(null);
+        }
+        model.addAttribute("historiaId", historiaId);
         model.addAttribute("titulo", "Nueva Atenci&oacute;n");
         return "atenciones/form";
     }
@@ -78,6 +87,7 @@ public class AtencionWebController {
     @GetMapping("/nuevo")
     public String nuevoGeneral(Model model) {
         model.addAttribute("citas", citaService.listarEntidadesPorEstado(EstadoCita.EN_ATENCION));
+        model.addAttribute("historiaId", null);
         model.addAttribute("titulo", "Nueva Atenci&oacute;n M&eacute;dica");
         return "atenciones/form";
     }
@@ -85,7 +95,7 @@ public class AtencionWebController {
     @PostMapping("/guardar")
     public String guardar(@ModelAttribute Atencion atencion,
                           @RequestParam Long citaId,
-                          @RequestParam(required = false) Long historiaId,
+                          @RequestParam(name = "historiaId", defaultValue = "") String historiaIdStr,
                           @RequestParam(required = false) Long medicoId,
                           @RequestParam(required = false) List<String> ordenesTipo,
                           @RequestParam(required = false) List<String> ordenesNombre,
@@ -95,7 +105,10 @@ public class AtencionWebController {
                           RedirectAttributes redirectAttributes) {
         try {
             var cita = citaService.obtenerEntidad(citaId);
-            Long hcId = historiaId;
+            Long hcId = null;
+            if (historiaIdStr != null && !historiaIdStr.isBlank()) {
+                try { hcId = Long.parseLong(historiaIdStr); } catch (NumberFormatException e) { hcId = null; }
+            }
             if (hcId == null && cita.getPaciente() != null) {
                 hcId = historiaClinicaService.buscarIdHistoriaPorPaciente(cita.getPaciente().getIdPaciente())
                     .orElse(null);
@@ -143,7 +156,7 @@ public class AtencionWebController {
                 }
             }
 
-            redirectAttributes.addFlashAttribute("ok", "Atenci&oacute;n m&eacute;dica guardada correctamente.");
+            redirectAttributes.addFlashAttribute("ok", "Atención médica guardada correctamente.");
             return "redirect:/atenciones";
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());

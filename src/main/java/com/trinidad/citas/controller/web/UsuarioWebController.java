@@ -94,6 +94,17 @@ public class UsuarioWebController {
         return "redirect:/usuarios";
     }
 
+    @PostMapping("/desbloquear/{id}")
+    public String desbloquear(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+        try {
+            usuarioService.desbloquear(id);
+            redirectAttributes.addFlashAttribute("ok", "Usuario desbloqueado correctamente.");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "Error al desbloquear: " + e.getMessage());
+        }
+        return "redirect:/usuarios";
+    }
+
     @PostMapping("/eliminar/{id}")
     public String eliminar(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         try {

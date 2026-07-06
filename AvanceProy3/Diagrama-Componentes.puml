@@ -1,0 +1,121 @@
+@startuml
+title "Diagrama de Componentes UML (APF3)\nArquitectura de Software - Sistema de Gestión de Citas Médicas"
+skinparam backgroundColor #FEFEFE
+skinparam component {
+  FontSize 11
+  BorderColor #2E86C1
+  BackgroundColor #EBF5FB
+}
+skinparam interface {
+  BorderColor #117A65
+  BackgroundColor #D5F5E3
+}
+
+' ── COMPONENTES ──
+component "Frontend Web (UI)\n<size:10>clinica-webapp.war</size>" as Frontend
+component "Backend API REST\n<size:10>clinica-api.jar</size>" as Backend
+component "Servicio de Autenticación\n<size:10>auth-service.jar</size>" as Auth
+component "Motor de Notificaciones\n<size:10>notifier-service.jar</size>" as Notifier
+component "Generador de Reportes\n<size:10>report-engine.jar</size>" as Reportes
+component "Pasarela de Pagos\n<size:10>payment-gateway.jar</size>" as Pagos
+component "Módulo de Auditoría\n<size:10>audit-log.jar</size>" as Auditoria
+component "Motor de Base de Datos\n<size:10>SQL Server 2022</size>" as BD
+
+' ── PROVEEDORES EXTERNOS ──
+component "Twilio API (SMS)" as Twilio
+component "SMTP Server (Email)" as SMTP
+component "MercadoPago (Pasarela)" as MPago
+
+' ── INTERFACE BALLS (Provided) ──
+() "ILogin" as ballIL
+() "IAgendamiento" as ballIAg
+() "IPaciente" as ballIP
+() "IMedico" as ballIM
+() "IReportes" as ballIR
+
+() "IGestionUsuarios" as ballIGU
+() "IGestionCitas" as ballIGC
+() "IGestionPacientes" as ballIGP
+() "IGestionPagos" as ballIPP
+() "IAuditoria" as ballIAU
+() "IGenerarReporte" as ballIGR
+
+() "IAutenticacion" as ballIA
+() "IAutorizacion" as ballIAuth
+
+() "INotificacionSMS" as ballINS
+() "INotificacionEmail" as ballINE
+
+() "IConexionBD" as ballIBD
+
+() "IProcesarPago" as ballIPPEx
+() "IVerificarTransaccion" as ballIVT
+
+() "IEnviarSMS" as ballSMS
+() "IEnviarEmail" as ballEmail
+() "IPagoExterno" as ballMP
+
+' ── ASSIGN PROVIDED INTERFACES ──
+ballIL - Frontend
+ballIAg - Frontend
+ballIP - Frontend
+ballIM - Frontend
+ballIR - Frontend
+
+ballIGU - Backend
+ballIGC - Backend
+ballIGP - Backend
+ballIPP - Backend
+ballIAU - Backend
+ballIGR - Backend
+
+ballIA - Auth
+ballIAuth - Auth
+
+ballINS - Notifier
+ballINE - Notifier
+
+ballIBD - BD
+
+ballIPPEx - Pagos
+ballIVT - Pagos
+
+' ── CONSUMER TO PROVIDER ──
+Frontend -- ballIGU
+Frontend -- ballIGC
+Frontend -- ballIGP
+Frontend -- ballIPP
+Frontend -- ballIAU
+Frontend -- ballIGR
+
+Backend -- ballIL
+Backend -- ballIAg
+Backend -- ballIP
+Backend -- ballIM
+Backend -- ballIR
+Backend -- ballIA
+Backend -- ballIAuth
+Backend -- ballIBD
+Backend -- ballINS
+Backend -- ballINE
+Backend -- ballIGR
+
+Auth -- ballIBD
+
+Notifier -- ballSMS
+Notifier -- ballEmail
+
+Pagos -- ballIBD
+Pagos -- ballMP
+
+Auditoria -- ballIBD
+
+Reportes - Backend
+Reportes -- ballIBD
+
+' ── COMPONENTE A API EXTERNA ──
+ballSMS - Twilio
+ballEmail - SMTP
+ballMP - MPago
+
+@enduml

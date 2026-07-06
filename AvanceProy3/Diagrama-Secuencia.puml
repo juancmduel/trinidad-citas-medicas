@@ -1,0 +1,71 @@
+@startuml
+title "Diagrama de Secuencia\nRegistro de Triaje (Signos Vitales)"
+
+skinparam backgroundColor #FEFEFE
+skinparam participant {
+  BorderColor #2E86C1
+  BackgroundColor #EBF5FB
+}
+skinparam actor {
+  BorderColor #1B4F72
+  BackgroundColor #AED6F1
+}
+skinparam database {
+  BorderColor #117A65
+  BackgroundColor #D5F5E3
+}
+
+actor "Enfermero" as Enfermero
+participant ":V_Triaje" as Vista
+participant ":CtrlTriaje" as Ctrl
+database ":SQL Server\n(BD)" as BD
+participant ":Triaje" as Triaje
+
+== Carga de datos de la cita ==
+Enfermero -> Vista : activarFormulario()
+activate Vista
+
+Vista -> Ctrl : getDatosCita(idCita)
+activate Ctrl
+
+Ctrl -> BD : SELECT * FROM Cita WHERE idCita = ?
+activate BD
+BD --> Ctrl : datosCita
+deactivate BD
+
+Ctrl --> Vista : retornarDatosPaciente()
+deactivate Ctrl
+
+Vista --> Enfermero : mostrarDatosPaciente()
+deactivate Vista
+
+== Registro de signos vitales ==
+Enfermero -> Vista : ingresarPresionArterial(120/80)
+Enfermero -> Vista : ingresarTemperatura(36.5)
+Enfermero -> Vista : ingresarPeso(72)
+Enfermero -> Vista : ingresarSaturacion(98)
+
+Enfermero -> Vista : guardarTriaje(datosVitales)
+activate Vista
+
+Vista -> Ctrl : guardarTriaje(datosVitales)
+activate Ctrl
+
+Ctrl -> Triaje : crearTriaje(datos)
+activate Triaje
+Triaje --> Ctrl : triajeCreado
+deactivate Triaje
+
+Ctrl -> BD : INSERT INTO Triaje VALUES(...)
+activate BD
+BD --> Ctrl : ok
+deactivate BD
+
+Ctrl --> Vista : confirmacionGuardado()
+deactivate Ctrl
+
+Vista --> Enfermero : mostrarConfirmacion()
+note right : La ventana modal\nde triaje se cierra\ny se libera la interfaz
+deactivate Vista
+
+@enduml

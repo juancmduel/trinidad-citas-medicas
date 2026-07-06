@@ -751,6 +751,7 @@
 .action-state:hover { background:rgba(245,158,11,0.15);color:var(--warning); }
 .action-activate:hover { background:rgba(16,185,129,0.12);color:var(--success); }
 .action-delete:hover { background:rgba(239,68,68,0.12);color:var(--danger); }
+.action-unlock:hover { background:rgba(14,116,144,0.15);color:#0e7490; }
 
 /* ===== FORM SECTION CARD ===== */
 .form-section-card { background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin-bottom:16px;box-shadow:var(--shadow-sm); }

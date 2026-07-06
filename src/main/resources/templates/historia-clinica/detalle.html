@@ -7,6 +7,53 @@
     <div th:replace="~{fragments/header :: topbar}"></div>
     <main class="page-main">
 
+    <!-- Modal Agregar Antecedente (colocado al inicio para evitar ERR_INCOMPLETE_CHUNKED_ENCODING) -->
+    <div class="modal fade" id="antecedenteModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <form th:action="@{/antecedentes/guardar}" method="post">
+                    <input type="hidden" name="idHistoria" th:value="${historia.idHistoria}">
+                    <div class="modal-header">
+                        <h5 class="modal-title"><i class="bi bi-clock-history me-2"></i>Nuevo Antecedente</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-field mb-3">
+                            <label>Tipo de Antecedente <span class="required">*</span></label>
+                            <select name="tipo" class="form-select-professional" required>
+                                <option value="">-- Seleccionar --</option>
+                                <option value="QUIRURGICO">Quirúrgico</option>
+                                <option value="ALERGICO">Alérgico</option>
+                                <option value="FARMACOLOGICO">Farmacológico</option>
+                                <option value="PATOLOGICO">Patológico</option>
+                                <option value="FAMILIAR">Familiar</option>
+                                <option value="TRAUMATICO">Traumático</option>
+                                <option value="HABITOS">Hábitos</option>
+                                <option value="OTRO">Otro</option>
+                            </select>
+                        </div>
+                        <div class="form-field mb-3">
+                            <label>Descripción <span class="required">*</span></label>
+                            <textarea name="descripcion" class="form-input-professional" rows="3" required placeholder="Describa el antecedente..."></textarea>
+                        </div>
+                        <div class="form-field mb-3">
+                            <label>Código CIE-10 (opcional)</label>
+                            <input type="text" name="codigoCie10" class="form-input-professional" placeholder="Ej: Z86.6" maxlength="10">
+                        </div>
+                        <div class="form-field">
+                            <label>Observaciones</label>
+                            <textarea name="observaciones" class="form-input-professional" rows="2" placeholder="Notas adicionales..."></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-modern btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-modern btn-primary"><i class="bi bi-check-circle"></i> Guardar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
         <div class="page-header">
             <div>
                 <h1><i class="bi bi-journal-medical"></i>Historia Clínica</h1>
@@ -150,6 +197,12 @@
 
                     <!-- Antecedentes -->
                     <div class="tab-pane fade show active" id="antecedentes" role="tabpanel">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <span></span>
+                            <button type="button" class="btn btn-modern btn-primary btn-sm" onclick="(function(){var m=document.getElementById('antecedenteModal');if(!m){alert('Error: modal no encontrado');return;}try{new bootstrap.Modal(m).show();}catch(e){m.classList.add('show');m.style.display='block';document.body.classList.add('modal-open');var b=document.createElement('div');b.className='modal-backdrop fade show';b.onclick=function(){m.classList.remove('show');m.style.display='none';document.body.classList.remove('modal-open');this.remove();};document.body.appendChild(b);}})()">
+                                <i class="bi bi-plus-lg"></i> Agregar Antecedente
+                            </button>
+                        </div>
                         <div class="table-container">
                             <table class="table-modern">
                                 <thead>
@@ -158,17 +211,26 @@
                                         <th>Descripción</th>
                                         <th>Código CIE-10</th>
                                         <th>Fecha Registro</th>
+                                        <th style="text-align:center;">Acción</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr th:each="a : ${antecedentes}">
+                                    <tr th:each="a : ${antecedentes}" th:if="${a != null}">
                                         <td><span class="badge-estado badge-completado" th:text="${a.tipo}"></span></td>
                                         <td th:text="${a.descripcion}"></td>
                                         <td th:text="${a.codigoCie10 ?: '-'}"></td>
                                         <td th:text="${#temporals.format(a.fechaRegistro, 'dd/MM/yyyy')}"></td>
+                                        <td style="text-align:center;">
+                                            <form th:action="@{/antecedentes/eliminar/{id}(id=${a.idAntecedente}, idHistoria=${historia.idHistoria})}" method="post" style="display:inline;">
+                                                <button type="submit" class="action-btn action-delete" title="Eliminar"
+                                                        onclick="return confirm('¿Eliminar este antecedente?')">
+                                                    <i class="bi bi-trash3"></i>
+                                                </button>
+                                            </form>
+                                        </td>
                                     </tr>
                                     <tr th:if="${#lists.isEmpty(antecedentes)}">
-                                        <td colspan="4" class="table-empty">No hay antecedentes registrados</td>
+                                        <td colspan="5" class="table-empty">No hay antecedentes registrados. Presione "Agregar Antecedente" para añadir uno.</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -223,7 +285,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr th:each="a : ${atenciones}">
+                                    <tr th:each="a : ${atenciones}" th:if="${a != null}">
                                         <td th:text="${#temporals.format(a.fechaAtencion, 'dd/MM/yyyy HH:mm')}"></td>
                                         <td th:text="${a.nombreMedicoCompleto}"></td>
                                         <td th:text="${a.diagnosticoDesc ?: '-'}"></td>
@@ -262,7 +324,7 @@
                                 </thead>
                                 <tbody>
                                     <tr th:each="a : ${atenciones}" th:remove="tag">
-                                        <tr th:each="o : ${ordenesPorAtencion.get(a.idAtencion)}">
+                                        <tr th:each="o : ${a != null ? ordenesPorAtencion.get(a.idAtencion) : {}}">
                                             <td th:text="${#temporals.format(o.fechaSolicitud, 'dd/MM/yyyy')}"></td>
                                             <td><span class="badge-estado badge-completado" th:text="${o.tipoExamen}"></span></td>
                                             <td th:text="${o.nombreExamen}"></td>
@@ -295,7 +357,7 @@
                                 </thead>
                                 <tbody>
                                     <tr th:each="a : ${atenciones}" th:remove="tag">
-                                        <tr th:each="r : ${recetasPorAtencion.get(a.idAtencion)}">
+                                        <tr th:each="r : ${a != null ? recetasPorAtencion.get(a.idAtencion) : {}}">
                                             <td><strong th:text="${r.nroReceta}"></strong></td>
                                             <td th:text="${#temporals.format(r.fechaEmision, 'dd/MM/yyyy')}"></td>
                                             <td th:text="${r.observaciones ?: '-'}"></td>

@@ -280,6 +280,45 @@
 
         function goToStep(n) {
             if (n < 1 || n > 4) return;
+
+            // Validar paso actual antes de avanzar
+            if (n > currentStep) {
+                if (currentStep === 1) {
+                    var p = document.getElementById('idPaciente');
+                    if (!p || !p.value) {
+                        showStepError('step1', 'Debe seleccionar un paciente.');
+                        return;
+                    }
+                    hideStepError('step1');
+                }
+                if (currentStep === 2) {
+                    var esp = document.getElementById('idEspecialidad');
+                    if (!esp || !esp.value) {
+                        showStepError('step2', 'Debe seleccionar una especialidad.');
+                        return;
+                    }
+                    var med = document.getElementById('idMedico');
+                    if (!med || !med.value) {
+                        showStepError('step2', 'Debe seleccionar un médico antes de continuar.');
+                        return;
+                    }
+                    hideStepError('step2');
+                }
+                if (currentStep === 3) {
+                    var f = document.querySelector('[name="fechaCita"]');
+                    var h = document.querySelector('[name="horaInicio"]');
+                    if (!f || !f.value) {
+                        showStepError('step3', 'Debe seleccionar una fecha.');
+                        return;
+                    }
+                    if (!h || !h.value) {
+                        showStepError('step3', 'Debe seleccionar una hora.');
+                        return;
+                    }
+                    hideStepError('step3');
+                }
+            }
+
             document.querySelectorAll('.step-panel').forEach(function(p) { p.style.display = 'none'; });
             document.getElementById('step' + n).style.display = 'block';
             for (var i = 1; i <= 4; i++) {
@@ -295,6 +334,23 @@
             }
             currentStep = n;
             window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function showStepError(stepId, msg) {
+            var step = document.getElementById(stepId);
+            var existing = step.querySelector('.step-validation-error');
+            if (!existing) {
+                var div = document.createElement('div');
+                div.className = 'step-validation-error alert-professional alert-danger-prof mt-2';
+                div.innerHTML = '<i class="bi bi-exclamation-triangle-fill me-1"></i>' + msg;
+                step.querySelector('.step-nav').before(div);
+            }
+        }
+
+        function hideStepError(stepId) {
+            var step = document.getElementById(stepId);
+            var existing = step.querySelector('.step-validation-error');
+            if (existing) existing.remove();
         }
 
         function selectSpecialty(el) {

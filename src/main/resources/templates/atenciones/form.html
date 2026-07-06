@@ -22,7 +22,7 @@
 
         <form th:action="@{/atenciones/guardar}" method="post" id="atencionForm">
             <input type="hidden" name="citaId" th:value="${cita != null ? cita.idCita : ''}">
-            <input type="hidden" name="historiaId" th:value="${cita != null && cita.paciente != null ? cita.paciente.idPaciente : ''}">
+            <input type="hidden" name="historiaId" th:value="${historiaId}">
             <input type="hidden" name="medicoId" th:value="${cita != null && cita.medico != null ? cita.medico.idMedico : ''}">
 
             <div class="row g-4">

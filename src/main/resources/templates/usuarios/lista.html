@@ -104,6 +104,11 @@
                                         <i class="bi" th:classappend="${u.activo == 1} ? 'bi-pause-fill' : 'bi-play-fill'"></i>
                                     </button>
                                 </form>
+                                <form th:if="${u.bloqueado == 1}" th:action="@{/usuarios/desbloquear/{id}(id=${u.idUsuario})}" method="post" style="display:inline;" onsubmit="return confirm('¿Desbloquear este usuario?')">
+                                    <button type="submit" class="action-btn action-unlock" title="Desbloquear">
+                                        <i class="bi bi-unlock-fill"></i>
+                                    </button>
+                                </form>
                                 <form th:action="@{/usuarios/eliminar/{id}(id=${u.idUsuario})}" method="post" style="display:inline;" onsubmit="return confirm('¿Eliminar este usuario?')">
                                     <button type="submit" class="action-btn action-delete" title="Eliminar"><i class="bi bi-trash3"></i></button>
                                 </form>

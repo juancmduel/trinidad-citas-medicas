@@ -16,6 +16,16 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 
+/**
+ * Cuando alguien mete mal la contraseña (o la cuenta está bloqueada),
+ * este manejador se encarga de:
+ *  1. Registrar el intento fallido en la base de datos (para auditoría)
+ *  2. Llevar la cuenta de cuántas veces ha fallado
+ *  3. Si llega a 5, bloquear la cuenta automáticamente
+ *  4. Redirigir al login con el mensaje de error apropiado
+ *
+ * Así evitamos que un bot se pase todo el día probando contraseñas.
+ */
 @Component
 @RequiredArgsConstructor
 public class CustomAuthenticationFailureHandler extends SimpleUrlAuthenticationFailureHandler {
@@ -31,9 +41,11 @@ public class CustomAuthenticationFailureHandler extends SimpleUrlAuthenticationF
         String username = request.getParameter("username");
         String ip = request.getRemoteAddr();
 
-        log.warn("Login failed for user '{}' from IP {}: {}", username, ip, exception.getClass().getSimpleName());
+        log.warn("⛔ Alguien no pudo iniciar sesión como '{}' desde la IP {}: {}",
+            username, ip, exception.getClass().getSimpleName());
 
         try {
+            // Traducimos el error técnico a algo que un humano entienda
             String errorMsg = exception.getMessage();
             if (exception instanceof BadCredentialsException) {
                 errorMsg = "Credenciales inválidas";
@@ -43,22 +55,28 @@ public class CustomAuthenticationFailureHandler extends SimpleUrlAuthenticationF
                 errorMsg = "Cuenta desactivada";
             }
 
+            // Registramos el intento en el historial
             intentoLoginService.registrarIntento(username != null ? username : "desconocido", false, ip, errorMsg);
 
+            // Si el usuario existe, aumentamos su contador de intentos fallidos
             if (username != null) {
                 usuarioRepository.findByUsername(username).ifPresent(usuario -> {
                     usuario.setIntentosFallidos(usuario.getIntentosFallidos() + 1);
+                    // ¿Ya llegó al límite? Pues lo bloqueamos.
                     if (intentoLoginService.debeBloquear(username)) {
                         usuario.setBloqueado(1);
-                        log.warn("User '{}' has been blocked due to too many failed attempts", username);
+                        log.warn("🔒 Usuario '{}' bloqueado por demasiados intentos fallidos", username);
                     }
                     usuarioRepository.save(usuario);
                 });
             }
         } catch (Exception e) {
-            log.error("Error recording failed login attempt for user '{}': {}", username, e.getMessage(), e);
+            // Si falla la auditoría, no debería impedir el login.
+            // Mejor logueamos el error y seguimos.
+            log.error("Error al registrar intento fallido para '{}': {}", username, e.getMessage(), e);
         }
 
+        // Redirigimos con un parámetro para que la pantalla de login muestre el error
         String redirectUrl = "/login?error=true";
         if (exception instanceof LockedException) {
             redirectUrl = "/login?error=locked";

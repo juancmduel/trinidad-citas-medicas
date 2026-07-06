@@ -25,6 +25,24 @@ import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * Servicio de correo electrónico.
+ *
+ * Aquí se construyen y envían los correos a los pacientes.
+ * Usamos Gmail SMTP (configurado en application.properties) y enviamos
+ * correos en formato HTML con diseño profesional.
+ *
+ * Tipos de correo que enviamos:
+ *  1. Confirmación de cita (cuando el paciente agenda)
+ *  2. Recordatorio (24 horas antes, vía scheduler)
+ *  3. Recuperación de contraseña (cuando alguien olvida su clave)
+ *
+ * Todos los correos incluyen la imagen de Trinidad Salud y un diseño
+ * responsivo que se ve bien en cualquier cliente de correo.
+ *
+ * Los códigos QR que se envían solo contienen el ID de la cita,
+ * NO datos personales del paciente. Así cumplimos con protección de datos.
+ */
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -32,24 +50,31 @@ public class EmailService {
 
     private final JavaMailSender mailSender;
 
+    /** El correo desde el que se envían los mensajes (configurado en application.properties) */
     @Value("${spring.mail.username}")
     private String fromEmail;
 
+    /**
+     * Envía un correo de confirmación al paciente cuando agenda una cita.
+     * Incluye: datos de la cita, un código QR, e instrucciones importantes.
+     *
+     * Si el paciente no tiene email registrado, lo saltamos sin hacer ruido.
+     */
     public void enviarConfirmacionCita(Cita cita) {
         String pacienteEmail = cita.getPaciente() != null ? cita.getPaciente().getEmail() : null;
         if (pacienteEmail == null || pacienteEmail.isBlank()) {
-            log.info("[EMAIL] Paciente sin email. CitaID={}", cita.getIdCita());
+            log.info("📧 Paciente sin email, no se envía confirmación. Cita #{}", cita.getIdCita());
             return;
         }
 
         String nombreCompleto = cita.getPaciente().getNombres() + " " + cita.getPaciente().getApellidoPaterno();
         String medico         = cita.getMedico() != null ? "Dr(a). " + cita.getMedico().getNombreCompleto() : "-";
         String especialidad   = cita.getEspecialidad() != null ? cita.getEspecialidad().getNombre() : "-";
-        // Nro. de cita para mostrar en plantilla (solo referencia visual, no expone datos sensibles)
+        // Número de cita legible para el paciente (solo referencia, no expone datos internos)
         String nroCita        = "CIT-" + String.format("%05d", cita.getIdCita());
 
         // ⚠ El QR solo contiene el ID de referencia, NO datos personales (DNI, nombre, etc.)
-        // por seguridad y cumplimiento de proteccion de datos.
+        // por seguridad y cumplimiento de protección de datos (LGPD / Ley de Protección de Datos).
         String qrContenido = "CITA:" + cita.getIdCita();
 
         String html = plantillaConfirmacion(nombreCompleto, medico, especialidad, nroCita,
@@ -67,10 +92,18 @@ public class EmailService {
         enviarHtml(pacienteEmail, "Trinidad Salud: Confirmacion de cita", html, textoPlano, qrContenido);
     }
 
+    /**
+     * Envía un recordatorio al paciente 24 horas antes de su cita.
+     * Esto se ejecuta automáticamente todos los días a las 8:00 AM
+     * (programado en CitaScheduler).
+     *
+     * La idea es reducir las inasistencias. La gente olvida, pero un
+     * correo bonito en su bandeja de entrada ayuda a recordar.
+     */
     public void enviarRecordatorio(Cita cita) {
         String pacienteEmail = cita.getPaciente() != null ? cita.getPaciente().getEmail() : null;
         if (pacienteEmail == null || pacienteEmail.isBlank()) {
-            log.info("[EMAIL] Paciente sin email. CitaID={}", cita.getIdCita());
+            log.info("📧 Paciente sin email, no se envía recordatorio. Cita #{}", cita.getIdCita());
             return;
         }
 
@@ -78,7 +111,7 @@ public class EmailService {
         String medico         = cita.getMedico() != null ? "Dr(a). " + cita.getMedico().getNombreCompleto() : "-";
         String nroCita        = "CIT-" + String.format("%05d", cita.getIdCita());
 
-        // ⚠ El QR solo contiene el ID de referencia, NO datos personales (DNI, nombre, etc.)
+        // ⚠ El QR solo contiene el ID de referencia, NO datos personales
         String qrContenido = "CITA:" + cita.getIdCita();
 
         String html = plantillaRecordatorio(nombreCompleto, medico, nroCita,
@@ -94,6 +127,11 @@ public class EmailService {
         enviarHtml(pacienteEmail, "Trinidad Salud: Recordatorio de cita", html, textoPlano, qrContenido);
     }
 
+    /**
+     * Envía el correo para restablecer la contraseña.
+     * Contiene un botón que lleva al formulario de cambio de contraseña.
+     * El enlace expira en 1 hora.
+     */
     public void enviarRecuperacionPassword(String destino, String nombre, String link) {
         String html = "<!DOCTYPE html><html lang='es'><head><meta charset='UTF-8'></head>"
             + "<body style='margin:0;padding:0;background:#f1f5f9;font-family:\"Segoe UI\",Arial,sans-serif;'>"
@@ -144,6 +182,14 @@ public class EmailService {
         }
     }
 
+    /**
+     * Plantilla HTML para el correo de confirmación de cita.
+     * Tiene un diseño limpio con:
+     *  - Encabezado con logo de Trinidad Salud
+     *  - Tabla con los datos de la cita
+     *  - Código QR para agilizar el check-in en recepción
+     *  - Instrucciones importantes para el paciente
+     */
     private String plantillaConfirmacion(String nombre, String medico, String especialidad,
                                           String nroCita, String fecha, String hora, String estado) {
         return baseHtml("Cita Confirmada",
@@ -162,6 +208,10 @@ public class EmailService {
               ));
     }
 
+    /**
+     * Plantilla HTML para el correo de recordatorio.
+     * Similar a la de confirmación pero más corta.
+     */
     private String plantillaRecordatorio(String nombre, String medico,
                                           String nroCita, String fecha, String hora) {
         return baseHtml("Recordatorio de Cita",
@@ -268,6 +318,18 @@ public class EmailService {
             + "</tr>";
     }
 
+    /**
+     * Método que realmente envía el correo.
+     *
+     * Crea un mensaje MIME con:
+     *  - Versión texto plano (para clientes de correo antiguos)
+     *  - Versión HTML (con diseño bonito)
+     *  - Imagen QR incrustada (no es un adjunto, va inline)
+     *
+     * También configura cabeceras para evitar que los sistemas
+     * antispam bloqueen el correo y para que no se active
+     * la respuesta automática "Gracias por su correo".
+     */
     private void enviarHtml(String destino, String asunto, String htmlBody, String plainTextBody, String qrContenido) {
         try {
             byte[] qrBytes = generarQR(qrContenido, 320);

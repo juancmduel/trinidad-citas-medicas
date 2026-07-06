@@ -13,6 +13,18 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+/**
+ * Controlador para el flujo de "Olvidé mi contraseña".
+ *
+ * Pasos:
+ *  1. GET /olvide-password → muestra el formulario para poner el email
+ *  2. POST /olvide-password → envía el correo con el enlace de recuperación
+ *  3. GET /reset-password/{token} → valida el token y muestra el formulario
+ *  4. POST /reset-password → guarda la nueva contraseña
+ *
+ * Siempre mostramos el mismo mensaje ("Si el email está registrado...")
+ * para no revelar qué correos existen en el sistema.
+ */
 @Profile({"web", "default"})
 @Controller
 @RequiredArgsConstructor
@@ -20,27 +32,37 @@ public class PasswordResetController {
 
     private final PasswordResetService passwordResetService;
 
+    /** Muestra el formulario para ingresar el correo */
     @GetMapping("/olvide-password")
     public String olvidePasswordForm(Model model) {
         model.addAttribute("titulo", "Recuperar Contrasena");
         return "auth/olvide-password";
     }
 
+    /**
+     * Recibe el correo y envía el enlace de recuperación.
+     * No importa si el correo existe o no, siempre decimos lo mismo.
+     */
     @PostMapping("/olvide-password")
     public String solicitarRestablecimiento(@RequestParam String email,
                                              HttpServletRequest request,
                                              RedirectAttributes ra) {
+        // Construimos la URL base para el enlace de recuperación
         String baseUrl = request.getScheme() + "://" + request.getServerName()
                 + ":" + request.getServerPort() + request.getContextPath();
         try {
             passwordResetService.solicitarRestablecimiento(email, baseUrl);
         } catch (BusinessException e) {
-            // No revelamos si el email existe o no por seguridad
+            // Calló silenciosamente. No revelamos si el correo existe o no.
         }
         ra.addFlashAttribute("ok", "Si el email esta registrado, recibiras un enlace de recuperacion.");
         return "redirect:/olvide-password";
     }
 
+    /**
+     * Valida el token y muestra el formulario para poner la nueva contraseña.
+     * Si el token es inválido, expiró o ya se usó, muestra error.
+     */
     @GetMapping("/reset-password/{token}")
     public String resetPasswordForm(@PathVariable String token, Model model) {
         try {
@@ -55,6 +77,11 @@ public class PasswordResetController {
         }
     }
 
+    /**
+     * Guarda la nueva contraseña.
+     * La contraseña debe tener al menos 8 caracteres.
+     * Si todo sale bien, redirige al login para que el usuario entre con su nueva clave.
+     */
     @PostMapping("/reset-password")
     public String restablecerPassword(@ModelAttribute ResetPasswordRequest dto,
                                        RedirectAttributes ra, Model model) {
@@ -76,6 +103,7 @@ public class PasswordResetController {
         }
     }
 
+    /** DTO interno para recibir el token + nueva contraseña del formulario */
     @Data
     public static class ResetPasswordRequest {
         @NotBlank

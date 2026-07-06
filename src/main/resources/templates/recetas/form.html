@@ -33,7 +33,8 @@
                         <option value="">-- Seleccionar --</option>
                         <option th:each="atencion : ${atenciones}"
                                 th:value="${atencion.idAtencion}"
-                                th:text="${atencion.cita.paciente.nombres + ' ' + atencion.cita.paciente.apellidoPaterno + ' - ' + atencion.cita.medico.nombreCompleto}">
+                                th:text="${atencion.cita?.paciente?.nombres + ' ' + atencion.cita?.paciente?.apellidoPaterno + ' - ' + atencion.cita?.medico?.nombreCompleto}"
+                                th:unless="${atencion.cita == null or atencion.cita.paciente == null}">
                         </option>
                     </select>
                 </div>

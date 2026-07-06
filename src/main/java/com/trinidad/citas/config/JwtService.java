@@ -17,6 +17,22 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
+/**
+ * Servicio para manejar los tokens JWT.
+ *
+ * Básicamente: cuando un usuario inicia sesión correctamente,
+ * le generamos un token (como un carnet digital) que caduca en 1 hora.
+ * Ese token lo pone en cada petición a la API y nosotros lo validamos.
+ *
+ * El token incluye:
+ *  - Quién es el usuario (subject = username)
+ *  - Qué roles tiene (para saber qué puede hacer)
+ *  - Cuándo se emitió
+ *  - Cuándo caduca
+ *
+ * Todo va firmado con HMAC-SHA256 usando una clave secreta que SOLO
+ * el servidor conoce (JWT_SECRET). Así nadie puede falsificar tokens.
+ */
 @Service
 public class JwtService {
 
@@ -32,16 +48,17 @@ public class JwtService {
     private long expirationMs;
 
     /**
-     * Valida al iniciar que el JWT secret tenga al menos 256 bits (32 bytes).
-     * HMAC-SHA256 requiere una clave de al menos 256 bits.
+     * Apenas arranca la aplicación, validamos que la clave secreta
+     * sea lo suficientemente larga. Si no, la aplicación ni siquiera
+     * inicia. Así evitamos sustos en producción.
      */
     @PostConstruct
     public void validarSecret() {
         try {
             getKey();
-            log.info("JWT secret configurado correctamente (min. {} bytes requeridos)", MIN_SECRET_BYTES);
+            log.info("✅ JWT secret configurado correctamente (min. {} bytes requeridos)", MIN_SECRET_BYTES);
         } catch (Exception e) {
-            log.error("JWT SECRET INVALIDO: {} — Debe tener al menos {} bytes (256 bits) " +
+            log.error("❌ JWT_SECRET INVÁLIDO: {} — Debe tener al menos {} bytes (256 bits) " +
                       "o ser un Base64 válido. Ej: openssl rand -base64 32", e.getMessage(), MIN_SECRET_BYTES);
             throw new IllegalStateException(
                 "JWT_SECRET invalido o demasiado corto. Se requieren al menos " +
@@ -49,6 +66,12 @@ public class JwtService {
         }
     }
 
+    /**
+     * Genera un token JWT para un usuario.
+     * El token incluye los roles del usuario como "claims" personalizados.
+     * Así no tenemos que consultar la BD en cada petición para saber
+     * qué puede hacer el usuario.
+     */
     public String generateToken(UserDetails userDetails) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("roles", userDetails.getAuthorities().stream()
@@ -62,14 +85,17 @@ public class JwtService {
             .compact();
     }
 
+    /** Extrae el nombre de usuario del token */
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
     }
 
+    /** Extrae la fecha de expiración del token */
     public Date extractExpiration(String token) {
         return extractClaim(token, Claims::getExpiration);
     }
 
+    /** Verifica que el token sea válido: que sea del mismo usuario y no haya expirado */
     public boolean isTokenValid(String token, UserDetails userDetails) {
         final String username = extractUsername(token);
         return username.equals(userDetails.getUsername()) && !isTokenExpired(token);
@@ -83,6 +109,7 @@ public class JwtService {
         return extractExpiration(token).before(new Date());
     }
 
+    /** Método genérico para extraer cualquier dato del token */
     private <T> T extractClaim(String token, Function<Claims, T> resolver) {
         Claims claims = Jwts.parser()
             .verifyWith(getKey())
@@ -92,6 +119,12 @@ public class JwtService {
         return resolver.apply(claims);
     }
 
+    /**
+     * Obtiene la clave secreta para firmar/validar los tokens.
+     * Soporta dos formatos:
+     *  - Texto plano (si tiene 64+ caracteres)
+     *  - Base64 (para claves binarias más cortas pero igual de seguras)
+     */
     private SecretKey getKey() {
         byte[] keyBytes = secret.length() >= 64
             ? secret.getBytes()

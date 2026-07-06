@@ -18,6 +18,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * El corazón del negocio: la gestión de citas médicas.
+ *
+ * Aquí se agendan, confirman, cancelan y mueven las citas a través
+ * de sus diferentes estados. También se encarga de:
+ *  - Validar que el médico esté libre en el horario solicitado
+ *  - Que el paciente no tenga otra cita con el mismo médico hace poco
+ *  - Enviar correos de confirmación cuando se agenda una cita
+ *  - Controlar que los cambios de estado sean válidos
+ *    (ej: no puedes pasar de PROGRAMADA a ATENDida sin pasar por EN_ATENCION)
+ *
+ * Básicamente, evita el caos en la agenda de la clínica.
+ */
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -31,15 +44,26 @@ public class CitaService {
 
     private static final DateTimeFormatter HORA_FMT = DateTimeFormatter.ofPattern("HH:mm");
 
-    // ── Máquina de estados: transiciones permitidas entre estados de cita ──
+    /**
+     * Máquina de estados de la cita.
+     *
+     * Una cita nace como PROGRAMADA y va avanzando:
+     *   PROGRAMADA → CONFIRMADA → EN_TRIAGE → EN_ATENCION → ATENDIDA
+     *
+     * Puede saltarse pasos o ir para atrás solo en casos específicos.
+     * Esto evita errores como marcar como ATENDIDA una cita que nunca
+     * llegó a EN_ATENCION.
+     *
+     * Las transiciones canceladas pueden ocurrir desde casi cualquier estado.
+     */
     private static final Map<EstadoCita, Set<EstadoCita>> TRANSICIONES_VALIDAS = Map.of(
         EstadoCita.PROGRAMADA,    Set.of(EstadoCita.CONFIRMADA, EstadoCita.CANCELADA),
         EstadoCita.CONFIRMADA,    Set.of(EstadoCita.EN_TRIAGE, EstadoCita.CANCELADA),
         EstadoCita.EN_TRIAGE,     Set.of(EstadoCita.EN_ATENCION, EstadoCita.CANCELADA),
         EstadoCita.EN_ATENCION,   Set.of(EstadoCita.ATENDIDA, EstadoCita.CANCELADA),
-        EstadoCita.ATENDIDA,      Set.of(),
-        EstadoCita.CANCELADA,     Set.of(),
-        EstadoCita.NO_ASISTIO,    Set.of(EstadoCita.PROGRAMADA),   // reprog
+        EstadoCita.ATENDIDA,      Set.of(),                         // terminal
+        EstadoCita.CANCELADA,     Set.of(),                         // terminal
+        EstadoCita.NO_ASISTIO,    Set.of(EstadoCita.PROGRAMADA),    // se puede reprogramar
         EstadoCita.REPROGRAMADA,  Set.of(EstadoCita.PROGRAMADA)
     );
 
@@ -130,6 +154,12 @@ public class CitaService {
         return obtenerEntidad(id);
     }
 
+    /**
+     * Agenda una nueva cita y envía correo de confirmación al paciente.
+     *
+     * La cita se crea con estado PROGRAMADA y automáticamente se le envía
+     * un correo al paciente con los detalles y un código QR.
+     */
     @Auditable(entidad = "CITA", accion = "CREAR")
     public CitaDTO agendar(CitaDTO dto) {
         Cita cita = agendarEntidad(dto);
@@ -137,6 +167,18 @@ public class CitaService {
         return toDTO(cita);
     }
 
+    /**
+     * Lógica interna de agendamiento.
+     *
+     * Valida varias cosas antes de crear la cita:
+     *  1. Que el médico pertenezca a la especialidad seleccionada
+     *  2. Que la fecha/hora no sea en el pasado
+     *  3. Que el médico no tenga otra cita en el mismo horario
+     *     (con bloqueo PESSIMISTIC_WRITE para evitar condiciones de carrera)
+     *  4. Que el paciente no tenga otra cita reciente con el mismo médico
+     *
+     * Si todo está bien, crea y guarda la cita.
+     */
     private Cita agendarEntidad(CitaDTO dto) {
         Paciente paciente = pacienteRepository.findById(dto.getIdPaciente())
             .orElseThrow(() -> new ResourceNotFoundException("Paciente", dto.getIdPaciente()));
@@ -197,6 +239,14 @@ public class CitaService {
         return citaRepository.save(cita);
     }
 
+    /**
+     * Cambia el estado de una cita, pero solo si la transición es válida.
+     *
+     * Ejemplo: no puedes pasar de PROGRAMADA a ATENDida directamente,
+     * primero tiene que ir a CONFIRMADA → EN_TRIAGE → EN_ATENCION → ATENDIDA.
+     *
+     * Esto mantiene la integridad del flujo de atención.
+     */
     @Auditable(entidad = "CITA", accion = "CAMBIAR_ESTADO")
     public CitaDTO cambiarEstado(Long idCita, EstadoCita nuevoEstado) {
         Cita c = obtener(idCita);
@@ -212,11 +262,17 @@ public class CitaService {
         return toDTO(citaRepository.save(c));
     }
 
+    /** Atajo para cancelar una cita. Solo si la transición es válida. */
     @Auditable(entidad = "CITA", accion = "CANCELAR")
     public CitaDTO cancelar(Long idCita) {
         return cambiarEstado(idCita, EstadoCita.CANCELADA);
     }
 
+    /**
+     * Confirma el pago de una cita.
+     * La cita pasa de PROGRAMADA a CONFIRMADA.
+     * Solo se puede hacer si la cita está PROGRAMADA (recién creada, sin pagar).
+     */
     @Auditable(entidad = "CITA", accion = "CONFIRMAR_PAGO")
     public CitaDTO confirmarPago(Long idCita) {
         Cita c = obtenerEntidad(idCita);
@@ -227,6 +283,14 @@ public class CitaService {
         return toDTO(citaRepository.save(c));
     }
 
+    /**
+     * Check-in del paciente en recepción.
+     * Cuando el paciente llega a la clínica, recepción registra su check-in
+     * y la cita pasa a EN_TRIAGE (para que enfermería lo atienda).
+     *
+     * Si el paciente no hace check-in a tiempo, el scheduler lo marca
+     * como NO_ASISTIO automáticamente.
+     */
     @Auditable(entidad = "CITA", accion = "CHECKIN")
     public CitaDTO checkin(Long idCita) {
         Cita c = obtenerEntidad(idCita);
@@ -241,6 +305,11 @@ public class CitaService {
         return toDTO(citaRepository.save(c));
     }
 
+    /**
+     * Finaliza la atención médica.
+     * El médico marca la cita como ATENDIDA cuando termina de atender al paciente.
+     * Solo puede hacerse si la cita está EN_ATENCION.
+     */
     @Auditable(entidad = "CITA", accion = "FINALIZAR")
     public CitaDTO finalizar(Long idCita) {
         Cita c = obtenerEntidad(idCita);
