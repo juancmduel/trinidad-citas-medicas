@@ -1,32 +1,43 @@
 package com.trinidad.citas.controller.web;
 
+import java.security.Principal;
+import java.time.LocalDate;
+import java.time.YearMonth;
+import java.time.format.TextStyle;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import org.springframework.context.annotation.Profile;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
 import com.trinidad.citas.dto.CitaDTO;
 import com.trinidad.citas.exception.ResourceNotFoundException;
 import com.trinidad.citas.repository.CitaRepository;
+import com.trinidad.citas.repository.MedicoRepository;
 import com.trinidad.citas.repository.PagoRepository;
 import com.trinidad.citas.service.CitaService;
 import com.trinidad.citas.service.EspecialidadService;
 import com.trinidad.citas.service.MedicoService;
 import com.trinidad.citas.service.PacienteService;
+
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
-import java.security.Principal;
-import java.time.LocalDate;
-import java.time.YearMonth;
-import java.time.format.TextStyle;
-import java.util.*;
-import java.util.stream.Collectors;
-
-import com.trinidad.citas.repository.MedicoRepository;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 
 @Profile({"web", "default"})
 @Controller
