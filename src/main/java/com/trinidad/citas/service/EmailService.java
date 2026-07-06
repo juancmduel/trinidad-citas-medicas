@@ -1,11 +1,14 @@
 package com.trinidad.citas.service;
 
 import com.google.zxing.BarcodeFormat;
+import com.google.zxing.EncodeHintType;
 import com.google.zxing.client.j2se.MatrixToImageConfig;
 import com.google.zxing.client.j2se.MatrixToImageWriter;
 import com.google.zxing.common.BitMatrix;
+import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
 import com.google.zxing.qrcode.QRCodeWriter;
 import com.trinidad.citas.model.Cita;
+import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,6 +19,9 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayOutputStream;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -47,7 +53,16 @@ public class EmailService {
         String html = plantillaConfirmacion(nombreCompleto, medico, especialidad, nroCita,
             cita.getFechaCita().toString(), cita.getHoraInicio(), cita.getEstado().toString());
 
-        enviarHtml(pacienteEmail, "✅ Confirmación de Cita Médica – Trinidad Salud", html, qrContenido);
+        String textoPlano = "Confirmacion de cita medica\n"
+            + "Paciente: " + nombreCompleto + "\n"
+            + "Medico: " + medico + "\n"
+            + "Especialidad: " + especialidad + "\n"
+            + "Nro. cita: " + nroCita + "\n"
+            + "Fecha: " + cita.getFechaCita() + "\n"
+            + "Hora: " + cita.getHoraInicio() + "\n"
+            + "Estado: " + cita.getEstado() + "\n";
+
+        enviarHtml(pacienteEmail, "Trinidad Salud: Confirmacion de cita", html, textoPlano, qrContenido);
     }
 
     public void enviarRecordatorio(Cita cita) {
@@ -67,7 +82,14 @@ public class EmailService {
         String html = plantillaRecordatorio(nombreCompleto, medico, nroCita,
             cita.getFechaCita().toString(), cita.getHoraInicio());
 
-        enviarHtml(pacienteEmail, "🔔 Recordatorio: Cita Mañana – Trinidad Salud", html, qrContenido);
+        String textoPlano = "Recordatorio de cita\n"
+            + "Paciente: " + nombreCompleto + "\n"
+            + "Medico: " + medico + "\n"
+            + "Nro. cita: " + nroCita + "\n"
+            + "Fecha: " + cita.getFechaCita() + "\n"
+            + "Hora: " + cita.getHoraInicio() + "\n";
+
+        enviarHtml(pacienteEmail, "Trinidad Salud: Recordatorio de cita", html, textoPlano, qrContenido);
     }
 
     public void enviarRecuperacionPassword(String destino, String nombre, String link) {
@@ -109,9 +131,9 @@ public class EmailService {
         try {
             MimeMessage mensaje = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(mensaje, true, "UTF-8");
-            helper.setFrom("\"Trinidad Salud 🏥\" <" + fromEmail + ">");
+            helper.setFrom("\"Trinidad Salud\" <" + fromEmail + ">");
             helper.setTo(destino);
-            helper.setSubject("Recuperacion de Contrasena – Trinidad Salud");
+            helper.setSubject("Recuperacion de contrasena - Trinidad Salud");
             helper.setText(html, true);
             mailSender.send(mensaje);
             log.info("[EMAIL] Recuperacion enviada a {}", destino);
@@ -122,34 +144,34 @@ public class EmailService {
 
     private String plantillaConfirmacion(String nombre, String medico, String especialidad,
                                           String nroCita, String fecha, String hora, String estado) {
-        return baseHtml("✅ Cita Confirmada",
+        return baseHtml("Cita Confirmada",
             "<p style='margin:0 0 8px;font-size:18px;font-weight:700;color:#0f172a;'>"
             + "Estimado/a <span style='color:#0e7490;'>" + nombre + "</span>,</p>"
             + "<p style='margin:0 0 24px;font-size:15px;color:#475569;line-height:1.7;'>"
             + "Su cita médica ha sido <strong style='color:#0e7490;'>registrada y confirmada</strong> "
             + "exitosamente. A continuación los detalles de su atención:</p>"
             + tablaDetalle(
-                fila("📅 Fecha",        fecha),
-                fila("⏰ Hora",         hora),
-                fila("👨‍⚕️ Médico",     medico),
-                fila("🏥 Especialidad", especialidad),
-                fila("📋 Estado",       estado),
-                filaDestacada("🪪 N° Cita", nroCita)
+                                fila("Fecha",        fecha),
+                                fila("Hora",         hora),
+                                fila("Medico",       medico),
+                                fila("Especialidad", especialidad),
+                                fila("Estado",       estado),
+                                filaDestacada("Nro. Cita", nroCita)
               ));
     }
 
     private String plantillaRecordatorio(String nombre, String medico,
                                           String nroCita, String fecha, String hora) {
-        return baseHtml("🔔 Recordatorio de Cita",
+        return baseHtml("Recordatorio de Cita",
             "<p style='margin:0 0 8px;font-size:18px;font-weight:700;color:#0f172a;'>"
             + "Estimado/a <span style='color:#0e7490;'>" + nombre + "</span>,</p>"
             + "<p style='margin:0 0 24px;font-size:15px;color:#475569;line-height:1.7;'>"
             + "Le recordamos que <strong>mañana</strong> tiene una cita médica programada:</p>"
             + tablaDetalle(
-                fila("📅 Fecha",    fecha),
-                fila("⏰ Hora",     hora),
-                fila("👨‍⚕️ Médico", medico),
-                filaDestacada("🪪 N° Cita", nroCita)
+                                fila("Fecha",    fecha),
+                                fila("Hora",     hora),
+                                fila("Medico",   medico),
+                                filaDestacada("Nro. Cita", nroCita)
               ));
     }
 
@@ -192,7 +214,7 @@ public class EmailService {
             + "<table width='100%' cellpadding='0' cellspacing='0' "
             + "style='background:#fffbeb;border-left:4px solid #f59e0b;border-radius:0 8px 8px 0;'>"
             + "<tr><td style='padding:16px 20px;'>"
-            + "<p style='margin:0 0 10px;font-size:13px;font-weight:700;color:#92400e;'>⚠️ Instrucciones importantes</p>"
+            + "<p style='margin:0 0 10px;font-size:13px;font-weight:700;color:#92400e;'>Instrucciones importantes</p>"
             + "<ul style='margin:0;padding-left:18px;color:#78350f;font-size:13px;line-height:1.9;'>"
             + "<li>Preséntese <strong>10 minutos antes</strong> de su cita en recepción.</li>"
             + "<li>Traiga su <strong>DNI o documento de identidad</strong> original.</li>"
@@ -219,7 +241,7 @@ public class EmailService {
             + "<tr style='background:#0e7490;'>"
             + "<td colspan='2' style='padding:12px 20px;'>"
             + "<p style='margin:0;color:#fff;font-size:12px;font-weight:700;letter-spacing:1px;"
-            + "text-transform:uppercase;'>📋 Información de la Cita</p>"
+            + "text-transform:uppercase;'>Informacion de la Cita</p>"
             + "</td></tr>");
         for (String fila : filas) sb.append(fila);
         sb.append("</table>");
@@ -244,16 +266,20 @@ public class EmailService {
             + "</tr>";
     }
 
-    private void enviarHtml(String destino, String asunto, String htmlBody, String qrContenido) {
+    private void enviarHtml(String destino, String asunto, String htmlBody, String plainTextBody, String qrContenido) {
         try {
-            byte[] qrBytes = generarQR(qrContenido, 200);
+            byte[] qrBytes = generarQR(qrContenido, 320);
             MimeMessage mensaje = mailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(mensaje, true, "UTF-8");
-            helper.setFrom("\"Trinidad Salud 🏥\" <" + fromEmail + ">");
+            MimeMessageHelper helper = new MimeMessageHelper(mensaje, MimeMessageHelper.MULTIPART_MODE_RELATED, "UTF-8");
+            helper.setFrom(new InternetAddress(fromEmail, "Trinidad Salud"));
             helper.setTo(destino);
+            helper.setReplyTo(fromEmail);
             helper.setSubject(asunto);
-            helper.setText(htmlBody, true);
+            helper.setText(plainTextBody + "\nCodigo de cita: " + qrContenido, htmlBody);
             helper.addInline("qr-cita", new ByteArrayResource(qrBytes), "image/png");
+            mensaje.setSentDate(new Date());
+            mensaje.addHeader("X-Auto-Response-Suppress", "All");
+            mensaje.addHeader("Auto-Submitted", "auto-generated");
             mailSender.send(mensaje);
             log.info("[EMAIL] Enviado exitosamente a {} | Asunto: {} | Remitente: {}", destino, asunto, fromEmail);
         } catch (Exception e) {
@@ -263,8 +289,13 @@ public class EmailService {
 
     private byte[] generarQR(String contenido, int tamanio) throws Exception {
         QRCodeWriter writer = new QRCodeWriter();
-        BitMatrix matrix = writer.encode(contenido, BarcodeFormat.QR_CODE, tamanio, tamanio);
-        MatrixToImageConfig config = new MatrixToImageConfig(0xFF0E7490, 0xFFFFFFFF); // azul y blanco
+        Map<EncodeHintType, Object> hints = new HashMap<>();
+        hints.put(EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.H);
+        hints.put(EncodeHintType.CHARACTER_SET, "UTF-8");
+        hints.put(EncodeHintType.MARGIN, 1);
+        BitMatrix matrix = writer.encode(contenido, BarcodeFormat.QR_CODE, tamanio, tamanio, hints);
+        // Negro sobre blanco maximiza legibilidad en clientes que recomprimen imágenes.
+        MatrixToImageConfig config = new MatrixToImageConfig(0xFF000000, 0xFFFFFFFF);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         MatrixToImageWriter.writeToStream(matrix, "PNG", baos, config);
         return baos.toByteArray();

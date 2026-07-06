@@ -2,6 +2,7 @@ package com.trinidad.citas.controller.web;
 
 import org.springframework.context.annotation.Profile;
 import com.trinidad.citas.dto.CitaDTO;
+import com.trinidad.citas.exception.ResourceNotFoundException;
 import com.trinidad.citas.repository.CitaRepository;
 import com.trinidad.citas.repository.PagoRepository;
 import com.trinidad.citas.service.CitaService;
@@ -147,10 +148,15 @@ public class CitaWebController {
     }
 
     @GetMapping("/{id}")
-    public String detalle(@PathVariable Long id, Model model) {
-        model.addAttribute("cita", citaService.obtener(id));
-        model.addAttribute("pago", pagoRepository.findByCita_IdCita(id).orElse(null));
-        return "citas/detalle";
+    public String detalle(@PathVariable Long id, Model model, RedirectAttributes ra) {
+        try {
+            model.addAttribute("cita", citaService.obtener(id));
+            model.addAttribute("pago", pagoRepository.findByCita_IdCita(id).orElse(null));
+            return "citas/detalle";
+        } catch (ResourceNotFoundException ex) {
+            ra.addFlashAttribute("error", ex.getMessage());
+            return "redirect:/citas";
+        }
     }
 
     @PostMapping("/agendar")
@@ -188,9 +194,13 @@ public class CitaWebController {
 
     @GetMapping("/{id}/checkin")
     public String checkinForm(@PathVariable Long id, Model model) {
-        model.addAttribute("cita", citaService.obtener(id));
-        model.addAttribute("pago", pagoRepository.findByCita_IdCita(id).orElse(null));
-        return "citas/checkin";
+        try {
+            model.addAttribute("cita", citaService.obtener(id));
+            model.addAttribute("pago", pagoRepository.findByCita_IdCita(id).orElse(null));
+            return "citas/checkin";
+        } catch (ResourceNotFoundException ex) {
+            return "redirect:/citas";
+        }
     }
 
     @PostMapping("/{id}/checkin")
