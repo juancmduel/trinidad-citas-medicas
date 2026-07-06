@@ -1,104 +1,219 @@
-# Trinidad Citas Médicas
+# 🏥 Trinidad Citas Médicas
 
-Sistema Integral de Gestión de Citas Médicas desarrollado para **Trinidad y Especialidades Médicas S.A.C.**
+Sistema integral de gestión de citas médicas desarrollado para **Trinidad y Especialidades Médicas S.A.C.**
 
-El sistema permite gestionar todo el flujo de atención médica: desde la programación de horarios de los médicos, pasando por la reserva de citas de los pacientes, hasta el registro del pago, la atención en consultorio, el diagnóstico (basado en CIE-10) y la generación de la receta médica. 
+El sistema cubre todo el flujo de atención: desde que el paciente agenda su cita por web, recibe un correo de confirmación con código QR, hasta que es atendido por el médico, recibe su diagnóstico (CIE-10), receta electrónica y órdenes de examen. Incluye recordatorios automáticos por correo, triaje, pagos, reportes gerenciales y más.
 
-## 🛠️ Tecnologías Utilizadas
+---
 
-- **Backend**: Java 17, Spring Boot 3.2.5
-- **Persistencia**: Spring Data JPA, Hibernate, Microsoft SQL Server
-- **Seguridad**: Spring Security 6, JWT (JSON Web Tokens) para API, Session Cookie para vistas MVC
-- **Frontend (UI)**: Thymeleaf, Bootstrap 5 (WebJars), HTML5, CSS3 Nativo (Variables CSS, Soporte Light/Dark Theme)
-- **Construcción**: Maven (`mvn` / `mvnd`)
-- **Librerías Adicionales**: Lombok, ZXing (Código QR), JJWT
+## ✨ Funcionalidades
 
-## ✨ Características Principales
+| Módulo | Descripción |
+|---|---|
+| **Citas Médicas** | Agenda, confirma, cancela y reprograma citas. Validación de horarios disponibles. |
+| **Portal Paciente** | Los pacientes se registran, agendan sus citas y ven su historial. |
+| **Triaje** | Enfermería registra signos vitales y nivel de urgencia. |
+| **Atención Médica** | El médico registra diagnóstico, tratamiento, recetas y órdenes. |
+| **Recetas Digitales** | Receta electrónica con medicamentos, dosis y duración. |
+| **Pagos** | Registro de pagos en efectivo, tarjeta, Yape, Plin, transferencia. |
+| **Reportes** | Dashboards con estadísticas de citas, ingresos, inasistencias. |
+| **Correos Automáticos** | Confirmación al agendar, recordatorio 24h antes, recuperación de contraseña. |
+| **Código QR** | Cada cita genera un QR que el paciente muestra en recepción. |
+| **Seguridad** | JWT para API, sesiones para web, roles granulares, bloqueo por intentos fallidos. |
+| **Modo Oscuro** | Tema claro/oscuro con persistencia en localStorage. |
+| **Auditoría** | Registro de cada acción importante del sistema. |
 
-*   **Arquitectura Limpia**: Separación en capas (Controllers, Services, Repositories, DTOs).
-*   **Diseño Visual Moderno**: Sistema de estilos basado en clases de utilidad y componentes (Glassmorphism, Dark Mode, Cards) a través de `system.css` y `trinidad.css`.
-*   **Sistema de Seguridad Robusto**:
-    *   Soporte híbrido de autenticación (JWT para REST APIs y Cookies para la plataforma Web).
-    *   Control de accesos basado en Roles: `ADMINISTRADOR`, `GERENTE`, `MEDICO`, `RECEPCIONISTA` y `PACIENTE`.
-    *   Mecanismo de **bloqueo automático** de cuentas de usuario tras 5 intentos fallidos de inicio de sesión en un lapso de 30 minutos, incluyendo auditoría detallada de los intentos.
-*   **Módulos del Sistema**:
-    *   Gestión de Usuarios, Roles y Auditoría de Seguridad.
-    *   Mantenimiento de Médicos, Especialidades y Horarios.
-    *   Gestión de Pacientes.
-    *   Reserva y confirmación de Citas Médicas.
-    *   Módulo de Caja/Pagos.
-    *   Módulo de Atención Médica, Diagnósticos CIE-10 y Recetas.
+---
 
-## ⚙️ Requisitos Previos
+## 🛠️ Tecnologías
 
-*   [Java Development Kit (JDK) 17](https://adoptium.net/)
-*   [Apache Maven](https://maven.apache.org/) o [Maven Daemon (mvnd)](https://github.com/apache/maven-mvnd)
-*   Microsoft SQL Server (Local o Remoto)
+| Capa | Tecnología |
+|---|---|
+| **Backend** | Java 21+, Spring Boot 3.2.6, Spring Security 6, Spring Data JPA |
+| **Base de datos** | SQL Server (principal), Oracle 21c XE, H2 (desarrollo) |
+| **Frontend** | Thymeleaf, Bootstrap 5, CSS nativo con variables, modo oscuro |
+| **API** | REST con JWT (jjwt), documentación OpenAPI/Swagger |
+| **Construcción** | Maven + Wrapper (mvnw.cmd) |
+| **Correo** | Spring Mail + Gmail SMTP, HTML responsivo, códigos QR (ZXing) |
+| **Extras** | Lombok, BCrypt, ZXing, Jackson, HikariCP |
 
-## 🚀 Instalación y Configuración
+---
 
-### 1. Preparar la Base de Datos
+## ⚙️ Requisitos
 
-El proyecto **no delega** la creación del esquema completo a Hibernate por motivos de optimización y uso de características específicas del motor (como Secuencias y Constraints). 
+- **Java** 21 o superior (probado con Java 25)
+- **Maven** 3.9+ (o usa el wrapper `.\mvnw.cmd`)
+- **SQL Server** (o alternativamente Oracle / H2)
 
-Antes de levantar el proyecto, debes crear la base de datos y ejecutar los scripts SQL proporcionados.
-Abre SSMS (SQL Server Management Studio) o usa `sqlcmd` y ejecuta:
+---
 
-1.  Crea la base de datos: `CREATE DATABASE clinica_trinidad;`
-2.  Ejecuta el script de estructura: `src/main/resources/db/sqlserver/01_schema.sql`
-3.  Ejecuta el script de datos semilla: `src/main/resources/db/sqlserver/02_seed.sql`
+## 🚀 Instalación Rápida
 
-### 2. Configurar Variables de Entorno
+### 1. Clonar y preparar variables de entorno
 
-El sistema requiere variables de entorno por seguridad, para no exponer credenciales en el código fuente:
+Copia el archivo `.env` (ya incluido en el proyecto) y ajústalo:
 
-*   `DB_PASSWORD`: La contraseña del usuario `sa` de tu SQL Server local.
-*   `JWT_SECRET`: Una cadena de texto larga (al menos 32 caracteres) utilizada para firmar los tokens JWT.
-
-### 3. Levantar la Aplicación
-
-Abre tu terminal en la raíz del proyecto y ejecuta el siguiente comando (sustituye las variables de ejemplo por las tuyas):
-
-**En Windows (CMD):**
-```cmd
-set DB_PASSWORD="su password"&& mvnd spring-boot:run
+```ini
+DB_PASSWORD=TuPasswordDeSQLServer
+MAIL_USERNAME=tu-correo@gmail.com
+MAIL_PASSWORD=tu-contraseña-de-aplicacion
+JWT_SECRET=openssl rand -base64 32  # genera una clave de 32 bytes
+TRINIDAD_SEED_USER_PASSWORD=Trinidad2026
+CORS_ALLOWED_ORIGINS=
 ```
 
-**En Windows (PowerShell):**
+> ⚠️ Para Gmail necesitas una **Contraseña de Aplicación** (no tu contraseña normal). Se genera en: https://myaccount.google.com/apppasswords
+
+### 2. Preparar la base de datos
+
+Ejecuta en **SSMS** o **sqlcmd** en este orden:
+
+```sql
+CREATE DATABASE clinica_trinidad;
+```
+
+Luego ejecuta los scripts:
+1. `src/main/resources/db/sqlserver/01_schema.sql` → crea 21 tablas + secuencias
+2. `src/main/resources/db/sqlserver/02_seed.sql` → carga datos de prueba
+
+### 3. Levantar el proyecto
+
 ```powershell
-$env:DB_PASSWORD="su password"; mvnd spring-boot:run
+.\run.ps1
 ```
 
-### 4. Acceder al Sistema
+Esto carga automáticamente las variables del `.env` y ejecuta `mvnw.cmd spring-boot:run`.
 
-Una vez la aplicación esté corriendo, abre tu navegador en:
-`http://localhost:8081/trinidad`
+### 4. Acceder
 
-## 🔑 Credenciales por Defecto (Seed Data)
+| Recurso | URL |
+|---|---|
+| **Web App** | http://localhost:8081/trinidad |
+| **Login** | http://localhost:8081/trinidad/login |
+| **API Swagger** | http://localhost:8081/trinidad/swagger-ui.html |
+| **H2 Console** | http://localhost:8081/trinidad/h2-console |
 
-Tras ejecutar `02_seed.sql`, se crean los siguientes usuarios de prueba (La contraseña para **todos** es `Trinidad2026`):
+---
 
-| Usuario | Rol | Descripción |
-| :--- | :--- | :--- |
-| `admin` | ADMINISTRADOR | Acceso total al sistema, auditorías, configuración. |
-| `gerente` | GERENTE | Dashboards y reportes gerenciales. |
-| `medico1` | MEDICO | Atenciones, recetas, historial clínico (Cardiología). |
-| `recepcion` | RECEPCIONISTA | Gestión de citas y cobros. |
-| `paciente1` | PACIENTE | Acceso al portal de pacientes. |
+## 🔑 Usuarios de Prueba (seed data)
+
+| Usuario | Contraseña | Rol |
+|---|---|---|
+| `admin` | `Trinidad2026` | ADMINISTRADOR |
+| `gerente` | `Trinidad2026` | GERENTE |
+| `recepcion` | `Trinidad2026` | RECEPCIONISTA |
+| `enfermera` | `Trinidad2026` | ENFERMERA |
+| `dr.garcia` | `Trinidad2026` | MEDICO (Medicina General) |
+| `dra.lopez` | `Trinidad2026` | MEDICO (Pediatría) |
+| `paciente1` | `Trinidad2026` | PACIENTE |
+
+La contraseña se define desde la variable de entorno `TRINIDAD_SEED_USER_PASSWORD`.
+
+---
+
+## 🌐 Perfiles de Base de Datos
+
+El proyecto soporta 3 perfiles intercambiables:
+
+| Perfil | BD | Cómo activarlo |
+|---|---|---|
+| **sqlserver** ✅ (default) | SQL Server | `spring.profiles.active=sqlserver,api,web` |
+| **oracle** | Oracle 21c XE | `spring.profiles.active=oracle,api,web` |
+| **dev** | H2 (archivo local) | `spring.profiles.active=dev,api,web` |
+
+Para cambiar de perfil, edita `application.properties` línea 18.
+
+---
+
+## 📧 Sistema de Correos
+
+| Tipo | Cuándo se envía | Método |
+|---|---|---|
+| **Confirmación de cita** | Al agendar | `EmailService.enviarConfirmacionCita()` |
+| **Recordatorio 24h** | Diario a las 8:00 AM | `CitaScheduler` (cron) |
+| **Recuperación de contraseña** | Al solicitar "Olvidé mi contraseña" | `PasswordResetService` |
+
+Los correos incluyen diseño HTML responsivo con la imagen de Trinidad Salud y código QR.
+
+---
+
+## 🔒 Seguridad
+
+- **Bloqueo de cuentas**: 5 intentos fallidos en 30 minutos → la cuenta se bloquea automáticamente
+- **Desbloqueo**: Un administrador puede desbloquear desde `Usuarios → 🔓` o el usuario se desbloquea solo al iniciar sesión correctamente
+- **Contraseñas**: encriptadas con BCrypt (fuerza 10)
+- **JWT**: tokens firmados con HMAC-SHA256, expiran en 1 hora (refresh en 24h)
+- **CORS**: configurable desde variable de entorno
+- **Rate limiting**: filtro que limita peticiones a la API
+- **Auditoría**: cada login (exitoso o fallido) se registra en `INTENTO_LOGIN`
+
+---
 
 ## 🏗️ Estructura del Proyecto
 
-*   `/src/main/java/com/trinidad/citas/`
-    *   `config/`: Configuraciones de Spring Security, JWT, Web MVC.
-    *   `controller/`: 
-        *   `api/`: Controladores REST (Retornan JSON).
-        *   `web/`: Controladores Spring MVC (Retornan Vistas Thymeleaf).
-    *   `dto/`: Data Transfer Objects para envío/recepción de datos limpios a las vistas.
-    *   `exception/`: Manejo global de excepciones (`@ControllerAdvice`).
-    *   `model/`: Entidades JPA.
-    *   `repository/`: Interfaces de Spring Data JPA.
-    *   `service/`: Capa de lógica de negocio transaccional.
-*   `/src/main/resources/`
-    *   `db/sqlserver/`: Scripts SQL de migración y seed.
-    *   `static/css/`: Hojas de estilo modernas (`system.css`, `trinidad.css`, `login.css`, `landing.css`).
-    *   `templates/`: Vistas de Thymeleaf organizadas por módulos.
+```
+trinidad-citas-medicas/
+├── run.ps1                          # Script para levantar con variables de entorno
+├── .env                              # Variables de entorno locales
+├── pom.xml
+└── src/
+    ├── main/
+    │   ├── java/com/trinidad/citas/
+    │   │   ├── TrinidadCitasApplication.java
+    │   │   ├── audit/                # Anotación @Auditable + aspecto
+    │   │   ├── config/               # Security, JWT, CORS, DataInitializer
+    │   │   ├── controller/
+    │   │   │   ├── api/              # 23 controladores REST (JSON)
+    │   │   │   └── web/              # Controladores MVC (Thymeleaf)
+    │   │   ├── dto/                  # Data Transfer Objects
+    │   │   ├── exception/            # Manejador global de errores
+    │   │   ├── model/                # 22 entidades JPA
+    │   │   ├── repository/           # 21 repositorios Spring Data
+    │   │   ├── scheduler/            # Tareas programadas (recordatorios)
+    │   │   ├── security/             # UserPrincipal, RateLimitingFilter
+    │   │   ├── service/              # 27 servicios de negocio
+    │   │   └── validation/           # Validaciones personalizadas
+    │   └── resources/
+    │       ├── application.properties
+    │       ├── application-{perfil}.properties
+    │       ├── db/
+    │       │   ├── sqlserver/        # Schema + seed para SQL Server
+    │       │   ├── oracle/           # Schema + seed para Oracle
+    │       │   └── h2/               # Schema + seed para H2
+    │       ├── static/
+    │       │   ├── css/              # system.css, trinidad.css, login.css
+    │       │   └── js/               # login-bg.js
+    │       └── templates/
+    │           ├── auth/             # login, registro, olvide-password
+    │           ├── portal/           # Portal del paciente
+    │           └── ...               # Vistas por módulo
+    └── test/
+        └── java/com/trinidad/citas/
+            ├── controller/           # Tests de controladores
+            └── service/              # Tests de servicios
+```
+
+---
+
+## 📋 Estados de una Cita
+
+```
+PROGRAMADA → CONFIRMADA → EN_TRIAGE → EN_ATENCION → ATENDIDA
+                                  ↘            ↘
+                                  CANCELADA    NO_ASISTIO
+```
+
+---
+
+## 🐳 Perfiles Disponibles para Arranque Rápido
+
+```powershell
+# SQL Server (default)
+.\run.ps1
+
+# Con Maven wrapper directamente:
+.\mvnw.cmd spring-boot:run
+
+# Con perfil específico:
+.\mvnw.cmd spring-boot:run -Dspring-boot.run.profiles=dev,api,web
+```
