@@ -45,69 +45,8 @@ Thumbs.db
 *.trace.db
 *.lock.db
 
-### Local overrides (credentials no compartidos) ###
-application-local.properties
-application-local.yml
-.env
-
-### Cookies de sesión ###
-*cookies.txt
-
-### Documentos y Carpetas externas/temporales ###
-documento/
-pipeline-output/
-TEST-SUMMARY.md
-HELP.md
-target/
-!.mvn/wrapper/maven-wrapper.jar
-!**/src/main/**/target/
-!**/src/test/**/target/
-
-### STS ###
-.apt_generated
-.classpath
-.factorypath
-.project
-.settings
-.springBeans
-.sts4-cache
-
-### IntelliJ IDEA ###
-.idea
-*.iws
-*.iml
-*.ipr
-
-### NetBeans ###
-/nbproject/private/
-/nbbuild/
-/dist/
-/nbdist/
-/.nb-gradle/
-build/
-!**/src/main/**/build/
-!**/src/test/**/build/
-
-### VS Code ###
-.vscode/
-
-### Logs ###
-logs/
-*.log
-
-### OS ###
-.DS_Store
-Thumbs.db
-
-### H2 (DB local) ###
-*.db
-*.trace.db
-*.lock.db
-
-### Local overrides (credentials no compartidos) ###
-application-local.properties
-application-local.yml
-.env
+### Configuración de aplicación (local, no compartida) ###
+application*.properties
 
 ### Cookies de sesión ###
 *cookies.txt
