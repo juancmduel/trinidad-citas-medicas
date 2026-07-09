@@ -53,7 +53,7 @@ public class OpenApiConfig {
                     .url("https://trinidadtarapoto.com")))
             .servers(List.of(
                 new Server()
-                    .url("http://localhost:8081" + contextPath)
+                    .url("http://localhost:8070" + contextPath)
                     .description("Servidor local de desarrollo"),
                 new Server()
                     .url("https://api.trinidadtarapoto.com" + contextPath)

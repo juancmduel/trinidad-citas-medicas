@@ -88,10 +88,10 @@ Esto carga automáticamente las variables del `.env` y ejecuta `mvnw.cmd spring-
 
 | Recurso | URL |
 |---|---|
-| **Web App** | http://localhost:8081/trinidad |
-| **Login** | http://localhost:8081/trinidad/login |
-| **API Swagger** | http://localhost:8081/trinidad/swagger-ui.html |
-| **H2 Console** | http://localhost:8081/trinidad/h2-console |
+| **Web App** | http://localhost:8070/trinidad |
+| **Login** | http://localhost:8070/trinidad/login |
+| **API Swagger** | http://localhost:8070/trinidad/swagger-ui.html |
+| **H2 Console** | http://localhost:8070/trinidad/h2-console |
 
 ---
 
